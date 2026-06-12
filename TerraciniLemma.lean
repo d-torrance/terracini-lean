@@ -3,6 +3,7 @@ import Mathlib.Analysis.Calculus.FDeriv.Add
 import Mathlib.Analysis.Calculus.FDeriv.Comp
 import Mathlib.Analysis.Calculus.FDeriv.Linear
 import Mathlib.LinearAlgebra.Span.Basic
+import Mathlib.LinearAlgebra.FiniteDimensional.Basic
 
 /-!
 # Terracini's Lemma
@@ -285,10 +286,16 @@ We now state and prove Terracini's Lemma. The theorem has two parts:
 combined parametrization Φ(u) = ∑ᵢ chartᵢ(uᵢ) at the product base point
 has image ∑ᵢ Im(tangentᵢ) = ∑ᵢ T_{vᵢ}X̂.
 
-**(B) Generic smoothness** (assumed as a hypothesis, marked `sorry` inside):
-The tangent space to σᵣ(X̂) at ∑ᵢ vᵢ is contained in the image of dΦ.
+**(B) Generic smoothness** (assumed as a hypothesis): The image of dΦ is
+contained in the tangent space T to σᵣ(X̂) at ∑ᵢ vᵢ (`hdominant`, easy), and
+dim T ≤ dim Im(dΦ) (`hgeneric`). The latter is a dimension count — in
+practice obtained from a Jacobian-rank computation — and is the precise
+content of generic smoothness in characteristic zero: at a general point,
+the differential of a dominant map has rank equal to the dimension of the
+target.
 
-The combination gives T_{∑vᵢ} σᵣ(X̂) = ∑ᵢ T_{vᵢ}X̂.
+Together, `Im(dΦ) ≤ T` and `dim T ≤ dim Im(dΦ)` force `Im(dΦ) = T`, so the
+combination gives T_{∑vᵢ} σᵣ(X̂) = ∑ᵢ T_{vᵢ}X̂.
 -/
 
 section TerraciniLemma
@@ -317,30 +324,31 @@ def combinedDerivative {r : ℕ} {X : Set E} {v : Fin r → E}
     `T` be the Zariski tangent space to σᵣ(X̂) at ∑ vᵢ.
 
     The proof combines:
-    - **Generic smoothness** (`hgeneric`): T ≤ Im(dΦ)     [algebraic geometry]
     - **Dominance** (`hdominant`): Im(dΦ) ≤ T              [because Φ maps into σᵣ(X̂)]
-    - **Terracini computation** (proved): Im(dΦ) = ⊔ Im(Dfᵢ)
+    - **Generic smoothness** (`hgeneric`): dim T ≤ dim Im(dΦ)  [Jacobian-rank count]
+    - **Terracini computation** (proved): Im(dΦ) = ⨆ Im(Dfᵢ)
 
-    Together these give T = ⊔ Im(Dfᵢ) = T_{v₁}X̂ + ⋯ + T_{vᵣ}X̂. -/
-theorem terraciniLemma {r : ℕ} {X : Set E}
+    Together these give T = Im(dΦ) = ⨆ Im(Dfᵢ) = T_{v₁}X̂ + ⋯ + T_{vᵣ}X̂. -/
+theorem terraciniLemma {r : ℕ} {X : Set E} [FiniteDimensional 𝕜 E]
     (v     : Fin r → E)
     (_hv   : ∀ i, v i ∈ X)
     (param : ∀ i, LocalParam (𝕜 := 𝕜) (𝔸 := 𝔸) X (v i))
     -- T is the Zariski tangent space to σᵣ(X̂) at ∑ vᵢ
     (T : Submodule 𝕜 E)
-    -- Generic smoothness: T is contained in the image of the combined derivative.
-    -- This encodes the fact that a dominant map in characteristic zero has
-    -- surjective differential at general points.
-    (hgeneric : T ≤ LinearMap.range (combinedDerivative (v := v) param).toLinearMap)
     -- Dominance: the combined derivative maps into the tangent space of σᵣ(X̂),
     -- because Φ itself maps into σᵣ(X̂) (as a sum of r points from X̂).
-    (hdominant : LinearMap.range (combinedDerivative (v := v) param).toLinearMap ≤ T) :
+    (hdominant : LinearMap.range (combinedDerivative (v := v) param).toLinearMap ≤ T)
+    -- Generic smoothness, as a dimension count: dim T ≤ dim Im(dΦ). Together
+    -- with hdominant (which gives dim Im(dΦ) ≤ dim T automatically), the two
+    -- dimensions must agree, forcing the submodules to coincide.
+    (hgeneric : Module.finrank 𝕜 T ≤
+        Module.finrank 𝕜 (LinearMap.range (combinedDerivative (v := v) param).toLinearMap)) :
     -- Conclusion: T equals the sum of the individual tangent spaces.
     T = ⨆ i : Fin r, (param i).tangentSpace := by
-  -- Since T ≤ Im(dΦ) ≤ T, we have T = Im(dΦ).
+  -- Since Im(dΦ) ≤ T and dim T ≤ dim Im(dΦ), the two submodules are equal.
   have heq : T = LinearMap.range (combinedDerivative (v := v) param).toLinearMap :=
-    le_antisymm hgeneric hdominant
-  -- And Im(dΦ) = ⊔ Im(Dfᵢ) by the Terracini computation.
+    (Submodule.eq_of_le_of_finrank_le hdominant hgeneric).symm
+  -- And Im(dΦ) = ⨆ Im(Dfᵢ) by the Terracini computation.
   rw [heq]
   exact range_combinedParam_eq_iSup (fun i => (param i).tangent)
 

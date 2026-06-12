@@ -32,7 +32,12 @@ The proof has two parts of very different character:
 | **A** | $d\Phi_{u^0} = \sum_i Df_i \circ \pi_i$, so $\operatorname{Im}(d\Phi) = T_{v_1}\hat X + \cdots + T_{v_r}\hat X$ | **Proved** (chain rule) |
 | **B** | $T_{\sum v_i}\,\hat\sigma_r(\hat X) = \operatorname{Im}(d\Phi)$ for general points | **Assumed** (generic smoothness) |
 
-Part A is a straightforward chain-rule calculation. Part B requires the *generic smoothness theorem*: a dominant morphism of smooth irreducible varieties in characteristic zero has surjective differential at general points. This theorem is not yet in Mathlib.
+Part A is a straightforward chain-rule calculation. Part B requires the *generic smoothness theorem*: a dominant morphism of smooth irreducible varieties in characteristic zero has surjective differential at general points. This theorem is not yet in Mathlib, so it is split into two hypotheses:
+
+- $\operatorname{Im}(d\Phi) \subseteq T$ (`hdominant`), which holds simply because $\Phi$ maps into $\hat\sigma_r(\hat X)$ — easy in any setting;
+- $\dim T \le \dim \operatorname{Im}(d\Phi)$ (`hgeneric`), a dimension count (in practice obtained from a Jacobian-rank computation), which is the actual content of generic smoothness in characteristic zero.
+
+Together these force $\operatorname{Im}(d\Phi) = T$ by a finite-dimensional submodule-equality lemma (`Submodule.eq_of_le_of_finrank_le`) — no containment in the "hard" direction needs to be assumed directly.
 
 ## File Overview
 
@@ -74,11 +79,11 @@ Models a smooth local parametrization of `X` at a point `x`, together with its d
 terraciniLemma          -- T = ⨆ tangentSpace (param i),  given hgeneric + hdominant
 terraciniLemma_derivative  -- HasFDerivAt of combined parametrization
 ```
-The main theorem takes two hypotheses that together encode generic smoothness:
-- `hgeneric : T ≤ Im(dΦ)` — the tangent space is contained in the image of $d\Phi$ (characteristic-zero input);
-- `hdominant : Im(dΦ) ≤ T` — the image of $d\Phi$ lands in the tangent space (because $\Phi$ maps into $\hat\sigma_r(\hat X)$).
+The main theorem (in finite dimension) takes two hypotheses that together encode generic smoothness:
+- `hdominant : Im(dΦ) ≤ T` — the image of $d\Phi$ lands in the tangent space (because $\Phi$ maps into $\hat\sigma_r(\hat X)$);
+- `hgeneric : finrank T ≤ finrank Im(dΦ)` — a dimension count (characteristic-zero, Jacobian-rank input).
 
-From these and Part A, the proof is immediate: $T = \operatorname{Im}(d\Phi) = \bigsqcup_i T_{v_i}\hat X$.
+From these, `Submodule.eq_of_le_of_finrank_le` gives $T = \operatorname{Im}(d\Phi)$, and Part A then gives $T = \bigsqcup_i T_{v_i}\hat X$.
 
 ### §6 — The projective formulation
 Sketch of how the affine cone result descends to the projective statement via `Mathlib.LinearAlgebra.Projectivization`. Not yet formalized.
