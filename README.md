@@ -47,9 +47,9 @@ The map $v \mapsto \sum_i v_i$ is continuous and $\mathbb{k}$-linear, hence its 
 ### §2 — The Terracini computation
 ```
 hasFDerivAt_combinedParam   -- dΦ = ∑ Dfᵢ ∘ πᵢ  (chain rule)
-range_combinedParam_eq_iSup -- Im(dΦ) = ⊔ Im(Dfᵢ)  (submodule algebra)
+range_combinedParam_eq_iSup -- Im(dΦ) = ⨆ Im(Dfᵢ)  (submodule algebra)
 ```
-The core result: the image of the derivative of $\Phi$ is exactly the sum of the individual tangent spaces. Both directions of the equality are addressed; one direction carries a `sorry` (see below).
+The core result: the image of the derivative of $\Phi$ is exactly the sum of the individual tangent spaces. Both directions of the equality are fully proved.
 
 ### §3 — Secant varieties
 ```
@@ -71,7 +71,7 @@ Models a smooth local parametrization of `X` at a point `x`, together with its d
 
 ### §5 — Terracini's Lemma
 ```
-terraciniLemma          -- T = ⊔ tangentSpace (param i),  given hgeneric + hdominant
+terraciniLemma          -- T = ⨆ tangentSpace (param i),  given hgeneric + hdominant
 terraciniLemma_derivative  -- HasFDerivAt of combined parametrization
 ```
 The main theorem takes two hypotheses that together encode generic smoothness:
@@ -85,16 +85,14 @@ Sketch of how the affine cone result descends to the projective statement via `M
 
 ## Sorry Inventory
 
-There are exactly two gaps in the formalization.
+There is exactly one gap in the formalization.
 
-**1. Range theorem, ≥ direction** (`range_combinedParam_eq_iSup`).  
-Claim: $\bigsqcup_i \operatorname{Im}(Df_i) \leq \operatorname{Im}(d\Phi)$.  
-This is a pure submodule algebra fact: any element of a finite join $\bigsqcup_i S_i$ can be written as a finite sum $\sum_i s_i$ with $s_i \in S_i$. The ≤ direction is proved. The ≥ direction is `sorry`; it can be proved by induction on $r$ from `Submodule.mem_sup`, pending identification of the right Mathlib lemma.
-
-**2. Generic smoothness.**  
+**Generic smoothness.**  
 Assumed as explicit hypotheses `hgeneric` and `hdominant` in `terraciniLemma`. Formalizing this would require either:
 - A general generic smoothness theorem in Mathlib (not yet present), or
 - A case-by-case argument for specific varieties of interest.
+
+(The range theorem `range_combinedParam_eq_iSup` is fully proved in both directions: the ≥ direction follows by taking, for $y = Df_i(a) \in \operatorname{Im}(Df_i)$, the input $u = \text{Pi.single } i\ a$, whose other coordinates vanish so that $d\Phi(u) = Df_i(a) = y$.)
 
 ## Building
 
