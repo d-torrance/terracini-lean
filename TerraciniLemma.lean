@@ -1,3 +1,9 @@
+import Mathlib.Analysis.Calculus.FDeriv.Basic
+import Mathlib.Analysis.Calculus.FDeriv.Add
+import Mathlib.Analysis.Calculus.FDeriv.Comp
+import Mathlib.Analysis.Calculus.FDeriv.Linear
+import Mathlib.LinearAlgebra.Span.Basic
+
 /-!
 # Terracini's Lemma
 
@@ -36,12 +42,6 @@ surjective differential at general points — which is not currently in Mathlib.
   Soc. **354** (2002), 151–178.
 -/
 
-import Mathlib.Analysis.Calculus.FDeriv.Basic
-import Mathlib.Analysis.Calculus.FDeriv.Add
-import Mathlib.Analysis.Calculus.FDeriv.Comp
-import Mathlib.Analysis.Calculus.FDeriv.Linear
-import Mathlib.LinearAlgebra.Span
-
 noncomputable section
 
 open Set Filter Topology
@@ -60,20 +60,20 @@ variable {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E]
 
 /-- The addition map (Fin r → E) →L[𝕜] E,  v ↦ ∑ᵢ vᵢ. -/
 def additionMap (r : ℕ) : (Fin r → E) →L[𝕜] E :=
-  ∑ i : Fin r, ContinuousLinearMap.proj i
+  ∑ i : Fin r, (ContinuousLinearMap.proj i : (Fin r → E) →L[𝕜] E)
 
 @[simp]
 theorem additionMap_apply (r : ℕ) (v : Fin r → E) :
-    additionMap r v = ∑ i, v i := by
+    additionMap (𝕜 := 𝕜) r v = ∑ i, v i := by
   simp [additionMap, ContinuousLinearMap.sum_apply, ContinuousLinearMap.proj_apply]
 
 /-- The addition map, being linear, is its own Fréchet derivative everywhere. -/
 theorem hasFDerivAt_additionMap (r : ℕ) (v : Fin r → E) :
-    HasFDerivAt (fun v : Fin r → E => ∑ i, v i) (additionMap r) v := by
-  have heq : (fun v : Fin r → E => ∑ i, v i) = ⇑(additionMap r) :=
+    HasFDerivAt (fun v : Fin r → E => ∑ i, v i) (additionMap (𝕜 := 𝕜) r) v := by
+  have heq : (fun v : Fin r → E => ∑ i, v i) = ⇑(additionMap (𝕜 := 𝕜) r) :=
     funext fun v => (additionMap_apply r v).symm
   rw [heq]
-  exact (additionMap r).hasFDerivAt
+  exact (additionMap (𝕜 := 𝕜) r : (Fin r → E) →L[𝕜] E).hasFDerivAt
 
 end AdditionMap
 
@@ -99,6 +99,23 @@ variable {𝔸 E : Type*}
   [NormedAddCommGroup 𝔸] [NormedSpace 𝕜 𝔸]
   [NormedAddCommGroup E] [NormedSpace 𝕜 E]
 
+/-- The i-th coordinate projection `(Fin r → 𝔸) →L[𝕜] 𝔸`, given an explicit
+    codomain type so that `𝕜` is not left as a metavariable during elaboration. -/
+def coordProj (r : ℕ) (i : Fin r) : (Fin r → 𝔸) →L[𝕜] 𝔸 :=
+  ContinuousLinearMap.proj i
+
+@[simp]
+theorem coordProj_apply (r : ℕ) (i : Fin r) (u : Fin r → 𝔸) :
+    coordProj (𝕜 := 𝕜) r i u = u i := rfl
+
+/-- The coordinate projection `coordProj r i` is its own Fréchet derivative
+    for the function `u ↦ u i`. -/
+theorem hasFDerivAt_coordProj (r : ℕ) (i : Fin r) (u : Fin r → 𝔸) :
+    HasFDerivAt (fun u : Fin r → 𝔸 => u i) (coordProj (𝕜 := 𝕜) r i) u := by
+  have heq : (fun u : Fin r → 𝔸 => u i) = ⇑(coordProj (𝕜 := 𝕜) r i) := rfl
+  rw [heq]
+  exact (coordProj (𝕜 := 𝕜) r i : (Fin r → 𝔸) →L[𝕜] 𝔸).hasFDerivAt
+
 /-- **Terracini derivative computation.**
 
     For smooth maps fᵢ : 𝔸 → E with derivatives Dfᵢ at uᵢ, the combined
@@ -110,15 +127,23 @@ theorem hasFDerivAt_combinedParam {r : ℕ}
     (hf : ∀ i, HasFDerivAt (f i) (Df i) (u i)) :
     HasFDerivAt
       (fun u : Fin r → 𝔸 => ∑ i, f i (u i))
-      (∑ i : Fin r, (Df i).comp (ContinuousLinearMap.proj i))
+      (∑ i : Fin r, (Df i).comp (coordProj r i))
       u := by
   -- Step 1: for each i, differentiate fᵢ ∘ πᵢ by the chain rule.
   have hcomp : ∀ i : Fin r,
       HasFDerivAt (fun u : Fin r → 𝔸 => f i (u i))
-                  ((Df i).comp (ContinuousLinearMap.proj i)) u := fun i =>
-    (hf i).comp u (ContinuousLinearMap.proj i).hasFDerivAt
+                  ((Df i).comp (coordProj r i)) u := fun i =>
+    (hf i).comp u (hasFDerivAt_coordProj r i u)
   -- Step 2: sum over all i using the Fréchet derivative sum rule.
-  exact HasFDerivAt.sum Finset.univ (fun i _ => hcomp i)
+  have hsum : HasFDerivAt (∑ i : Fin r, fun u : Fin r → 𝔸 => f i (u i))
+      (∑ i : Fin r, (Df i).comp (coordProj r i)) u :=
+    HasFDerivAt.sum (fun i _ => hcomp i)
+  -- Rewrite the pointwise sum of functions as a function of a sum.
+  have heq : (∑ i : Fin r, fun u : Fin r → 𝔸 => f i (u i)) =
+      fun u : Fin r → 𝔸 => ∑ i, f i (u i) := by
+    funext u
+    simp
+  rwa [heq] at hsum
 
 /-!
 ### Range of the combined derivative
@@ -132,23 +157,23 @@ sum of the individual tangent spaces.
 theorem range_combinedParam_eq_iSup {r : ℕ}
     (Df : Fin r → 𝔸 →L[𝕜] E) :
     LinearMap.range
-        (∑ i : Fin r, (Df i).comp (ContinuousLinearMap.proj i) :
+        (∑ i : Fin r, (Df i).comp (coordProj r i) :
          (Fin r → 𝔸) →L[𝕜] E).toLinearMap =
-    ⊔ i : Fin r, LinearMap.range (Df i).toLinearMap := by
+    ⨆ i : Fin r, LinearMap.range (Df i).toLinearMap := by
   apply le_antisymm
-  · -- (≤) range(dΦ) ≤ ⊔ Im(Dfᵢ).
+  · -- (≤) range(dΦ) ≤ ⨆ Im(Dfᵢ).
     -- Any y in the range satisfies y = ∑ᵢ Dfᵢ(uᵢ) for some u : Fin r → 𝔸.
-    -- Each term Dfᵢ(uᵢ) lies in Im(Dfᵢ) ≤ ⊔ Im(Dfᵢ), so their sum is too.
+    -- Each term Dfᵢ(uᵢ) lies in Im(Dfᵢ) ≤ ⨆ Im(Dfᵢ), so their sum is too.
     rintro y ⟨u, rfl⟩
     -- Switch from LinearMap.toLinearMap to the underlying CLM coercion
-    change (∑ i : Fin r, (Df i).comp (ContinuousLinearMap.proj i)) u ∈
-           ⊔ i : Fin r, LinearMap.range (Df i).toLinearMap
+    change (∑ i : Fin r, (Df i).comp (coordProj r i)) u ∈
+           ⨆ i : Fin r, LinearMap.range (Df i).toLinearMap
     simp only [ContinuousLinearMap.sum_apply, ContinuousLinearMap.comp_apply,
-               ContinuousLinearMap.proj_apply]
-    -- Goal: ∑ i, Df i (u i) ∈ ⊔ i, Im(Df i)
+               coordProj_apply]
+    -- Goal: ∑ i, Df i (u i) ∈ ⨆ i, Im(Df i)
     apply Submodule.sum_mem
     intro i _
-    exact Submodule.le_iSup (f := fun i => LinearMap.range (Df i).toLinearMap) i
+    exact le_iSup (f := fun i => LinearMap.range (Df i).toLinearMap) i
       ⟨u i, rfl⟩
   · -- (≥) ⊔ Im(Dfᵢ) ≤ range(dΦ).
     -- For a finite join of submodules, any element is a sum y = ∑ yᵢ with yᵢ ∈ Im(Dfᵢ).
@@ -197,7 +222,7 @@ theorem secantSet_subset_secantVariety (r : ℕ) (X : Set E) :
 
 theorem secantVariety_one_eq (X : Set E) (hX : IsClosed X) :
     secantVariety 1 X = X := by
-  simp [secantVariety, secantSet_one_eq, hX.closure_eq]
+  rw [secantVariety, secantSet_one_eq, hX.closure_eq]
 
 /-- σᵣ(X) ⊆ σᵣ₊₁(X) whenever 0 ∈ X. -/
 theorem secantVariety_mono {r : ℕ} {X : Set E} (h0 : (0 : E) ∈ X) :
@@ -279,7 +304,7 @@ the main theorem, making the logical dependency transparent.
 def combinedDerivative {r : ℕ} {X : Set E} {v : Fin r → E}
     (param : ∀ i : Fin r, LocalParam (𝕜 := 𝕜) (𝔸 := 𝔸) X (v i)) :
     (Fin r → 𝔸) →L[𝕜] E :=
-  ∑ i : Fin r, ((param i).tangent).comp (ContinuousLinearMap.proj i)
+  ∑ i : Fin r, ((param i).tangent).comp (coordProj r i)
 
 /-- **Terracini's Lemma** (modulo generic smoothness).
 
@@ -294,7 +319,7 @@ def combinedDerivative {r : ℕ} {X : Set E} {v : Fin r → E}
     Together these give T = ⊔ Im(Dfᵢ) = T_{v₁}X̂ + ⋯ + T_{vᵣ}X̂. -/
 theorem terraciniLemma {r : ℕ} {X : Set E}
     (v     : Fin r → E)
-    (hv    : ∀ i, v i ∈ X)
+    (_hv   : ∀ i, v i ∈ X)
     (param : ∀ i, LocalParam (𝕜 := 𝕜) (𝔸 := 𝔸) X (v i))
     -- T is the Zariski tangent space to σᵣ(X̂) at ∑ vᵢ
     (T : Submodule 𝕜 E)
@@ -306,7 +331,7 @@ theorem terraciniLemma {r : ℕ} {X : Set E}
     -- because Φ itself maps into σᵣ(X̂) (as a sum of r points from X̂).
     (hdominant : LinearMap.range (combinedDerivative (v := v) param).toLinearMap ≤ T) :
     -- Conclusion: T equals the sum of the individual tangent spaces.
-    T = ⊔ i : Fin r, (param i).tangentSpace := by
+    T = ⨆ i : Fin r, (param i).tangentSpace := by
   -- Since T ≤ Im(dΦ) ≤ T, we have T = Im(dΦ).
   have heq : T = LinearMap.range (combinedDerivative (v := v) param).toLinearMap :=
     le_antisymm hgeneric hdominant
@@ -322,7 +347,7 @@ theorem terraciniLemma {r : ℕ} {X : Set E}
     This is the core computation of Terracini's Lemma, fully proved from the chain rule. -/
 theorem terraciniLemma_derivative {r : ℕ} {X : Set E}
     (v     : Fin r → E)
-    (hv    : ∀ i, v i ∈ X)
+    (_hv   : ∀ i, v i ∈ X)
     (param : ∀ i, LocalParam (𝕜 := 𝕜) (𝔸 := 𝔸) X (v i)) :
     HasFDerivAt
       (fun u : Fin r → 𝔸 => ∑ i, (param i).chart (u i))
@@ -337,7 +362,7 @@ theorem terraciniLemma_derivative {r : ℕ} {X : Set E}
 /-- **Corollary:** The combined parametrization Φ evaluates to ∑ vᵢ at the base point. -/
 theorem terraciniLemma_basePoint {r : ℕ} {X : Set E}
     (v     : Fin r → E)
-    (hv    : ∀ i, v i ∈ X)
+    (_hv   : ∀ i, v i ∈ X)
     (param : ∀ i, LocalParam (𝕜 := 𝕜) (𝔸 := 𝔸) X (v i)) :
     ∑ i, (param i).chart ((param i).basePoint) = ∑ i, v i :=
   Finset.sum_congr rfl fun i _ => (param i).chart_eval
