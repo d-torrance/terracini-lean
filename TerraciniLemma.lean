@@ -175,14 +175,19 @@ theorem range_combinedParam_eq_iSup {r : ℕ}
     intro i _
     exact le_iSup (f := fun i => LinearMap.range (Df i).toLinearMap) i
       ⟨u i, rfl⟩
-  · -- (≥) ⊔ Im(Dfᵢ) ≤ range(dΦ).
-    -- For a finite join of submodules, any element is a sum y = ∑ yᵢ with yᵢ ∈ Im(Dfᵢ).
-    -- Pick uᵢ with Dfᵢ(uᵢ) = yᵢ; then u = (u₁,…,uᵣ) witnesses y = dΦ(u).
-    -- (Membership in a finite join of submodules is characterized by finite sums;
-    -- this is proved e.g. by induction on r from `Submodule.mem_sup`. We mark
-    -- it sorry pending the relevant Mathlib lemma `Submodule.mem_finset_iSup` or
-    -- a direct inductive proof.)
-    sorry
+  · -- (≥) ⨆ Im(Dfᵢ) ≤ range(dΦ).
+    -- For each i, Im(Dfᵢ) ≤ range(dΦ): given y = Dfᵢ(a), take u = Pi.single i a,
+    -- so that all other coordinates contribute 0 and dΦ(u) = Dfᵢ(a) = y.
+    apply iSup_le
+    intro i
+    rintro y ⟨a, rfl⟩
+    refine ⟨Pi.single i a, ?_⟩
+    change (∑ j : Fin r, (Df j).comp (coordProj r j)) (Pi.single i a) = Df i a
+    simp only [ContinuousLinearMap.sum_apply, ContinuousLinearMap.comp_apply, coordProj_apply]
+    rw [Finset.sum_eq_single i
+        (fun j _ hji => by rw [Pi.single_eq_of_ne hji, map_zero])
+        (fun h => absurd (Finset.mem_univ i) h),
+      Pi.single_eq_same]
 
 end TerraciniDerivative
 
