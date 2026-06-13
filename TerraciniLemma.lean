@@ -45,9 +45,9 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
 | `range_combinedParam_eq_iSup` | ✓ proved | Im(dΦ) = ⨆ Im(Dfᵢ), both directions |
 | `terraciniLemma_derivative` | ✓ proved | Core Terracini computation |
 | `terraciniLemma` | ✓ proved | From `hdominant` + `hgeneric` (finrank count) |
-| `parabola_terracini` | ✓ proved | Worked example: plane conic, σ₂ = ℝ² |
-| `segre_terracini` | ✓ proved | Worked example: Segre quadric P¹×P¹ ⊂ P³, σ₂ = ℝ³ |
-| `segre3_terracini` | ✓ proved | Worked example: Segre threefold P¹×P¹×P¹ ⊂ P⁷, σ₂ ⊊ ℝ⁷ (defective) |
+| `parabola_terracini` | ✓ proved | Worked example: plane conic, σ₂ = 𝕜² |
+| `segre_terracini` | ✓ proved | Worked example: Segre quadric P¹×P¹ ⊂ P³, σ₂ = 𝕜³ |
+| `segre3_terracini` | ✓ proved | Worked example: Segre threefold P¹×P¹×P¹ ⊂ P⁷, σ₂ ⊊ 𝕜⁷ (defective) |
 | Generic smoothness | ⚠ hypothesis | `hdominant`/`hgeneric` in `terraciniLemma` |
 
 There are no `sorry`s remaining in this file. The only gap is mathematical,
