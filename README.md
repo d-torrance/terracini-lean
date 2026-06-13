@@ -41,7 +41,7 @@ Together these force $\operatorname{Im}(d\Phi) = T$ by a finite-dimensional subm
 
 ## File Overview
 
-The mathematics is organized into four files:
+The mathematics is organized into five files:
 
 - [`TerraciniLemma.lean`](TerraciniLemma.lean) — top-level module: imports the
   files below and gives the overall statement, file organization, and a
@@ -55,6 +55,11 @@ The mathematics is organized into four files:
 - [`TerraciniLemma/Segre.lean`](TerraciniLemma/Segre.lean) — worked examples
   for Segre varieties: the non-defective Segre quadric `ℙ¹ × ℙ¹ ⊂ ℙ³` and the
   defective Segre threefold `ℙ¹ × ℙ¹ × ℙ¹ ⊂ ℙ⁷`.
+- [`TerraciniLemma/EllipticCurve.lean`](TerraciniLemma/EllipticCurve.lean) —
+  a worked example for the elliptic curve `y² = x³ + 1`. Unlike the
+  Veronese/Segre examples, this curve has no global rational
+  parametrization, so the local charts at each point are instead built from
+  Mathlib's Implicit Function Theorem.
 
 The sections below (§1–§6) all live in `TerraciniLemma/Core.lean`.
 

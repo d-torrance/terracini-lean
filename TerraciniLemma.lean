@@ -1,6 +1,7 @@
 import TerraciniLemma.Core
 import TerraciniLemma.Veronese
 import TerraciniLemma.Segre
+import TerraciniLemma.EllipticCurve
 
 /-!
 # Terracini's Lemma
@@ -25,6 +26,11 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
 * `TerraciniLemma.Segre` — worked examples for Segre varieties: the
   non-defective Segre quadric `ℙ¹ × ℙ¹ ⊂ ℙ³` and the defective Segre
   threefold `ℙ¹ × ℙ¹ × ℙ¹ ⊂ ℙ⁷`.
+* `TerraciniLemma.EllipticCurve` — a worked example for the elliptic curve
+  `y² = x³ + 1`, which (unlike the Veronese/Segre examples) has no global
+  rational parametrization. Local charts are instead built from Mathlib's
+  Implicit Function Theorem, demonstrating that `LocalParam` only needs a
+  *local* smooth chart at each point.
 
 ## References
 
@@ -48,6 +54,7 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
 | `parabola_terracini` | ✓ proved | Worked example: plane conic, σ₂ = 𝕜² |
 | `segre_terracini` | ✓ proved | Worked example: Segre quadric P¹×P¹ ⊂ P³, σ₂ = 𝕜³ |
 | `segre3_terracini` | ✓ proved | Worked example: Segre threefold P¹×P¹×P¹ ⊂ P⁷, σ₂ ⊊ 𝕜⁷ (defective) |
+| `elliptic_terracini` | ✓ proved | Worked example: elliptic curve y²=x³+1 via the Implicit Function Theorem, σ₂ = 𝕜² |
 | Generic smoothness | ⚠ hypothesis | `hdominant`/`hgeneric` in `terraciniLemma` |
 
 There are no `sorry`s remaining in this file. The only gap is mathematical,
@@ -56,6 +63,6 @@ maps into σᵣ(X̂)) and `hgeneric : finrank T ≤ finrank Im(dΦ)` (a dimensio
 count, the actual content of generic smoothness in characteristic zero) as
 hypotheses, rather than deriving them from a general theory of dominant
 morphisms — which is not yet in Mathlib. The worked examples above discharge
-both hypotheses concretely for the plane conic, the Segre quadric, and the
-(defective) Segre threefold.
+both hypotheses concretely for the plane conic, the Segre quadric, the
+(defective) Segre threefold, and the elliptic curve.
 -/
