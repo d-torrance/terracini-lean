@@ -504,6 +504,117 @@ theorem parabola_terracini (t₁ t₂ : ℝ) (h : t₁ ≠ t₂) :
 end ParabolaExample
 
 /-!
+## Example: Terracini's Lemma for the Segre quadric P¹×P¹ ⊂ P³
+
+As a second worked example, we consider the affine chart of the Segre
+variety `P¹ × P¹ ⊂ P³`, the classical "saddle surface"
+`{(s, t, s·t) : s, t ∈ ℝ} ⊆ ℝ³`. As a non-degenerate quadric surface in `P³`,
+its second secant variety should fill the ambient `P³`.
+
+For two distinct points `p₁ ≠ p₂ ∈ ℝ²`, the tangent plane to the surface at
+`segre pᵢ = (pᵢ.1, pᵢ.2, pᵢ.1 * pᵢ.2)` is the image of `segreDeriv pᵢ`. We
+show that the combined derivative of the two-point parametrization is
+surjective onto ℝ³, so Terracini's Lemma gives
+
+    ℝ³ = T_{segre p₁} X + T_{segre p₂} X,
+
+matching the classical fact that the second secant variety of the Segre
+quadric `P¹ × P¹ ⊂ P³` is the whole `P³` (it is not defective).
+-/
+
+noncomputable section SegreExample
+
+/-- The affine chart of the Segre variety `P¹ × P¹ ⊂ P³`: the "saddle
+surface" `(s, t) ↦ (s, t, s * t)`. -/
+def segre (p : ℝ × ℝ) : ℝ × ℝ × ℝ := (p.1, p.2, p.1 * p.2)
+
+/-- The derivative of `segre` at `p`: the linear map
+`(ds, dt) ↦ (ds, dt, p.2 * ds + p.1 * dt)`. -/
+def segreDeriv (p : ℝ × ℝ) : (ℝ × ℝ) →L[ℝ] ℝ × ℝ × ℝ :=
+  (ContinuousLinearMap.fst ℝ ℝ ℝ).prod
+    ((ContinuousLinearMap.snd ℝ ℝ ℝ).prod
+      (p.1 • ContinuousLinearMap.snd ℝ ℝ ℝ + p.2 • ContinuousLinearMap.fst ℝ ℝ ℝ))
+
+@[simp]
+theorem segreDeriv_apply (p q : ℝ × ℝ) :
+    segreDeriv p q = (q.1, q.2, p.1 * q.2 + p.2 * q.1) := by
+  simp [segreDeriv]
+
+theorem hasFDerivAt_segre (p : ℝ × ℝ) : HasFDerivAt segre (segreDeriv p) p := by
+  have h1 : HasFDerivAt (fun q : ℝ × ℝ => q.1) (ContinuousLinearMap.fst ℝ ℝ ℝ) p :=
+    (ContinuousLinearMap.fst ℝ ℝ ℝ).hasFDerivAt
+  have h2 : HasFDerivAt (fun q : ℝ × ℝ => q.2) (ContinuousLinearMap.snd ℝ ℝ ℝ) p :=
+    (ContinuousLinearMap.snd ℝ ℝ ℝ).hasFDerivAt
+  exact h1.prodMk (h2.prodMk (h1.mul h2))
+
+/-- The local parametrization of the Segre surface at parameter `p`. -/
+def segreParam (p : ℝ × ℝ) :
+    LocalParam (𝕜 := ℝ) (𝔸 := ℝ × ℝ) (Set.range segre) (segre p) where
+  basePoint := p
+  chart := segre
+  chart_eval := rfl
+  tangent := segreDeriv p
+  hasFDerivAt := hasFDerivAt_segre p
+
+/-- The pair of local parametrizations at `p₁` and `p₂` (see
+`parabolaParamPair` for why this needs a pattern-matching definition rather
+than `![·, ·]` notation). -/
+def segreParamPair (p₁ p₂ : ℝ × ℝ) :
+    ∀ i : Fin 2, LocalParam (𝕜 := ℝ) (𝔸 := ℝ × ℝ)
+      (Set.range segre) (![segre p₁, segre p₂] i)
+  | 0 => segreParam p₁
+  | 1 => segreParam p₂
+
+/-- For `p₁ ≠ p₂`, the combined derivative of the two-point parametrization
+is surjective onto ℝ³. -/
+theorem combinedDerivative_segre_surjective (p₁ p₂ : ℝ × ℝ) (h : p₁ ≠ p₂) :
+    Function.Surjective
+      (combinedDerivative (v := ![segre p₁, segre p₂]) (segreParamPair p₁ p₂)) := by
+  obtain ⟨s₁, t₁⟩ := p₁
+  obtain ⟨s₂, t₂⟩ := p₂
+  have hD : (t₁ - t₂) ^ 2 + (s₁ - s₂) ^ 2 ≠ 0 := by
+    intro hD0
+    obtain ⟨ht, hs⟩ := (add_eq_zero_iff_of_nonneg (sq_nonneg _) (sq_nonneg _)).mp hD0
+    rw [sq_eq_zero_iff, sub_eq_zero] at ht hs
+    exact h (Prod.ext_iff.mpr ⟨hs, ht⟩)
+  rintro ⟨a, b, c⟩
+  set k : ℝ := (c - t₂ * a - s₂ * b) / ((t₁ - t₂) ^ 2 + (s₁ - s₂) ^ 2) with hk
+  set ds₁ : ℝ := (t₁ - t₂) * k with hds₁
+  set dt₁ : ℝ := (s₁ - s₂) * k with hdt₁
+  refine ⟨![(ds₁, dt₁), (a - ds₁, b - dt₁)], ?_⟩
+  simp only [combinedDerivative, segreParamPair, segreParam, Fin.sum_univ_two,
+    ContinuousLinearMap.add_apply, ContinuousLinearMap.comp_apply, coordProj_apply,
+    Matrix.cons_val_zero, Matrix.cons_val_one, segreDeriv_apply, Prod.mk_add_mk]
+  rw [Prod.mk.injEq, Prod.mk.injEq]
+  refine ⟨by ring, by ring, ?_⟩
+  rw [hds₁, hdt₁, hk]
+  field_simp
+  ring
+
+/-- **Terracini's Lemma for the Segre quadric.** For `p₁ ≠ p₂`, the tangent
+planes to the Segre surface `{(s,t,s·t)}` at `segre p₁` and `segre p₂`
+together span all of `ℝ³` — matching the fact that the second secant
+variety of the (non-degenerate) Segre quadric `P¹ × P¹ ⊂ P³` is the whole
+`P³`. -/
+theorem segre_terracini (p₁ p₂ : ℝ × ℝ) (h : p₁ ≠ p₂) :
+    (⊤ : Submodule ℝ (ℝ × ℝ × ℝ)) =
+      ⨆ i : Fin 2, (segreParamPair p₁ p₂ i).tangentSpace := by
+  have hrange : LinearMap.range
+      (combinedDerivative (v := ![segre p₁, segre p₂])
+        (segreParamPair p₁ p₂)).toLinearMap = ⊤ :=
+    LinearMap.range_eq_top.mpr (combinedDerivative_segre_surjective p₁ p₂ h)
+  have hgeneric : Module.finrank ℝ (⊤ : Submodule ℝ (ℝ × ℝ × ℝ)) ≤
+      Module.finrank ℝ (LinearMap.range
+        (combinedDerivative (v := ![segre p₁, segre p₂])
+          (segreParamPair p₁ p₂)).toLinearMap) :=
+    le_of_eq (by rw [hrange])
+  exact terraciniLemma ![segre p₁, segre p₂]
+    (fun i => by fin_cases i <;> exact ⟨_, rfl⟩)
+    (segreParamPair p₁ p₂) ⊤ le_top hgeneric
+
+end SegreExample
+
+/-!
 ## Summary of proof obligations
 
 | Step | Status | Description |
@@ -514,6 +625,7 @@ end ParabolaExample
 | `terraciniLemma_derivative` | ✓ proved | Core Terracini computation |
 | `terraciniLemma` | ✓ proved | From `hdominant` + `hgeneric` (finrank count) |
 | `parabola_terracini` | ✓ proved | Worked example: plane conic, σ₂ = ℝ² |
+| `segre_terracini` | ✓ proved | Worked example: Segre quadric P¹×P¹ ⊂ P³, σ₂ = ℝ³ |
 | Generic smoothness | ⚠ hypothesis | `hdominant`/`hgeneric` in `terraciniLemma` |
 
 There are no `sorry`s remaining in this file. The only gap is mathematical,
@@ -521,6 +633,6 @@ not formal: `terraciniLemma` takes `hdominant : Im(dΦ) ≤ T` (easy, since Φ
 maps into σᵣ(X̂)) and `hgeneric : finrank T ≤ finrank Im(dΦ)` (a dimension
 count, the actual content of generic smoothness in characteristic zero) as
 hypotheses, rather than deriving them from a general theory of dominant
-morphisms — which is not yet in Mathlib. The worked example above discharges
-both hypotheses concretely for the plane conic.
+morphisms — which is not yet in Mathlib. The worked examples above discharge
+both hypotheses concretely for the plane conic and the Segre quadric.
 -/
