@@ -41,7 +41,22 @@ Together these force $\operatorname{Im}(d\Phi) = T$ by a finite-dimensional subm
 
 ## File Overview
 
-All mathematics is in [`TerraciniLemma.lean`](TerraciniLemma.lean), organized in six sections.
+The mathematics is organized into four files:
+
+- [`TerraciniLemma.lean`](TerraciniLemma.lean) — top-level module: imports the
+  files below and gives the overall statement, file organization, and a
+  summary table of proof obligations.
+- [`TerraciniLemma/Core.lean`](TerraciniLemma/Core.lean) — the general theory
+  (§1–§6 below): the addition map, the Terracini derivative computation,
+  secant varieties, smooth local parametrizations (`LocalParam`), and
+  `terraciniLemma` itself.
+- [`TerraciniLemma/Veronese.lean`](TerraciniLemma/Veronese.lean) — worked
+  examples for Veronese varieties (currently the plane conic `v₂(ℙ¹) ⊂ ℙ²`).
+- [`TerraciniLemma/Segre.lean`](TerraciniLemma/Segre.lean) — worked examples
+  for Segre varieties: the non-defective Segre quadric `ℙ¹ × ℙ¹ ⊂ ℙ³` and the
+  defective Segre threefold `ℙ¹ × ℙ¹ × ℙ¹ ⊂ ℙ⁷`.
+
+The sections below (§1–§6) all live in `TerraciniLemma/Core.lean`.
 
 ### §1 — The addition map
 ```
