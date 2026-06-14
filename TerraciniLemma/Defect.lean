@@ -1,4 +1,7 @@
 import TerraciniLemma.VeroneseSurface
+import TerraciniLemma.RationalNormalCurves
+import TerraciniLemma.Segre
+import TerraciniLemma.EllipticCurve
 import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 
 /-!
@@ -22,6 +25,11 @@ points on `X̂`. This file packages the resulting dimension count into the class
   for `r` points implies non-defectivity for any smaller sub-collection of those points; in the
   *superabundant* regime (the combined span fills `E`), non-defectivity for `r` points implies
   non-defectivity for any larger super-collection.
+* `not_isDefective_of_sup_eq_top` is the two-point specialization of
+  `not_isDefective_of_finsetSup_eq_top` (via the helper `iSup_fin_two : ⨆ i : Fin 2, f i = f 0
+  ⊔ f 1`), used to extend the `σ₂`-fills-`E` examples (`parabola_terracini`, `segre_terracini`,
+  `elliptic_terracini`) to non-defectivity of `σ_r` for every `r ≥ 2`:
+  `parabola_not_isDefective`, `segre_not_isDefective`, `elliptic_not_isDefective`.
 
 ## Caveat: cone vs. chart
 
@@ -150,6 +158,27 @@ theorem not_isDefective_of_finsetSup_eq_top
   rw [htop, finrank_top, not_lt]
   exact min_le_left _ _
 
+/-- The supremum over `Fin 2` is a binary join: `⨆ i : Fin 2, f i = f 0 ⊔ f 1`. -/
+theorem iSup_fin_two {α : Type*} [CompleteLattice α] (f : Fin 2 → α) :
+    (⨆ i, f i) = f 0 ⊔ f 1 := by
+  apply le_antisymm
+  · refine iSup_le fun i => ?_
+    fin_cases i
+    · exact le_sup_left
+    · exact le_sup_right
+  · exact sup_le (le_iSup f 0) (le_iSup f 1)
+
+omit [FiniteDimensional 𝕜 E] in
+/-- A binary specialization of `not_isDefective_of_finsetSup_eq_top`: if two members `S i₀` and
+`S i₁` of a family already span `E` between them, then `S` is non-defective — whatever the
+remaining members of `S` happen to be. -/
+theorem not_isDefective_of_sup_eq_top
+    {ι : Type*} [Fintype ι] [DecidableEq ι] (S : ι → Submodule 𝕜 E)
+    {i₀ i₁ : ι} (htop : S i₀ ⊔ S i₁ = ⊤) :
+    ¬ IsDefective S :=
+  not_isDefective_of_finsetSup_eq_top S (T := {i₀, i₁})
+    (by rw [Finset.sup_insert, Finset.sup_singleton, htop])
+
 end
 
 /-!
@@ -246,3 +275,60 @@ theorem defect_veroneseSurface :
   simp only [defect, finrank_iSup_veroneseSurface, expectedDim_veroneseSurface]
 
 end VeroneseSurfaceDefect
+
+/-!
+## Extending `σ₂` to `σ_r`: the parabola, Segre quadric, and elliptic curve
+
+`parabola_terracini`, `segre_terracini`, and `elliptic_terracini` each show that the combined
+tangent space of *two* general points already fills the ambient space — the superabundant case
+of §7's monotonicity. By `not_isDefective_of_sup_eq_top`, this propagates to *any* larger family
+containing those two tangent spaces among its members: `σ_r` is non-defective for every `r ≥ 2`,
+no matter what the other `r - 2` points are or what their tangent spaces look like.
+-/
+
+noncomputable section ExtendedExamples
+
+variable {𝕜 : Type*}
+
+/-- **`σ_r(v₂(ℙ¹))` is non-defective for every `r ≥ 2`.** If two members of a family `S` of
+tangent spaces in `𝕜²` are the tangent lines to the parabola at `(t₁,t₁²)` and `(t₂,t₂²)`
+(`t₁ ≠ t₂`), then `S` is non-defective — these two tangent lines already span `𝕜²`
+(`parabola_terracini`), so adding any further points cannot create a defect. -/
+theorem parabola_not_isDefective [NontriviallyNormedField 𝕜] [CharZero 𝕜]
+    {t₁ t₂ : 𝕜} (h : t₁ ≠ t₂)
+    {ι : Type*} [Fintype ι] [DecidableEq ι] (S : ι → Submodule 𝕜 (𝕜 × 𝕜))
+    {i₀ i₁ : ι}
+    (h₀ : S i₀ = (parabolaParamPair t₁ t₂ 0).tangentSpace)
+    (h₁ : S i₁ = (parabolaParamPair t₁ t₂ 1).tangentSpace) :
+    ¬ IsDefective S := by
+  apply not_isDefective_of_sup_eq_top S (i₀ := i₀) (i₁ := i₁)
+  rw [h₀, h₁, parabola_terracini t₁ t₂ h, iSup_fin_two]
+
+/-- **`σ_r(ℙ¹ × ℙ¹ ⊂ ℙ³)` is non-defective for every `r ≥ 2`.** If two members of a family `S`
+of tangent spaces in `𝕜³` are the tangent planes to the Segre quadric at `segre p₁` and
+`segre p₂` (`p₁ ≠ p₂`), then `S` is non-defective — these two tangent planes already span `𝕜³`
+(`segre_terracini`), so adding any further points cannot create a defect. -/
+theorem segre_not_isDefective [NontriviallyNormedField 𝕜]
+    {p₁ p₂ : 𝕜 × 𝕜} (h : p₁ ≠ p₂)
+    {ι : Type*} [Fintype ι] [DecidableEq ι] (S : ι → Submodule 𝕜 (𝕜 × 𝕜 × 𝕜))
+    {i₀ i₁ : ι}
+    (h₀ : S i₀ = (segreParamPair p₁ p₂ 0).tangentSpace)
+    (h₁ : S i₁ = (segreParamPair p₁ p₂ 1).tangentSpace) :
+    ¬ IsDefective S := by
+  apply not_isDefective_of_sup_eq_top S (i₀ := i₀) (i₁ := i₁)
+  rw [h₀, h₁, segre_terracini p₁ p₂ h, iSup_fin_two]
+
+/-- **`σ_r(y² = x³ + 1)` is non-defective for every `r ≥ 2`.** If two members of a family `S`
+of tangent spaces in `𝕜²` (modeled as `Fin 2 → 𝕜`) are the tangent lines to the elliptic curve
+at `(0,1)` and `(2,3)`, then `S` is non-defective — these two tangent lines already span `𝕜²`
+(`elliptic_terracini`), so adding any further points cannot create a defect. -/
+theorem elliptic_not_isDefective [RCLike 𝕜]
+    {ι : Type*} [Fintype ι] [DecidableEq ι] (S : ι → Submodule 𝕜 (Fin 2 → 𝕜))
+    {i₀ i₁ : ι}
+    (h₀ : S i₀ = (ellipticParamPair (𝕜 := 𝕜) 0).tangentSpace)
+    (h₁ : S i₁ = (ellipticParamPair (𝕜 := 𝕜) 1).tangentSpace) :
+    ¬ IsDefective S := by
+  apply not_isDefective_of_sup_eq_top S (i₀ := i₀) (i₁ := i₁)
+  rw [h₀, h₁, elliptic_terracini, iSup_fin_two]
+
+end ExtendedExamples

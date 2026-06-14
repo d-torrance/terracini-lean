@@ -62,7 +62,10 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
   `finrank_finsetSup_eq_sum_of_not_isDefective_subabundant` (subabundant case,
   non-defectivity for `r` points propagates down to any sub-collection) and
   `not_isDefective_of_finsetSup_eq_top` (superabundant case, propagates up to
-  any super-collection).
+  any super-collection). The two-point specialization
+  `not_isDefective_of_sup_eq_top` then extends the `σ₂ = E` examples
+  (`parabola_terracini`, `segre_terracini`, `elliptic_terracini`) to
+  non-defectivity of `σ_r` for every `r ≥ 2`.
 
 ## References
 
@@ -97,6 +100,10 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
 | `defect_veroneseSurface` | ✓ proved | the defect of `σ₂(v₂(ℙ²))` is exactly `1` |
 | `finrank_finsetSup_eq_sum_of_not_isDefective_subabundant` | ✓ proved | subabundant non-defectivity for `r` points implies it for any sub-collection |
 | `not_isDefective_of_finsetSup_eq_top` | ✓ proved | superabundant non-defectivity for `r` points implies it for any super-collection |
+| `not_isDefective_of_sup_eq_top` | ✓ proved | two-point specialization of the above |
+| `parabola_not_isDefective` | ✓ proved | `σ_r(v₂(ℙ¹))` is non-defective for every `r ≥ 2` |
+| `segre_not_isDefective` | ✓ proved | `σ_r(ℙ¹×ℙ¹⊂ℙ³)` is non-defective for every `r ≥ 2` |
+| `elliptic_not_isDefective` | ✓ proved | `σ_r(y²=x³+1)` is non-defective for every `r ≥ 2` |
 | Generic smoothness | ⚠ hypothesis | `hdominant`/`hgeneric` in `terraciniLemma` |
 
 There are no `sorry`s remaining in this file. The only gap is mathematical,

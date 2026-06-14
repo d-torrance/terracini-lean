@@ -182,6 +182,16 @@ family `S : ι → Submodule 𝕜 E`:
   superabundant (fills the ambient space), then `σ_s(X)` is non-defective for
   every `s > r`.
 
+**Extending `σ₂` to `σ_r`.** `parabola_terracini`, `segre_terracini`, and
+`elliptic_terracini` each show `σ₂ = E` (the superabundant case). The
+two-point specialization `not_isDefective_of_sup_eq_top` (via the helper
+`iSup_fin_two : ⨆ i : Fin 2, f i = f 0 ⊔ f 1`) turns each of these into a
+statement about *every* `σ_r`, `r ≥ 2`:
+`parabola_not_isDefective`, `segre_not_isDefective`, and
+`elliptic_not_isDefective` show that any family of tangent spaces containing
+those two tangent spaces among its members is non-defective, regardless of
+the remaining members.
+
 ## Sorry Inventory
 
 There is exactly one gap in the formalization.
