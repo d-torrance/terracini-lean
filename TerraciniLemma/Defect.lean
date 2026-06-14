@@ -16,6 +16,12 @@ points on `X̂`. This file packages the resulting dimension count into the class
 * `IsDefective S` holds when this bound is *not* attained, i.e. the combined tangent space
   falls short of the naive prediction. `defect S` is the size of the shortfall, and
   `IsDefective S ↔ 0 < defect S`.
+* `finrank_finsetSup_eq_sum_of_not_isDefective_subabundant` and
+  `not_isDefective_of_finsetSup_eq_top` give **monotonicity of non-defectivity** in the number
+  of points `r`: in the *subabundant* regime (`∑ i, finrank (S i) ≤ finrank E`), non-defectivity
+  for `r` points implies non-defectivity for any smaller sub-collection of those points; in the
+  *superabundant* regime (the combined span fills `E`), non-defectivity for `r` points implies
+  non-defectivity for any larger super-collection.
 
 ## Caveat: cone vs. chart
 
@@ -47,14 +53,35 @@ theorem finrank_finsetSup_le {ι : Type*} [DecidableEq ι] (S : ι → Submodule
     rw [Finset.sup_insert, Finset.sum_insert hi]
     exact (Submodule.finrank_add_le_finrank_add_finrank _ _).trans (Nat.add_le_add_left ih _)
 
+omit [FiniteDimensional 𝕜 E] in
+/-- A finite supremum of submodules is the `Finset.sup` over `Finset.univ`. -/
+theorem iSup_eq_finsetSup_univ {ι : Type*} [Fintype ι] (S : ι → Submodule 𝕜 E) :
+    (⨆ i, S i : Submodule 𝕜 E) = Finset.univ.sup S :=
+  le_antisymm (iSup_le fun i => Finset.le_sup (Finset.mem_univ i))
+    (Finset.sup_le fun i _ => le_iSup S i)
+
 /-- `finrank` is subadditive over a finite supremum of submodules. -/
 theorem finrank_iSup_le {ι : Type*} [Fintype ι] [DecidableEq ι] (S : ι → Submodule 𝕜 E) :
     Module.finrank 𝕜 ((⨆ i, S i : Submodule 𝕜 E)) ≤ ∑ i, Module.finrank 𝕜 (S i) := by
-  have hsup : (⨆ i, S i) = Finset.univ.sup S :=
-    le_antisymm (iSup_le fun i => Finset.le_sup (Finset.mem_univ i))
-      (Finset.sup_le fun i _ => le_iSup S i)
-  rw [hsup]
+  rw [iSup_eq_finsetSup_univ]
   exact finrank_finsetSup_le S Finset.univ
+
+/-- If a finite family `S` attains the upper bound `finrank_iSup_le` on the nose
+(`finrank (⨆ i, S i) = ∑ i, finrank (S i)`), then so does every sub-family indexed by a
+`Finset T ⊆ ι`: the combined span of `{S i | i ∈ T}` already has dimension `∑ i ∈ T, finrank
+(S i)`. -/
+theorem finrank_finsetSup_eq_sum_of_finrank_iSup_eq_sum
+    {ι : Type*} [Fintype ι] [DecidableEq ι] (S : ι → Submodule 𝕜 E)
+    (h : Module.finrank 𝕜 ((⨆ i, S i : Submodule 𝕜 E)) = ∑ i, Module.finrank 𝕜 (S i))
+    (T : Finset ι) :
+    Module.finrank 𝕜 ((T.sup S : Submodule 𝕜 E)) = ∑ i ∈ T, Module.finrank 𝕜 (S i) := by
+  have hT := finrank_finsetSup_le S T
+  have hTc := finrank_finsetSup_le S Tᶜ
+  have hsup : (T.sup S ⊔ Tᶜ.sup S : Submodule 𝕜 E) = ⨆ i, S i := by
+    rw [← Finset.sup_union, Finset.union_compl, ← iSup_eq_finsetSup_univ]
+  have hadd := Submodule.finrank_sup_add_finrank_inf_eq (T.sup S) (Tᶜ.sup S)
+  rw [hsup, h, ← Finset.sum_add_sum_compl T] at hadd
+  omega
 
 /-- The *expected dimension* of the combined span `⨆ i, S i` of a finite family of submodules:
 the naive ("non-defective") prediction `min (finrank E) (∑ i, finrank (S i))`. -/
@@ -84,6 +111,44 @@ theorem isDefective_iff_defect_pos {ι : Type*} [Fintype ι] [DecidableEq ι]
     (S : ι → Submodule 𝕜 E) :
     IsDefective S ↔ 0 < defect S :=
   Nat.sub_pos_iff_lt.symm
+
+/-- **Subabundant monotonicity of non-defectivity.** If `S` is non-defective and *subabundant*
+(`∑ i, finrank (S i) ≤ finrank E`, so `expectedDim S = ∑ i, finrank (S i)`), then every
+sub-family `{S i | i ∈ T}` indexed by a `Finset T ⊆ ι` is non-defective too: its combined span
+already has the naive dimension `∑ i ∈ T, finrank (S i)`.
+
+Geometrically: if `σ_r(X)` is non-defective and subabundant, then `σ_s(X)` is non-defective for
+every `s < r` (take `T` to be any `s`-element subset of the `r` general points witnessing
+`σ_r(X)`). -/
+theorem finrank_finsetSup_eq_sum_of_not_isDefective_subabundant
+    {ι : Type*} [Fintype ι] [DecidableEq ι] (S : ι → Submodule 𝕜 E)
+    (hsub : ∑ i, Module.finrank 𝕜 (S i) ≤ Module.finrank 𝕜 E)
+    (h : ¬ IsDefective S) (T : Finset ι) :
+    Module.finrank 𝕜 ((T.sup S : Submodule 𝕜 E)) = ∑ i ∈ T, Module.finrank 𝕜 (S i) := by
+  refine finrank_finsetSup_eq_sum_of_finrank_iSup_eq_sum S ?_ T
+  have hle := finrank_iSup_le_expectedDim S
+  simp only [IsDefective, expectedDim, not_lt, min_eq_right hsub] at h hle
+  exact le_antisymm hle h
+
+omit [FiniteDimensional 𝕜 E] in
+/-- **Superabundant monotonicity of non-defectivity.** If the combined span of a sub-family
+`{S i | i ∈ T}` (for some `T : Finset ι`) already fills the ambient space, then `S` itself is
+non-defective: its combined span fills the ambient space too, attaining the `expectedDim` bound
+`finrank E`.
+
+Geometrically: if `σ_r(X)` is non-defective and superabundant (fills the ambient space), then
+`σ_s(X)` is non-defective for every `s > r` (extend the `r` general points witnessing
+`σ_r(X) = E` to `s` general points; `σ_r(X) ⊆ σ_s(X)` already fills the ambient space). -/
+theorem not_isDefective_of_finsetSup_eq_top
+    {ι : Type*} [Fintype ι] [DecidableEq ι] (S : ι → Submodule 𝕜 E)
+    {T : Finset ι} (hT : (T.sup S : Submodule 𝕜 E) = ⊤) :
+    ¬ IsDefective S := by
+  have htop : (⨆ i, S i : Submodule 𝕜 E) = ⊤ := by
+    rw [iSup_eq_finsetSup_univ]
+    exact le_antisymm le_top (hT ▸ Finset.sup_mono (Finset.subset_univ T))
+  unfold IsDefective expectedDim
+  rw [htop, finrank_top, not_lt]
+  exact min_le_left _ _
 
 end
 

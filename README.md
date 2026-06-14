@@ -87,7 +87,9 @@ The mathematics is organized into six files:
   `expectedDim S = min(N, ∑ᵢ dim Tᵢ)`, `IsDefective S ↔ dim ⨆ᵢ Tᵢ <
   expectedDim S`, and `defect S` is the resulting shortfall. Instantiated for
   the quadric Veronese surface (cone model): the classical defect of
-  `σ₂(v₂(ℙ²))` is exactly `1`.
+  `σ₂(v₂(ℙ²))` is exactly `1`. Also proves monotonicity of non-defectivity in
+  the number of points `r`, in both the subabundant and superabundant
+  regimes.
 
 The sections below (§1–§7) live in `TerraciniLemma/Core.lean` and
 `TerraciniLemma/Defect.lean`.
@@ -164,6 +166,21 @@ curves, Segre varieties, the elliptic curve — tangent spaces have dimension
 `dim X` rather than `dim X + 1`, so `expectedDim` there is a systematically
 different quantity; `IsDefective`/`defect` are deliberately not instantiated
 for those.)
+
+**Monotonicity of non-defectivity in `r`.** Two general lemmas about a finite
+family `S : ι → Submodule 𝕜 E`:
+
+- `finrank_finsetSup_eq_sum_of_not_isDefective_subabundant`: if `S` is
+  non-defective and *subabundant* (`∑ i, finrank (S i) ≤ finrank E`), then for
+  every `T : Finset ι`, the sub-family `{S i | i ∈ T}` is non-defective too —
+  its combined span already has dimension `∑ i ∈ T, finrank (S i)`.
+  Geometrically: if `σ_r(X)` is non-defective and subabundant, then `σ_s(X)`
+  is non-defective for every `s < r`.
+- `not_isDefective_of_finsetSup_eq_top`: if the combined span of some
+  sub-family `{S i | i ∈ T}` already fills `E`, then `S` itself is
+  non-defective. Geometrically: if `σ_r(X)` is non-defective and
+  superabundant (fills the ambient space), then `σ_s(X)` is non-defective for
+  every `s > r`.
 
 ## Sorry Inventory
 

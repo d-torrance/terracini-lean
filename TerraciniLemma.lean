@@ -57,7 +57,12 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
   (∑ i, finrank (S i))`, `IsDefective S` holds when `finrank (⨆ i, S i) <
   expectedDim S`, and `defect S` is the resulting shortfall. Instantiated for
   the quadric Veronese surface (cone model): `veroneseSurface_isDefective` and
-  `defect_veroneseSurface` show the classical defect is exactly `1`.
+  `defect_veroneseSurface` show the classical defect is exactly `1`. Also
+  proves monotonicity of non-defectivity in the number of points `r`:
+  `finrank_finsetSup_eq_sum_of_not_isDefective_subabundant` (subabundant case,
+  non-defectivity for `r` points propagates down to any sub-collection) and
+  `not_isDefective_of_finsetSup_eq_top` (superabundant case, propagates up to
+  any super-collection).
 
 ## References
 
@@ -90,6 +95,8 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
 | `finrank_iSup_le_expectedDim` | ✓ proved | `finrank (⨆ i, S i) ≤ expectedDim S`, always |
 | `veroneseSurface_isDefective` | ✓ proved | `v₂(ℙ²) ⊂ ℙ⁵` is Alexander–Hirschowitz defective |
 | `defect_veroneseSurface` | ✓ proved | the defect of `σ₂(v₂(ℙ²))` is exactly `1` |
+| `finrank_finsetSup_eq_sum_of_not_isDefective_subabundant` | ✓ proved | subabundant non-defectivity for `r` points implies it for any sub-collection |
+| `not_isDefective_of_finsetSup_eq_top` | ✓ proved | superabundant non-defectivity for `r` points implies it for any super-collection |
 | Generic smoothness | ⚠ hypothesis | `hdominant`/`hgeneric` in `terraciniLemma` |
 
 There are no `sorry`s remaining in this file. The only gap is mathematical,
