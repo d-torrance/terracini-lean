@@ -59,6 +59,14 @@ The mathematics is organized into six files:
   examples for Veronese varieties: the plane conic `v₂(ℙ¹) ⊂ ℙ²` (σ₂ fills
   the plane) and the twisted cubic `v₃(ℙ¹) ⊂ ℙ³` (the two tangent directions
   span a hyperplane, the expected outcome since `2 · dim X < dim ℙ³`).
+- [`TerraciniLemma/VeroneseSurface.lean`](TerraciniLemma/VeroneseSurface.lean)
+  — the quadric Veronese surface `v₂(ℙ²) ⊂ ℙ⁵`, worked directly in the
+  *affine cone* model (ambient `𝕜⁶`, tangent spaces of dimension `3`). This
+  is a genuinely **defective** case: the combined tangent space of two
+  general points is a `5`-dimensional hyperplane `⊊ 𝕜⁶`, even though
+  `min(6, 2·3) = 6` would be the non-defective expectation — the classical
+  Alexander–Hirschowitz defect of `σ₂(v₂(ℙ²))` (the determinantal cubic
+  hypersurface).
 - [`TerraciniLemma/Segre.lean`](TerraciniLemma/Segre.lean) — worked examples
   for Segre varieties: the non-defective Segre quadric `ℙ¹ × ℙ¹ ⊂ ℙ³` and the
   defective Segre threefold `ℙ¹ × ℙ¹ × ℙ¹ ⊂ ℙ⁷`.

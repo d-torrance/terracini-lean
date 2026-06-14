@@ -1,6 +1,7 @@
 import TerraciniLemma.Core
 import TerraciniLemma.PolynomialCalculus
 import TerraciniLemma.Veronese
+import TerraciniLemma.VeroneseSurface
 import TerraciniLemma.Segre
 import TerraciniLemma.EllipticCurve
 
@@ -29,6 +30,11 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
   calculus of polynomial maps for free.
 * `TerraciniLemma.Veronese` — worked examples for Veronese varieties: the
   plane conic `v₂(ℙ¹) ⊂ ℙ²` and the twisted cubic `v₃(ℙ¹) ⊂ ℙ³`.
+* `TerraciniLemma.VeroneseSurface` — the quadric Veronese surface
+  `v₂(ℙ²) ⊂ ℙ⁵`, worked in the *affine cone* model. Unlike the Veronese
+  examples above, this is a genuinely **defective** case in the sense of the
+  Alexander–Hirschowitz theorem: `σ₂(v₂(ℙ²))` falls one dimension short of
+  the expected dimension.
 * `TerraciniLemma.Segre` — worked examples for Segre varieties: the
   non-defective Segre quadric `ℙ¹ × ℙ¹ ⊂ ℙ³` and the defective Segre
   threefold `ℙ¹ × ℙ¹ × ℙ¹ ⊂ ℙ⁷`.
@@ -59,6 +65,7 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
 | `terraciniLemma` | ✓ proved | From `hdominant` + `hgeneric` (finrank count) |
 | `parabola_terracini` | ✓ proved | Worked example: plane conic, σ₂ = 𝕜² |
 | `twistedCubic_terracini` | ✓ proved | Worked example: twisted cubic, combined tangent directions span a hyperplane ⊊ 𝕜³ |
+| `veroneseSurface_terracini` | ✓ proved | Worked example: quadric Veronese surface v₂(ℙ²) ⊂ ℙ⁵ (cone model), σ₂ ⊊ 𝕜⁶ (genuine Alexander–Hirschowitz defect) |
 | `segre_terracini` | ✓ proved | Worked example: Segre quadric P¹×P¹ ⊂ P³, σ₂ = 𝕜³ |
 | `segre3_terracini` | ✓ proved | Worked example: Segre threefold P¹×P¹×P¹ ⊂ P⁷, σ₂ ⊊ 𝕜⁷ (defective) |
 | `elliptic_terracini` | ✓ proved | Worked example: elliptic curve y²=x³+1 via the Implicit Function Theorem, σ₂ = 𝕜² |
@@ -70,6 +77,7 @@ maps into σᵣ(X̂)) and `hgeneric : finrank T ≤ finrank Im(dΦ)` (a dimensio
 count, the actual content of generic smoothness in characteristic zero) as
 hypotheses, rather than deriving them from a general theory of dominant
 morphisms — which is not yet in Mathlib. The worked examples above discharge
-both hypotheses concretely for the plane conic, the Segre quadric, the
-(defective) Segre threefold, and the elliptic curve.
+both hypotheses concretely for the plane conic, the (defective) quadric
+Veronese surface, the Segre quadric, the (defective) Segre threefold, and the
+elliptic curve.
 -/
