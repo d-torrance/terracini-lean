@@ -6,7 +6,7 @@ import Mathlib.Analysis.Complex.Basic
 /-!
 # Worked example: the quadric Veronese surface `v₂(ℙ²) ⊂ ℙ⁵` (a genuinely defective case)
 
-Every previous Veronese example (`TerraciniLemma.Veronese`) used the **affine chart** model:
+Every previous Veronese example (`TerraciniLemma.RationalNormalCurves`) used the **affine chart** model:
 `X ⊆ 𝕜^N` is the affine chart of `v_d(ℙⁿ) ⊂ ℙᴺ` (so `dim X = n`, ambient `N`), and tangent
 spaces have dimension `n`. As explained there, for that model the combined tangent space of
 `r` general points has dimension `min(N, r·n)`, which is *always* self-consistent — it can
@@ -37,7 +37,7 @@ a `5`-dimensional subspace, **not** all of `𝕜⁶`. Terracini's Lemma then giv
     T = T_{e₁⊗e₁} X̂ + T_{e₂⊗e₂} X̂  ⊊ 𝕜⁶ = (the non-defective expectation),
 
 which is exactly the Alexander–Hirschowitz defect of the quadric Veronese surface, in contrast
-to `TerraciniLemma.Veronese`'s twisted cubic (where the analogous "shortfall" was the *expected,
+to `TerraciniLemma.RationalNormalCurves`'s twisted cubic (where the analogous "shortfall" was the *expected,
 generic* outcome, not a defect).
 
 The calculus of the six degree-`2` monomials `v₀², v₁², v₂², v₀v₁, v₀v₂, v₁v₂` is obtained, as

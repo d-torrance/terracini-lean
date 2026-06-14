@@ -3,15 +3,17 @@ import Mathlib.Analysis.Calculus.Deriv.Polynomial
 import Mathlib.Analysis.Complex.Basic
 
 /-!
-# Worked examples: Veronese varieties
+# Worked examples: rational normal curves
 
 The `r`-th Veronese embedding `v_r : ℙ¹ → ℙ^r` sends `[s:t]` to the vector of
-all monomials of degree `r` in `s, t`. Its affine chart is the rational
-normal curve `t ↦ (t, t², …, tʳ) ⊆ 𝕜^r`.
+all monomials of degree `r` in `s, t`; its image is the rational normal curve
+of degree `r`. Its affine chart is `t ↦ (t, t², …, tʳ) ⊆ 𝕜^r`.
 
 This file contains the case `r = 2`, the plane conic (parabola), and the case
-`r = 3`, the twisted cubic. Further Veronese examples can be added here
-following the same `parabolaParamPair`/`twistedCubicParamPair` pattern.
+`r = 3`, the twisted cubic. Further rational normal curve examples can be
+added here following the same `parabolaParamPair`/`twistedCubicParamPair`
+pattern. (For Veronese varieties `v_d(ℙⁿ)` with `n ≥ 2`, see
+`TerraciniLemma.VeroneseSurface`.)
 -/
 
 /-!

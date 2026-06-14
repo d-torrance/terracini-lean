@@ -43,10 +43,11 @@ projective variety `X` (so that `ℙ(E)` is the ambient projective space contain
 `X`). This holds for `TerraciniLemma.VeroneseSurface` (`E = Fin 6 → 𝕜 = Sym²(𝕜³)`
 is the cone over `v₂(ℙ²) ⊂ ℙ⁵`), and we instantiate the corollary for that
 example below. It does *not* hold for the affine-*chart* examples
-(`TerraciniLemma.Veronese`'s parabola/twisted cubic, `TerraciniLemma.Segre`,
-`TerraciniLemma.EllipticCurve`), whose ambient spaces are affine charts of a
-projective space rather than cones over it — `Submodule.projectivization` still
-applies formally to those `T = ⨆ ...` equations, but the resulting statement is
+(`TerraciniLemma.RationalNormalCurves`'s parabola/twisted cubic,
+`TerraciniLemma.Segre`, `TerraciniLemma.EllipticCurve`), whose ambient spaces
+are affine charts of a projective space rather than cones over it —
+`Submodule.projectivization` still applies formally to those `T = ⨆ ...`
+equations, but the resulting statement is
 about `ℙ(E)` for the *wrong* `E`, not the projective secant variety of the
 intended `X`.
 -/

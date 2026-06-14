@@ -7,8 +7,8 @@ import Mathlib.Analysis.Calculus.FDeriv.Mul
 /-!
 # Calculus of multivariate polynomials
 
-A "middle ground" between hand-rolled calculus (as in `TerraciniLemma.Veronese` and
-`TerraciniLemma.Segre`) and the Implicit Function Theorem (as in
+A "middle ground" between hand-rolled calculus (as in `TerraciniLemma.RationalNormalCurves`
+and `TerraciniLemma.Segre`) and the Implicit Function Theorem (as in
 `TerraciniLemma.EllipticCurve`): every variety in this project is cut out by, or
 parametrized by, polynomials, so Mathlib's *formal* derivative
 (`MvPolynomial.pderiv`) already computes the Fréchet derivative of evaluation. This

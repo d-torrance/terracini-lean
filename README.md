@@ -53,12 +53,12 @@ The mathematics is organized into six files:
 - [`TerraciniLemma/PolynomialCalculus.lean`](TerraciniLemma/PolynomialCalculus.lean)
   — a "middle ground" between hand-rolled calculus and the Implicit Function
   Theorem: a generic bridge from `MvPolynomial.pderiv` to `HasFDerivAt` and
-  `ContDiff`, used by the Veronese and elliptic curve examples to get the
-  calculus of polynomial maps for free.
-- [`TerraciniLemma/Veronese.lean`](TerraciniLemma/Veronese.lean) — worked
-  examples for Veronese varieties: the plane conic `v₂(ℙ¹) ⊂ ℙ²` (σ₂ fills
-  the plane) and the twisted cubic `v₃(ℙ¹) ⊂ ℙ³` (the two tangent directions
-  span a hyperplane, the expected outcome since `2 · dim X < dim ℙ³`).
+  `ContDiff`, used by the rational normal curve and elliptic curve examples
+  to get the calculus of polynomial maps for free.
+- [`TerraciniLemma/RationalNormalCurves.lean`](TerraciniLemma/RationalNormalCurves.lean)
+  — worked examples for rational normal curves: the plane conic `v₂(ℙ¹) ⊂ ℙ²`
+  (σ₂ fills the plane) and the twisted cubic `v₃(ℙ¹) ⊂ ℙ³` (the two tangent
+  directions span a hyperplane, the expected outcome since `2 · dim X < dim ℙ³`).
 - [`TerraciniLemma/VeroneseSurface.lean`](TerraciniLemma/VeroneseSurface.lean)
   — the quadric Veronese surface `v₂(ℙ²) ⊂ ℙ⁵`, worked directly in the
   *affine cone* model (ambient `𝕜⁶`, tangent spaces of dimension `3`). This
@@ -72,7 +72,7 @@ The mathematics is organized into six files:
   defective Segre threefold `ℙ¹ × ℙ¹ × ℙ¹ ⊂ ℙ⁷`.
 - [`TerraciniLemma/EllipticCurve.lean`](TerraciniLemma/EllipticCurve.lean) —
   a worked example for the elliptic curve `y² = x³ + 1`. Unlike the
-  Veronese/Segre examples, this curve has no global rational
+  RationalNormalCurves/Segre examples, this curve has no global rational
   parametrization, so the local charts at each point are instead built from
   Mathlib's Implicit Function Theorem.
 - [`TerraciniLemma/Projective.lean`](TerraciniLemma/Projective.lean) —

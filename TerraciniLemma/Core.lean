@@ -11,7 +11,7 @@ import Mathlib.LinearAlgebra.FiniteDimensional.Basic
 # Terracini's Lemma: core theory
 
 This file contains the general theory shared by the worked examples in
-`TerraciniLemma.Veronese` and `TerraciniLemma.Segre`.
+`TerraciniLemma.RationalNormalCurves` and `TerraciniLemma.Segre`.
 
 We work with the *affine cone* over ℙ^N, replacing a projective variety X by
 its cone X̂ ⊆ V and σᵣ(X) by σ̂ᵣ(X̂) = closure { v₁ + ⋯ + vᵣ | vᵢ ∈ X̂ }. The

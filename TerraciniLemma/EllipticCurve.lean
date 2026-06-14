@@ -7,7 +7,7 @@ import Mathlib.LinearAlgebra.Dual.Lemmas
 /-!
 # Worked example: an elliptic curve via the Implicit Function Theorem
 
-All previous worked examples (`TerraciniLemma.Veronese`, `TerraciniLemma.Segre`) build their
+All previous worked examples (`TerraciniLemma.RationalNormalCurves`, `TerraciniLemma.Segre`) build their
 `LocalParam`s from an explicit *rational parametrization* of the variety. An elliptic curve
 cannot be rationally parametrized, so we instead build the required local charts directly from
 Mathlib's **implicit function theorem** (`HasStrictFDerivAt.implicitFunction` and friends, in
