@@ -56,7 +56,9 @@ The mathematics is organized into six files:
   `ContDiff`, used by the Veronese and elliptic curve examples to get the
   calculus of polynomial maps for free.
 - [`TerraciniLemma/Veronese.lean`](TerraciniLemma/Veronese.lean) — worked
-  examples for Veronese varieties (currently the plane conic `v₂(ℙ¹) ⊂ ℙ²`).
+  examples for Veronese varieties: the plane conic `v₂(ℙ¹) ⊂ ℙ²` (σ₂ fills
+  the plane) and the twisted cubic `v₃(ℙ¹) ⊂ ℙ³` (the two tangent directions
+  span a hyperplane, the expected outcome since `2 · dim X < dim ℙ³`).
 - [`TerraciniLemma/Segre.lean`](TerraciniLemma/Segre.lean) — worked examples
   for Segre varieties: the non-defective Segre quadric `ℙ¹ × ℙ¹ ⊂ ℙ³` and the
   defective Segre threefold `ℙ¹ × ℙ¹ × ℙ¹ ⊂ ℙ⁷`.

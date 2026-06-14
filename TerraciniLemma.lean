@@ -27,8 +27,8 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
   `MvPolynomial.pderiv` and `HasFDerivAt`/`ContDiff`, used by
   `TerraciniLemma.Veronese` and `TerraciniLemma.EllipticCurve` to compute the
   calculus of polynomial maps for free.
-* `TerraciniLemma.Veronese` — worked examples for Veronese varieties
-  (currently the plane conic `v₂(ℙ¹) ⊂ ℙ²`).
+* `TerraciniLemma.Veronese` — worked examples for Veronese varieties: the
+  plane conic `v₂(ℙ¹) ⊂ ℙ²` and the twisted cubic `v₃(ℙ¹) ⊂ ℙ³`.
 * `TerraciniLemma.Segre` — worked examples for Segre varieties: the
   non-defective Segre quadric `ℙ¹ × ℙ¹ ⊂ ℙ³` and the defective Segre
   threefold `ℙ¹ × ℙ¹ × ℙ¹ ⊂ ℙ⁷`.
@@ -58,6 +58,7 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
 | `terraciniLemma_derivative` | ✓ proved | Core Terracini computation |
 | `terraciniLemma` | ✓ proved | From `hdominant` + `hgeneric` (finrank count) |
 | `parabola_terracini` | ✓ proved | Worked example: plane conic, σ₂ = 𝕜² |
+| `twistedCubic_terracini` | ✓ proved | Worked example: twisted cubic, combined tangent directions span a hyperplane ⊊ 𝕜³ |
 | `segre_terracini` | ✓ proved | Worked example: Segre quadric P¹×P¹ ⊂ P³, σ₂ = 𝕜³ |
 | `segre3_terracini` | ✓ proved | Worked example: Segre threefold P¹×P¹×P¹ ⊂ P⁷, σ₂ ⊊ 𝕜⁷ (defective) |
 | `elliptic_terracini` | ✓ proved | Worked example: elliptic curve y²=x³+1 via the Implicit Function Theorem, σ₂ = 𝕜² |

@@ -141,21 +141,26 @@ example (t₁ t₂ : ℂ) (h : t₁ ≠ t₂) :
 end ParabolaExample
 
 /-!
-## Example: Terracini's Lemma for the twisted cubic (a defective σ₂)
+## Example: Terracini's Lemma for the twisted cubic (a proper hyperplane span)
 
 We now turn to the twisted cubic `X = {(t, t², t³) : t ∈ 𝕜} ⊆ 𝕜³`, the affine
 chart of the rational normal curve `v₃(ℙ¹) ⊂ ℙ³`. The tangent line to `X` at
 `(t, t², t³)` is spanned by `(1, 2t, 3t²)`.
 
-Unlike the parabola (`r = 2`, ambient `𝕜²`, where `2 · 1 = 2` fills the
-ambient space), here `2 · 1 = 2 < 3 = dim 𝕜³`: the expected dimension of σ₂ is
-only `2`, so σ₂(X) is a proper (hypersurface) subvariety of `𝕜³` — the twisted
-cubic is *defective* for `r = 2` in this affine chart.
+Unlike the parabola (`r = 2`, ambient `𝕜²`, where `r · dim X = 2 · 1 = 2`
+equals the ambient dimension, so the two tangent directions fill `𝕜²`), here
+`r · dim X = 2 < 3 = dim 𝕜³`: two 1-dimensional tangent directions can only
+ever span a 2-dimensional subspace, so their combined span is necessarily a
+*proper* (hyperplane) subspace of `𝕜³`. This is the **expected/generic**
+outcome whenever `r · dim X < N` — it is *not* an instance of defectivity in
+the sense of the Alexander–Hirschowitz theorem (which concerns higher Veronese
+varieties `v_d(ℙⁿ)`, `n ≥ 2`; rational normal curves such as the twisted cubic
+are never defective).
 
 Concretely, at the points `t₁ = 0` and `t₂ = 1` the tangent directions are
-`(1, 0, 0)` and `(1, 2, 3)`, both of which satisfy `3y = 2z`. We show that
-their span is *exactly* the hyperplane `{(x, y, z) : 3y = 2z}`, so Terracini's
-Lemma gives
+`(1, 0, 0)` and `(1, 2, 3)`, which are linearly independent and both satisfy
+`3y = 2z`. We show that their span is *exactly* the hyperplane
+`{(x, y, z) : 3y = 2z}`, so Terracini's Lemma gives
 
     {(x, y, z) : 3y = 2z} = T_{(0,0,0)} X + T_{(1,1,1)} X.
 -/
@@ -278,10 +283,10 @@ theorem range_combinedDerivative_twistedCubic :
 
 /-- **Terracini's Lemma for the twisted cubic `v₃(ℙ¹) ⊂ ℙ³`** (at `t₁ = 0`, `t₂ = 1`):
 the tangent lines to the twisted cubic at `(0,0,0)` and `(1,1,1)` together span exactly
-the hyperplane `ker twistedCubicDefect = {(x,y,z) : 3y = 2z}` — *not* all of `𝕜³`. Since
-the expected dimension of σ₂ for a curve (`min(3, 2·1) = 2`) is less than the ambient
-dimension `3`, this exhibits the (mild) defectiveness of the twisted cubic's second
-secant variety in this affine chart. -/
+the hyperplane `ker twistedCubicDefect = {(x,y,z) : 3y = 2z}` — a proper subspace of
+`𝕜³`, since two 1-dimensional tangent directions can span at most a 2-dimensional
+subspace. This is the expected/generic outcome (not an instance of defectivity in the
+Alexander–Hirschowitz sense; rational normal curves are never defective). -/
 theorem twistedCubic_terracini :
     LinearMap.ker twistedCubicDefect.toLinearMap =
       ⨆ i : Fin 2, (twistedCubicParamPair (0 : 𝕜) 1 i).tangentSpace := by
