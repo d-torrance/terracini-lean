@@ -5,6 +5,7 @@ import TerraciniLemma.VeroneseSurface
 import TerraciniLemma.Segre
 import TerraciniLemma.EllipticCurve
 import TerraciniLemma.Projective
+import TerraciniLemma.Defect
 
 /-!
 # Terracini's Lemma
@@ -50,6 +51,13 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
   order isomorphism `Submodule.projectivization` between linear subspaces of
   `E` and projective subspaces of `ℙ(E)`. Instantiated for the quadric
   Veronese surface: `ℙ(σ₂(v₂(ℙ²)))` is a proper hyperplane `ℙ⁴ ⊊ ℙ⁵`.
+* `TerraciniLemma.Defect` (§7) — packages the dimension count from
+  `terraciniLemma` into the classical Alexander–Hirschowitz language of
+  *expected dimension* and *defect*: `expectedDim S = min (finrank E)
+  (∑ i, finrank (S i))`, `IsDefective S` holds when `finrank (⨆ i, S i) <
+  expectedDim S`, and `defect S` is the resulting shortfall. Instantiated for
+  the quadric Veronese surface (cone model): `veroneseSurface_isDefective` and
+  `defect_veroneseSurface` show the classical defect is exactly `1`.
 
 ## References
 
@@ -79,6 +87,9 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
 | `terraciniLemma_projective` | ✓ proved | Projective form of `terraciniLemma`, via `Submodule.projectivization` |
 | `veroneseSurface_terracini_projective` | ✓ proved | Projective form for v₂(ℙ²) ⊂ ℙ⁵: ℙ(σ₂) is the span of the two projective tangent planes |
 | `veroneseSurface_terracini_projective_ne_top` | ✓ proved | ℙ(σ₂(v₂(ℙ²))) ⊊ ℙ⁵ (a hyperplane ℙ⁴) |
+| `finrank_iSup_le_expectedDim` | ✓ proved | `finrank (⨆ i, S i) ≤ expectedDim S`, always |
+| `veroneseSurface_isDefective` | ✓ proved | `v₂(ℙ²) ⊂ ℙ⁵` is Alexander–Hirschowitz defective |
+| `defect_veroneseSurface` | ✓ proved | the defect of `σ₂(v₂(ℙ²))` is exactly `1` |
 | Generic smoothness | ⚠ hypothesis | `hdominant`/`hgeneric` in `terraciniLemma` |
 
 There are no `sorry`s remaining in this file. The only gap is mathematical,

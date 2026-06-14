@@ -81,8 +81,16 @@ The mathematics is organized into six files:
   isomorphism `Submodule.projectivization` between linear subspaces of `E`
   and projective subspaces of `ℙ(E)`. Instantiated for the quadric Veronese
   surface, showing `ℙ(σ₂(v₂(ℙ²)))` is a proper hyperplane `ℙ⁴ ⊊ ℙ⁵`.
+- [`TerraciniLemma/Defect.lean`](TerraciniLemma/Defect.lean) (§7) — packages
+  the dimension count from `terraciniLemma` into the classical
+  Alexander–Hirschowitz language of *expected dimension* and *defect*:
+  `expectedDim S = min(N, ∑ᵢ dim Tᵢ)`, `IsDefective S ↔ dim ⨆ᵢ Tᵢ <
+  expectedDim S`, and `defect S` is the resulting shortfall. Instantiated for
+  the quadric Veronese surface (cone model): the classical defect of
+  `σ₂(v₂(ℙ²))` is exactly `1`.
 
-The sections below (§1–§6) all live in `TerraciniLemma/Core.lean`.
+The sections below (§1–§7) live in `TerraciniLemma/Core.lean` and
+`TerraciniLemma/Defect.lean`.
 
 ### §1 — The addition map
 ```
@@ -134,6 +142,28 @@ from `Mathlib.LinearAlgebra.Projectivization`. This is formalized in
 [`TerraciniLemma/Projective.lean`](TerraciniLemma/Projective.lean), with the
 quadric Veronese surface as a worked example: `ℙ(σ₂(v₂(ℙ²)))` is a proper
 hyperplane `ℙ⁴ ⊊ ℙ⁵`.
+
+### §7 — Expected dimension and defect
+```
+expectedDim S          -- min (finrank E) (∑ i, finrank (S i))
+IsDefective S          -- finrank (⨆ i, S i) < expectedDim S
+defect S                -- expectedDim S - finrank (⨆ i, S i)
+```
+This packages the dimension count from `terraciniLemma` into the classical
+**Alexander–Hirschowitz** language: `expectedDim S` is the naive
+("non-defective") prediction for `finrank (⨆ i, S i)`, always an upper bound
+(`finrank_iSup_le_expectedDim`), and `IsDefective S ↔ 0 < defect S`. This is
+formalized in [`TerraciniLemma/Defect.lean`](TerraciniLemma/Defect.lean).
+
+`IsDefective`/`defect` have their *intended* meaning — genuine
+Alexander–Hirschowitz defectivity of `X = ℙ(X̂)` — only when `E` is the affine
+**cone** over `X`, as for the quadric Veronese surface: `veroneseSurface_isDefective`
+and `defect_veroneseSurface` show `σ₂(v₂(ℙ²))` has defect exactly `1`, matching
+the classical result. (For the affine-**chart** examples — rational normal
+curves, Segre varieties, the elliptic curve — tangent spaces have dimension
+`dim X` rather than `dim X + 1`, so `expectedDim` there is a systematically
+different quantity; `IsDefective`/`defect` are deliberately not instantiated
+for those.)
 
 ## Sorry Inventory
 
