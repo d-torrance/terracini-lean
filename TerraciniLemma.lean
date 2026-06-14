@@ -4,6 +4,7 @@ import TerraciniLemma.Veronese
 import TerraciniLemma.VeroneseSurface
 import TerraciniLemma.Segre
 import TerraciniLemma.EllipticCurve
+import TerraciniLemma.Projective
 
 /-!
 # Terracini's Lemma
@@ -43,6 +44,11 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
   rational parametrization. Local charts are instead built from Mathlib's
   Implicit Function Theorem, demonstrating that `LocalParam` only needs a
   *local* smooth chart at each point.
+* `TerraciniLemma.Projective` — descends `terraciniLemma` to the projective
+  statement `T_{[p]} σᵣ(X) = ⟨T_{[p₁]}X, …, T_{[pᵣ]}X⟩` in `ℙ(E)`, via the
+  order isomorphism `Submodule.projectivization` between linear subspaces of
+  `E` and projective subspaces of `ℙ(E)`. Instantiated for the quadric
+  Veronese surface: `ℙ(σ₂(v₂(ℙ²)))` is a proper hyperplane `ℙ⁴ ⊊ ℙ⁵`.
 
 ## References
 
@@ -69,6 +75,9 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
 | `segre_terracini` | ✓ proved | Worked example: Segre quadric P¹×P¹ ⊂ P³, σ₂ = 𝕜³ |
 | `segre3_terracini` | ✓ proved | Worked example: Segre threefold P¹×P¹×P¹ ⊂ P⁷, σ₂ ⊊ 𝕜⁷ (defective) |
 | `elliptic_terracini` | ✓ proved | Worked example: elliptic curve y²=x³+1 via the Implicit Function Theorem, σ₂ = 𝕜² |
+| `terraciniLemma_projective` | ✓ proved | Projective form of `terraciniLemma`, via `Submodule.projectivization` |
+| `veroneseSurface_terracini_projective` | ✓ proved | Projective form for v₂(ℙ²) ⊂ ℙ⁵: ℙ(σ₂) is the span of the two projective tangent planes |
+| `veroneseSurface_terracini_projective_ne_top` | ✓ proved | ℙ(σ₂(v₂(ℙ²))) ⊊ ℙ⁵ (a hyperplane ℙ⁴) |
 | Generic smoothness | ⚠ hypothesis | `hdominant`/`hgeneric` in `terraciniLemma` |
 
 There are no `sorry`s remaining in this file. The only gap is mathematical,

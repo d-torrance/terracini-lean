@@ -392,10 +392,15 @@ Terracini's Lemma in projective coordinates then says:
 
 which is exactly the statement T_p σᵣ(X) = ⟨T_{p₁}X, …, T_{pᵣ}X⟩.
 
-We do not give a full formalization of the projective version here, as it
-requires the projectivization API from `Mathlib.LinearAlgebra.Projectivization`,
-which can be connected to the affine cone results above via the standard
-cone-to-projective correspondence.
+This descent is carried out in `TerraciniLemma.Projective`, using the order
+isomorphism `Submodule.projectivization : Submodule 𝕜 E ≃o
+Projectivization.Subspace 𝕜 E` from `Mathlib.LinearAlgebra.Projectivization`:
+applying it to both sides of `T = ⨆ i, (param i).tangentSpace` (and using that
+order isomorphisms of complete lattices preserve `iSup`) immediately gives the
+projective statement above. See that file for the precise statement,
+including the caveat that `E` must itself be the affine cone over `X` for the
+result to carry its intended geometric meaning (true for
+`TerraciniLemma.VeroneseSurface`, not for the affine-chart examples).
 -/
 
 end

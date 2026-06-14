@@ -75,6 +75,12 @@ The mathematics is organized into six files:
   Veronese/Segre examples, this curve has no global rational
   parametrization, so the local charts at each point are instead built from
   Mathlib's Implicit Function Theorem.
+- [`TerraciniLemma/Projective.lean`](TerraciniLemma/Projective.lean) —
+  descends `terraciniLemma` to the projective statement
+  `T_{[p]} σᵣ(X) = ⟨T_{[p₁]}X, …, T_{[pᵣ]}X⟩` in `ℙ(E)`, via the order
+  isomorphism `Submodule.projectivization` between linear subspaces of `E`
+  and projective subspaces of `ℙ(E)`. Instantiated for the quadric Veronese
+  surface, showing `ℙ(σ₂(v₂(ℙ²)))` is a proper hyperplane `ℙ⁴ ⊊ ℙ⁵`.
 
 The sections below (§1–§6) all live in `TerraciniLemma/Core.lean`.
 
@@ -121,7 +127,13 @@ The main theorem (in finite dimension) takes two hypotheses that together encode
 From these, `Submodule.eq_of_le_of_finrank_le` gives $T = \operatorname{Im}(d\Phi)$, and Part A then gives $T = \bigsqcup_i T_{v_i}\hat X$.
 
 ### §6 — The projective formulation
-Sketch of how the affine cone result descends to the projective statement via `Mathlib.LinearAlgebra.Projectivization`. Not yet formalized.
+The affine cone result descends to the projective statement
+`T_{[p]} σᵣ(X) = ⟨T_{[p₁]}X, …, T_{[pᵣ]}X⟩` in `ℙ(E)` via the order isomorphism
+`Submodule.projectivization : Submodule 𝕜 E ≃o Projectivization.Subspace 𝕜 E`
+from `Mathlib.LinearAlgebra.Projectivization`. This is formalized in
+[`TerraciniLemma/Projective.lean`](TerraciniLemma/Projective.lean), with the
+quadric Veronese surface as a worked example: `ℙ(σ₂(v₂(ℙ²)))` is a proper
+hyperplane `ℙ⁴ ⊊ ℙ⁵`.
 
 ## Sorry Inventory
 
