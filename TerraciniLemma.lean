@@ -1,4 +1,5 @@
 import TerraciniLemma.Core
+import TerraciniLemma.PolynomialCalculus
 import TerraciniLemma.Veronese
 import TerraciniLemma.Segre
 import TerraciniLemma.EllipticCurve
@@ -21,6 +22,11 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
   the Terracini derivative computation, secant varieties, smooth local
   parametrizations (`LocalParam`), and the statement/proof of
   `terraciniLemma` itself.
+* `TerraciniLemma.PolynomialCalculus` — a "middle ground" between hand-rolled
+  calculus and the Implicit Function Theorem: a generic bridge between
+  `MvPolynomial.pderiv` and `HasFDerivAt`/`ContDiff`, used by
+  `TerraciniLemma.Veronese` and `TerraciniLemma.EllipticCurve` to compute the
+  calculus of polynomial maps for free.
 * `TerraciniLemma.Veronese` — worked examples for Veronese varieties
   (currently the plane conic `v₂(ℙ¹) ⊂ ℙ²`).
 * `TerraciniLemma.Segre` — worked examples for Segre varieties: the

@@ -41,7 +41,7 @@ Together these force $\operatorname{Im}(d\Phi) = T$ by a finite-dimensional subm
 
 ## File Overview
 
-The mathematics is organized into five files:
+The mathematics is organized into six files:
 
 - [`TerraciniLemma.lean`](TerraciniLemma.lean) — top-level module: imports the
   files below and gives the overall statement, file organization, and a
@@ -50,6 +50,11 @@ The mathematics is organized into five files:
   (§1–§6 below): the addition map, the Terracini derivative computation,
   secant varieties, smooth local parametrizations (`LocalParam`), and
   `terraciniLemma` itself.
+- [`TerraciniLemma/PolynomialCalculus.lean`](TerraciniLemma/PolynomialCalculus.lean)
+  — a "middle ground" between hand-rolled calculus and the Implicit Function
+  Theorem: a generic bridge from `MvPolynomial.pderiv` to `HasFDerivAt` and
+  `ContDiff`, used by the Veronese and elliptic curve examples to get the
+  calculus of polynomial maps for free.
 - [`TerraciniLemma/Veronese.lean`](TerraciniLemma/Veronese.lean) — worked
   examples for Veronese varieties (currently the plane conic `v₂(ℙ¹) ⊂ ℙ²`).
 - [`TerraciniLemma/Segre.lean`](TerraciniLemma/Segre.lean) — worked examples

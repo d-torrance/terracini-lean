@@ -1,4 +1,5 @@
 import TerraciniLemma.Core
+import Mathlib.Analysis.Calculus.Deriv.Polynomial
 import Mathlib.Analysis.Complex.Basic
 
 /-!
@@ -55,7 +56,18 @@ theorem parabolaDeriv_apply (t s : 𝕜) : parabolaDeriv t s = (s, 2 * t * s) :=
 omit [CharZero 𝕜] in
 theorem hasFDerivAt_parabola (t : 𝕜) : HasFDerivAt parabola (parabolaDeriv t) t := by
   have h2 : HasFDerivAt (fun x : 𝕜 => x ^ 2) ((2 * t) • ContinuousLinearMap.id 𝕜 𝕜) t := by
-    simpa [nsmul_eq_mul] using hasFDerivAt_pow (𝕜 := 𝕜) 2 (x := t)
+    have hp := (Polynomial.X ^ 2 : Polynomial 𝕜).hasFDerivAt t
+    have heval : (fun x : 𝕜 => (Polynomial.X ^ 2 : Polynomial 𝕜).eval x) = fun x : 𝕜 => x ^ 2 := by
+      funext x; simp
+    have hderiv : (Polynomial.X ^ 2 : Polynomial 𝕜).derivative.eval t = 2 * t := by
+      simp only [Polynomial.derivative_X_pow, Polynomial.eval_mul, Polynomial.eval_C,
+        Polynomial.eval_pow, Polynomial.eval_X, Nat.cast_ofNat]
+      norm_num
+    rw [heval, hderiv] at hp
+    have hsmul : ContinuousLinearMap.smulRight (1 : 𝕜 →L[𝕜] 𝕜) (2 * t)
+        = (2 * t) • ContinuousLinearMap.id 𝕜 𝕜 :=
+      ContinuousLinearMap.ext fun x => by simp [mul_comm]
+    rwa [hsmul] at hp
   exact (hasFDerivAt_id t).prodMk h2
 
 /-- The local parametrization of the parabola at parameter `t`. -/
