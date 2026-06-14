@@ -37,6 +37,12 @@ field, not just `ℝ`. The surjectivity proof solves a 2×2 linear system: since
 nonzero coefficient that can be inverted in `𝕜`. (This replaces the classical
 real argument "a sum of two squares vanishes iff both terms do", which needs
 an ordered field and fails over `ℂ`.)
+
+**Affine chart vs. cone.** `𝕜³` here is the affine chart `{(1, s, t, st)}` of
+`P³`, not the 4-dimensional cone `𝕜²⊗𝕜²` over the Segre embedding
+`P¹×P¹ ⊂ P³`. So `segre_terracini` is a chart-level computation and does not
+directly feed into `TerraciniLemma.Projective`'s `Submodule.projectivization`
+descent.
 -/
 
 noncomputable section SegreExample
@@ -179,6 +185,13 @@ Terracini's Lemma then gives `T = T_{segre3 p₁}X + T_{segre3 p₂}X`, and sinc
 `P⁷` — the classical defectiveness of the Segre threefold. The proof of
 injectivity solves `2x = 0 ⟹ x = 0`, which requires `2 ≠ 0`, i.e.
 characteristic zero.
+
+**Affine chart vs. cone.** `𝕜⁷` here is the affine chart `{(1,r,s,t,rs,rt,st,rst)}`
+of `P⁷`, not the 8-dimensional cone `𝕜²⊗𝕜²⊗𝕜²` over the Segre embedding
+`P¹×P¹×P¹ ⊂ P⁷`. So `segre3_terracini` is a chart-level computation and does
+not directly feed into `TerraciniLemma.Projective`'s
+`Submodule.projectivization` descent — a genuinely projective version of this
+defective example would need to be redone in the cone `𝕜⁸`.
 -/
 
 noncomputable section SegreCubicExample

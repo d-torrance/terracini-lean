@@ -35,6 +35,14 @@ non-degenerate plane conic is the whole plane. The proof solves
 characteristic zero (the parabola is genuinely special in characteristic 2:
 its tangent direction `(1, 2t) = (1, 0)` is constant, so the tangent lines
 never span `𝕜²`).
+
+**Affine chart vs. cone.** The ambient `𝕜²` here is the affine chart
+`{[1:s:u]} ⊂ ℙ²` of the conic `v₂(ℙ¹) ⊂ ℙ²`, not the affine cone
+`𝕜³ = Sym²(𝕜²)` over it. So `parabola_terracini` is a *chart-level*
+computation: it does not descend via `Submodule.projectivization`
+(`TerraciniLemma.Projective`) to a statement about `ℙ(σ₂(v₂(ℙ¹)))`. For that,
+one would need to redo the computation in the cone `𝕜³`, as
+`TerraciniLemma.VeroneseSurface` does for `v₂(ℙ²)`.
 -/
 
 noncomputable section ParabolaExample
@@ -163,6 +171,12 @@ Concretely, at the points `t₁ = 0` and `t₂ = 1` the tangent directions are
 `{(x, y, z) : 3y = 2z}`, so Terracini's Lemma gives
 
     {(x, y, z) : 3y = 2z} = T_{(0,0,0)} X + T_{(1,1,1)} X.
+
+**Affine chart vs. cone.** As with the parabola above, `𝕜³` here is the
+affine chart `{[1:s:u:w]} ⊂ ℙ³` of the twisted cubic `v₃(ℙ¹) ⊂ ℙ³`, not the
+4-dimensional affine cone over it. So `twistedCubic_terracini` is a
+chart-level computation and does not directly feed into
+`TerraciniLemma.Projective`'s `Submodule.projectivization` descent.
 -/
 
 noncomputable section TwistedCubicExample

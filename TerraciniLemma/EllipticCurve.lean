@@ -28,6 +28,12 @@ two rational points `p₁ = (0,1)` and `p₂ = (2,3)`, the tangent lines are spa
 The calculus of `ellipticF` (its derivative and smoothness) is obtained for free from
 `TerraciniLemma.PolynomialCalculus`'s generic `MvPolynomial.pderiv` ↔ `HasFDerivAt` bridge,
 since `ellipticF` is literally evaluation of `ellipticPoly`.
+
+**Affine chart vs. cone.** `Fin 2 → 𝕜` here is the affine chart `{[1:x:y]}` of
+`ℙ²` (the curve `E` minus its point at infinity), not the 3-dimensional cone
+over `E`. So `elliptic_terracini` is a chart-level computation and does not
+directly feed into `TerraciniLemma.Projective`'s `Submodule.projectivization`
+descent.
 -/
 
 noncomputable section EllipticCurveExample
