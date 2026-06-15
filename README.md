@@ -78,6 +78,18 @@ The mathematics is organized into six files:
   Alexander–Hirschowitz defective **iff `2 ≤ r ≤ n`**; `veroneseGeneral_sup_eq_top`
   and `veroneseGeneral_not_isDefective_of_succ_le` show the boundary case
   `r = n+1` fills the ambient space and every `r ≥ n+1` is non-defective.
+- [`TerraciniLemma/VeroneseDegree.lean`](TerraciniLemma/VeroneseDegree.lean)
+  — the degree-`d` Veronese variety `v_d(ℙⁿ) ⊂ ℙ^N`
+  (`N = binom(n+d,d) - 1`), worked in the affine cone model (ambient
+  `Sym (Fin (n+1)) d → 𝕜`, of dimension `binom(n+d,d)`, representing degree-`d`
+  forms in `n+1` variables) for general `d ≥ 1`, generalizing
+  `TerraciniLemma/VeroneseGeneral.lean`'s `d = 2`-only `Sym2 (Fin (n+1))`
+  indexing. The main theorem `veroneseDeg_not_isDefective` shows that for
+  `d ≥ 3` and `r ≤ n+1` coordinate points, `σ_r(v_d(ℙⁿ))` is **not**
+  Alexander–Hirschowitz defective: the `n+1`-element tangent-space supports at
+  each of the `r` points are pairwise *disjoint* (in contrast to `d = 2`,
+  where they pairwise overlap in exactly one element), so the combined tangent
+  space is a direct sum of dimension `r(n+1)`.
 - [`TerraciniLemma/Segre.lean`](TerraciniLemma/Segre.lean) — worked examples
   for Segre varieties: the non-defective Segre quadric `ℙ¹ × ℙ¹ ⊂ ℙ³` and the
   defective Segre threefold `ℙ¹ × ℙ¹ × ℙ¹ ⊂ ℙ⁷`.

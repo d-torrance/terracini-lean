@@ -3,6 +3,7 @@ import TerraciniLemma.PolynomialCalculus
 import TerraciniLemma.RationalNormalCurves
 import TerraciniLemma.VeroneseSurface
 import TerraciniLemma.VeroneseGeneral
+import TerraciniLemma.VeroneseDegree
 import TerraciniLemma.Segre
 import TerraciniLemma.EllipticCurve
 import TerraciniLemma.Projective
@@ -47,6 +48,15 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
   Alexander–Hirschowitz defective iff `2 ≤ r ≤ n`; `veroneseGeneral_sup_eq_top`
   and `veroneseGeneral_not_isDefective_of_succ_le` handle the non-defective
   superabundant regime `r ≥ n+1`.
+* `TerraciniLemma.VeroneseDegree` — the degree-`d` Veronese variety
+  `v_d(ℙⁿ) ⊂ ℙ^N` (`N = binom(n+d,d) - 1`), with ambient space indexed by
+  `Sym (Fin (n+1)) d` (general `d ≥ 1`), generalizing the `d = 2`-only
+  `Sym2 (Fin (n+1))`-indexed construction of `TerraciniLemma.VeroneseGeneral`.
+  For `d ≥ 3` and `r ≤ n+1` coordinate points, `veroneseDeg_not_isDefective`
+  shows `σ_r(v_d(ℙⁿ))` is *not* Alexander–Hirschowitz defective: the per-point
+  tangent space supports are pairwise disjoint (unlike the `d = 2` case, where
+  they pairwise overlap in one element), so the combined tangent space is an
+  honest direct sum of dimension `r(n+1)`.
 * `TerraciniLemma.Segre` — worked examples for Segre varieties: the
   non-defective Segre quadric `ℙ¹ × ℙ¹ ⊂ ℙ³` and the defective Segre
   threefold `ℙ¹ × ℙ¹ × ℙ¹ ⊂ ℙ⁷`.
@@ -110,6 +120,10 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
 | `isDefective_veroneseGeneral_iff` | ✓ proved | `σᵣ(v₂(ℙⁿ)) ⊂ ℙ^N` is Alexander–Hirschowitz defective iff `2 ≤ r ≤ n` |
 | `veroneseGeneral_sup_eq_top` | ✓ proved | `σ_{n+1}(v₂(ℙⁿ))` fills the ambient space (superabundant, non-defective) |
 | `veroneseGeneral_not_isDefective_of_succ_le` | ✓ proved | `σ_r(v₂(ℙⁿ))` is non-defective for every `r ≥ n+1` |
+| `finrank_ambient_veroneseDeg` | ✓ proved | ambient space of `v_d(ℙⁿ)` has dimension `binom(n+d,d)` |
+| `finrank_tangentSpace_veroneseDegFamily` | ✓ proved | each coordinate-point tangent space of `v_d(ℙⁿ)` has dimension `n+1` |
+| `finrank_iSup_veroneseDeg` | ✓ proved | for `d ≥ 3`, `r ≤ n+1` coordinate points, the combined tangent space has dimension exactly `r(n+1)` (direct sum, disjoint supports) |
+| `veroneseDeg_not_isDefective` | ✓ proved | `σ_r(v_d(ℙⁿ))` is non-defective for `d ≥ 3`, `r ≤ n+1` coordinate points |
 | `finrank_finsetSup_eq_sum_of_not_isDefective_subabundant` | ✓ proved | subabundant non-defectivity for `r` points implies it for any sub-collection |
 | `not_isDefective_of_finsetSup_eq_top` | ✓ proved | superabundant non-defectivity for `r` points implies it for any super-collection |
 | `not_isDefective_of_sup_eq_top` | ✓ proved | two-point specialization of the above |
