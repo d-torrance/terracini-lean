@@ -5,6 +5,7 @@ import TerraciniLemma.VeroneseSurface
 import TerraciniLemma.VeroneseGeneral
 import TerraciniLemma.VeroneseDegree
 import TerraciniLemma.VeroneseAH437
+import TerraciniLemma.VeroneseAH245
 import TerraciniLemma.Segre
 import TerraciniLemma.EllipticCurve
 import TerraciniLemma.Projective
@@ -67,6 +68,15 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
   Brambilla–Ottaviani) it is the Hankel-determinant cubic of the unique
   rational normal curve through the 7 points, whose secant variety is singular
   along that curve.
+* `TerraciniLemma.VeroneseAH245` — the `(n,d,r) = (2,4,5)` exceptional case of
+  the Alexander–Hirschowitz theorem: `ah245_isDefective` shows
+  `σ₅(v₄(ℙ²)) ⊂ ℙ^{14}` is defective, using 3 coordinate points `e₀,e₁,e₂` plus
+  two general points `p₃ = (1,1,1)`, `p₄ = (1,2,3)`. The certificate is a "dual
+  quartic" linear functional `dualQuarticφ` given by the coefficients of
+  `F = Q²`, where `Q = 3x₀x₁ - 4x₀x₂ + x₁x₂` is the unique conic through the 5
+  points: since `∇F = 2Q∇Q` vanishes on `{Q = 0}` and all 5 points lie on this
+  conic, `dualQuarticφ` vanishes on all 5 tangent spaces but not on the whole
+  ambient space.
 * `TerraciniLemma.Segre` — worked examples for Segre varieties: the
   non-defective Segre quadric `ℙ¹ × ℙ¹ ⊂ ℙ³` and the defective Segre
   threefold `ℙ¹ × ℙ¹ × ℙ¹ ⊂ ℙ⁷`.
@@ -139,6 +149,11 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
 | `finrank_ker_dualCubicφ'` | ✓ proved | `ker dualCubicφ'` has dimension `34 = 35 - 1` |
 | `finrank_tangentSpace_ah437` | ✓ proved | each of the 7 tangent spaces of `(4,3,7)` has dimension `5` |
 | `ah437_isDefective` | ✓ proved | `σ₇(v₃(ℙ⁴))` is Alexander–Hirschowitz defective (the `(4,3,7)` exceptional case) |
+| `dualQuarticφ_ne_zero` | ✓ proved | the dual quartic functional (`F = Q²` for the conic `Q` through the 5 points) on `v₄(ℙ²)`'s ambient space is nonzero |
+| `range_combinedDerivative_ah245_le_ker` | ✓ proved | the dual quartic vanishes on the combined tangent space of the 5 points of `(2,4,5)` |
+| `finrank_ker_dualQuarticφ` | ✓ proved | `ker dualQuarticφ` has dimension `14 = 15 - 1` |
+| `finrank_tangentSpace_ah245` | ✓ proved | each of the 5 tangent spaces of `(2,4,5)` has dimension `3` |
+| `ah245_isDefective` | ✓ proved | `σ₅(v₄(ℙ²))` is Alexander–Hirschowitz defective (the `(2,4,5)` exceptional case) |
 | `finrank_finsetSup_eq_sum_of_not_isDefective_subabundant` | ✓ proved | subabundant non-defectivity for `r` points implies it for any sub-collection |
 | `not_isDefective_of_finsetSup_eq_top` | ✓ proved | superabundant non-defectivity for `r` points implies it for any super-collection |
 | `not_isDefective_of_sup_eq_top` | ✓ proved | two-point specialization of the above |

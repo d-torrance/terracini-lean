@@ -100,6 +100,16 @@ The mathematics is organized into six files:
   following Brambilla–Ottaviani, it is (up to scale) the Hankel-determinant
   cubic of the unique rational normal curve through the 7 points, whose secant
   variety is singular along that curve.
+- [`TerraciniLemma/VeroneseAH245.lean`](TerraciniLemma/VeroneseAH245.lean) —
+  the `(n,d,r) = (2,4,5)` exceptional case of the Alexander–Hirschowitz
+  theorem: `ah245_isDefective` shows `σ₅(v₄(ℙ²)) ⊂ ℙ^{14}` is **defective**,
+  using 3 coordinate points `e₀,e₁,e₂` plus two general points
+  `p₃ = (1,1,1)`, `p₄ = (1,2,3)`. The certificate is a "dual quartic" linear
+  functional `dualQuarticφ` given by the coefficients of `F = Q²`, where
+  `Q = 3x₀x₁ - 4x₀x₂ + x₁x₂` is the unique conic through the 5 points: since
+  `∇F = 2Q∇Q` vanishes on `{Q = 0}` and all 5 points lie on this conic,
+  `dualQuarticφ` vanishes on all 5 tangent spaces (bounding their combined
+  dimension by `14 < 15`) but is itself nonzero.
 - [`TerraciniLemma/Segre.lean`](TerraciniLemma/Segre.lean) — worked examples
   for Segre varieties: the non-defective Segre quadric `ℙ¹ × ℙ¹ ⊂ ℙ³` and the
   defective Segre threefold `ℙ¹ × ℙ¹ × ℙ¹ ⊂ ℙ⁷`.
