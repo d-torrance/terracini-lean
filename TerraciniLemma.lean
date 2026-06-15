@@ -4,6 +4,7 @@ import TerraciniLemma.RationalNormalCurves
 import TerraciniLemma.VeroneseSurface
 import TerraciniLemma.VeroneseGeneral
 import TerraciniLemma.VeroneseDegree
+import TerraciniLemma.VeroneseAH437
 import TerraciniLemma.Segre
 import TerraciniLemma.EllipticCurve
 import TerraciniLemma.Projective
@@ -57,6 +58,15 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
   tangent space supports are pairwise disjoint (unlike the `d = 2` case, where
   they pairwise overlap in one element), so the combined tangent space is an
   honest direct sum of dimension `r(n+1)`.
+* `TerraciniLemma.VeroneseAH437` — the `(n,d,r) = (4,3,7)` exceptional case of
+  the Alexander–Hirschowitz theorem: `ah437_isDefective` shows
+  `σ₇(v₃(ℙ⁴)) ⊂ ℙ^{34}` is defective, using 5 coordinate points `e₀,…,e₄` plus
+  two general points `p₆ = (1,1,1,1,1)`, `p₇ = (1,2,3,4,5)`. The certificate is
+  a "dual cubic" linear functional `dualCubicφ'` that vanishes on all 7
+  tangent spaces but not on the whole ambient space; geometrically (following
+  Brambilla–Ottaviani) it is the Hankel-determinant cubic of the unique
+  rational normal curve through the 7 points, whose secant variety is singular
+  along that curve.
 * `TerraciniLemma.Segre` — worked examples for Segre varieties: the
   non-defective Segre quadric `ℙ¹ × ℙ¹ ⊂ ℙ³` and the defective Segre
   threefold `ℙ¹ × ℙ¹ × ℙ¹ ⊂ ℙ⁷`.
@@ -124,6 +134,11 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
 | `finrank_tangentSpace_veroneseDegFamily` | ✓ proved | each coordinate-point tangent space of `v_d(ℙⁿ)` has dimension `n+1` |
 | `finrank_iSup_veroneseDeg` | ✓ proved | for `d ≥ 3`, `r ≤ n+1` coordinate points, the combined tangent space has dimension exactly `r(n+1)` (direct sum, disjoint supports) |
 | `veroneseDeg_not_isDefective` | ✓ proved | `σ_r(v_d(ℙⁿ))` is non-defective for `d ≥ 3`, `r ≤ n+1` coordinate points |
+| `dualCubicφ'_ne_zero` | ✓ proved | the dual cubic functional (Hankel-determinant cubic) on `v₃(ℙ⁴)`'s ambient space is nonzero |
+| `range_combinedDerivative_ah437_le_ker` | ✓ proved | the dual cubic vanishes on the combined tangent space of the 7 points of `(4,3,7)` |
+| `finrank_ker_dualCubicφ'` | ✓ proved | `ker dualCubicφ'` has dimension `34 = 35 - 1` |
+| `finrank_tangentSpace_ah437` | ✓ proved | each of the 7 tangent spaces of `(4,3,7)` has dimension `5` |
+| `ah437_isDefective` | ✓ proved | `σ₇(v₃(ℙ⁴))` is Alexander–Hirschowitz defective (the `(4,3,7)` exceptional case) |
 | `finrank_finsetSup_eq_sum_of_not_isDefective_subabundant` | ✓ proved | subabundant non-defectivity for `r` points implies it for any sub-collection |
 | `not_isDefective_of_finsetSup_eq_top` | ✓ proved | superabundant non-defectivity for `r` points implies it for any super-collection |
 | `not_isDefective_of_sup_eq_top` | ✓ proved | two-point specialization of the above |

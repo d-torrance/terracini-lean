@@ -90,6 +90,16 @@ The mathematics is organized into six files:
   each of the `r` points are pairwise *disjoint* (in contrast to `d = 2`,
   where they pairwise overlap in exactly one element), so the combined tangent
   space is a direct sum of dimension `r(n+1)`.
+- [`TerraciniLemma/VeroneseAH437.lean`](TerraciniLemma/VeroneseAH437.lean) —
+  the `(n,d,r) = (4,3,7)` exceptional case of the Alexander–Hirschowitz
+  theorem: `ah437_isDefective` shows `σ₇(v₃(ℙ⁴)) ⊂ ℙ^{34}` is **defective**,
+  using 5 coordinate points `e₀,…,e₄` plus two general points
+  `p₆ = (1,1,1,1,1)`, `p₇ = (1,2,3,4,5)`. The certificate is a "dual cubic"
+  linear functional `dualCubicφ'` that vanishes on all 7 tangent spaces
+  (bounding their combined dimension by `34 < 35`) but is itself nonzero;
+  following Brambilla–Ottaviani, it is (up to scale) the Hankel-determinant
+  cubic of the unique rational normal curve through the 7 points, whose secant
+  variety is singular along that curve.
 - [`TerraciniLemma/Segre.lean`](TerraciniLemma/Segre.lean) — worked examples
   for Segre varieties: the non-defective Segre quadric `ℙ¹ × ℙ¹ ⊂ ℙ³` and the
   defective Segre threefold `ℙ¹ × ℙ¹ × ℙ¹ ⊂ ℙ⁷`.
