@@ -2,6 +2,7 @@ import TerraciniLemma.Core
 import TerraciniLemma.PolynomialCalculus
 import TerraciniLemma.RationalNormalCurves
 import TerraciniLemma.VeroneseSurface
+import TerraciniLemma.VeroneseGeneral
 import TerraciniLemma.Segre
 import TerraciniLemma.EllipticCurve
 import TerraciniLemma.Projective
@@ -38,6 +39,14 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
   curve examples above, this is a genuinely **defective** case in the sense of
   the Alexander–Hirschowitz theorem: `σ₂(v₂(ℙ²))` falls one dimension short of
   the expected dimension.
+* `TerraciniLemma.VeroneseGeneral` — the general quadric Veronese variety
+  `v₂(ℙⁿ) ⊂ ℙ^N` (`N = binom(n+2,2) - 1`), worked in the affine cone model for
+  arbitrary `n` and arbitrary `r` general points (`1 ≤ r ≤ n+1`), subsuming
+  `TerraciniLemma.VeroneseSurface`'s `n = 2, r = 2` instance.
+  `isDefective_veroneseGeneral_iff` shows `σᵣ(v₂(ℙⁿ))` is
+  Alexander–Hirschowitz defective iff `2 ≤ r ≤ n`; `veroneseGeneral_sup_eq_top`
+  and `veroneseGeneral_not_isDefective_of_succ_le` handle the non-defective
+  superabundant regime `r ≥ n+1`.
 * `TerraciniLemma.Segre` — worked examples for Segre varieties: the
   non-defective Segre quadric `ℙ¹ × ℙ¹ ⊂ ℙ³` and the defective Segre
   threefold `ℙ¹ × ℙ¹ × ℙ¹ ⊂ ℙ⁷`.
@@ -98,6 +107,9 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
 | `finrank_iSup_le_expectedDim` | ✓ proved | `finrank (⨆ i, S i) ≤ expectedDim S`, always |
 | `veroneseSurface_isDefective` | ✓ proved | `v₂(ℙ²) ⊂ ℙ⁵` is Alexander–Hirschowitz defective |
 | `defect_veroneseSurface` | ✓ proved | the defect of `σ₂(v₂(ℙ²))` is exactly `1` |
+| `isDefective_veroneseGeneral_iff` | ✓ proved | `σᵣ(v₂(ℙⁿ)) ⊂ ℙ^N` is Alexander–Hirschowitz defective iff `2 ≤ r ≤ n` |
+| `veroneseGeneral_sup_eq_top` | ✓ proved | `σ_{n+1}(v₂(ℙⁿ))` fills the ambient space (superabundant, non-defective) |
+| `veroneseGeneral_not_isDefective_of_succ_le` | ✓ proved | `σ_r(v₂(ℙⁿ))` is non-defective for every `r ≥ n+1` |
 | `finrank_finsetSup_eq_sum_of_not_isDefective_subabundant` | ✓ proved | subabundant non-defectivity for `r` points implies it for any sub-collection |
 | `not_isDefective_of_finsetSup_eq_top` | ✓ proved | superabundant non-defectivity for `r` points implies it for any super-collection |
 | `not_isDefective_of_sup_eq_top` | ✓ proved | two-point specialization of the above |

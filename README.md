@@ -67,6 +67,17 @@ The mathematics is organized into six files:
   `min(6, 2·3) = 6` would be the non-defective expectation — the classical
   Alexander–Hirschowitz defect of `σ₂(v₂(ℙ²))` (the determinantal cubic
   hypersurface).
+- [`TerraciniLemma/VeroneseGeneral.lean`](TerraciniLemma/VeroneseGeneral.lean)
+  — the general quadric Veronese variety `v₂(ℙⁿ) ⊂ ℙ^N`
+  (`N = binom(n+2,2) - 1`), worked in the affine cone model (ambient
+  `Sym2 (Fin (n+1)) → 𝕜`, of dimension `binom(n+2,2)`, representing symmetric
+  `(n+1)×(n+1)` matrices) for arbitrary `n` and arbitrary `r` general points
+  (`1 ≤ r ≤ n+1`). This subsumes `TerraciniLemma/VeroneseSurface.lean`'s
+  `n = 2, r = 2` instance. The main theorem
+  `isDefective_veroneseGeneral_iff` shows `σᵣ(v₂(ℙⁿ))` is
+  Alexander–Hirschowitz defective **iff `2 ≤ r ≤ n`**; `veroneseGeneral_sup_eq_top`
+  and `veroneseGeneral_not_isDefective_of_succ_le` show the boundary case
+  `r = n+1` fills the ambient space and every `r ≥ n+1` is non-defective.
 - [`TerraciniLemma/Segre.lean`](TerraciniLemma/Segre.lean) — worked examples
   for Segre varieties: the non-defective Segre quadric `ℙ¹ × ℙ¹ ⊂ ℙ³` and the
   defective Segre threefold `ℙ¹ × ℙ¹ × ℙ¹ ⊂ ℙ⁷`.
