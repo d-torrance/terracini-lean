@@ -300,81 +300,16 @@ theorem finrank_ker_dualCubicφ' :
 
 /-! ### §E — Each of the 7 tangent spaces has dimension 5 -/
 
-/-- Closed form for `veroneseDegDeriv n d v dv` at the monomial `X_a^d`. -/
-theorem veroneseDegDeriv_apply_replicate' (n d : ℕ) (hd : 1 ≤ d) (a : Fin (n + 1))
-    (v dv : Fin (n + 1) → 𝕜) :
-    veroneseDegDeriv n d v dv (Sym.replicate d a) = (d : 𝕜) * (v a) ^ (d - 1) * dv a := by
-  rw [veroneseDegDeriv_apply, Finset.sum_eq_single a]
-  · rw [Sym.val_replicate, Multiset.count_replicate, if_pos rfl]
-    obtain ⟨d', rfl⟩ := Nat.exists_eq_succ_of_ne_zero (by omega : d ≠ 0)
-    rw [Multiset.replicate_succ, Multiset.erase_cons_head, Multiset.map_replicate,
-      Multiset.prod_replicate]
-    simp
-  · intro k _ hk
-    rw [Sym.val_replicate, Multiset.count_replicate, if_neg (Ne.symm hk)]
-    push_cast
-    ring
-  · simp
-
-/-- If every coordinate of `v` is nonzero, `veroneseDegDeriv n d v` is injective — so the
-tangent space at `v` has the maximal possible dimension `n+1`. -/
-theorem veroneseDegDeriv_injective_of_ne_zero (n d : ℕ) (hd : 1 ≤ d) (v : Fin (n + 1) → 𝕜)
-    (hv : ∀ a, v a ≠ 0) : Function.Injective (veroneseDegDeriv n d v) := by
-  intro dv₁ dv₂ heq
-  rw [← sub_eq_zero, ← map_sub] at heq
-  rw [← sub_eq_zero]
-  funext a
-  have h := congrFun heq (Sym.replicate d a)
-  rw [veroneseDegDeriv_apply_replicate' n d hd a] at h
-  simp only [Pi.sub_apply, Pi.zero_apply] at h ⊢
-  have hd0 : (d : 𝕜) ≠ 0 := Nat.cast_ne_zero.mpr (by omega)
-  have hva0 : (v a) ^ (d - 1) ≠ 0 := pow_ne_zero _ (hv a)
-  exact (mul_eq_zero.mp h).resolve_left (mul_ne_zero hd0 hva0)
-
 /-- The tangent space at `p₆ = (1,1,1,1,1)` has dimension `5`. -/
 theorem finrank_tangentSpace_ah437Pt6 :
-    Module.finrank 𝕜 (LinearMap.range (veroneseDegDeriv (𝕜 := 𝕜) 4 3 ah437Pt6).toLinearMap) = 5 := by
-  have hinj : Function.Injective (veroneseDegDeriv (𝕜 := 𝕜) 4 3 ah437Pt6) :=
-    veroneseDegDeriv_injective_of_ne_zero 4 3 (by norm_num) ah437Pt6 (fun a => by
-      simp [ah437Pt6])
-  have hinj' : Function.Injective (veroneseDegDeriv (𝕜 := 𝕜) 4 3 ah437Pt6).toLinearMap := hinj
-  rw [LinearMap.finrank_range_of_inj hinj', Module.finrank_pi, Fintype.card_fin]
+    Module.finrank 𝕜 (LinearMap.range (veroneseDegDeriv (𝕜 := 𝕜) 4 3 ah437Pt6).toLinearMap) = 5 :=
+  finrank_tangentSpace_of_ne_zero 4 3 (by norm_num) ah437Pt6 (fun a => by simp [ah437Pt6])
 
 /-- The tangent space at `p₇ = (1,2,3,4,5)` has dimension `5`. -/
 theorem finrank_tangentSpace_ah437Pt7 :
-    Module.finrank 𝕜 (LinearMap.range (veroneseDegDeriv (𝕜 := 𝕜) 4 3 ah437Pt7).toLinearMap) = 5 := by
-  have hinj : Function.Injective (veroneseDegDeriv (𝕜 := 𝕜) 4 3 ah437Pt7) := by
-    apply veroneseDegDeriv_injective_of_ne_zero 4 3 (by norm_num) ah437Pt7
-    intro a
-    fin_cases a <;> norm_num [ah437Pt7]
-  have hinj' : Function.Injective (veroneseDegDeriv (𝕜 := 𝕜) 4 3 ah437Pt7).toLinearMap := hinj
-  rw [LinearMap.finrank_range_of_inj hinj', Module.finrank_pi, Fintype.card_fin]
-
-/-- At any coordinate point `eₐ` (for any `a`, with no constraint `r ≤ n+1`),
-`veroneseDegDeriv n d (Pi.single a 1)` is injective — so its tangent space has the maximal
-possible dimension `n+1`. -/
-theorem veroneseDegDeriv_injective_single (n d : ℕ) (hd : 1 ≤ d) (a : Fin (n + 1)) :
-    Function.Injective (veroneseDegDeriv (𝕜 := 𝕜) n d (Pi.single a 1)) := by
-  intro dv₁ dv₂ heq
-  rw [← sub_eq_zero, ← map_sub] at heq
-  rw [← sub_eq_zero]
-  funext j
-  by_cases hja : j = a
-  · rw [hja]
-    have hr1 := congrFun heq (Sym.replicate d a)
-    rw [veroneseDegDeriv_apply_replicate n d hd a] at hr1
-    have hd0 : (d : 𝕜) ≠ 0 := Nat.cast_ne_zero.mpr (by omega)
-    exact (mul_eq_zero.mp hr1).resolve_left hd0
-  · have hr2 := congrFun heq (veroneseDegElt n d hd a j)
-    rwa [veroneseDegDeriv_apply_cons n d hd a j hja] at hr2
-
-/-- The tangent space at any coordinate point `eₐ` has dimension `n+1`. -/
-theorem finrank_tangentSpace_single (n d : ℕ) (hd : 1 ≤ d) (a : Fin (n + 1)) :
-    Module.finrank 𝕜
-      (LinearMap.range (veroneseDegDeriv (𝕜 := 𝕜) n d (Pi.single a 1)).toLinearMap) = n + 1 := by
-  have hinj' : Function.Injective (veroneseDegDeriv (𝕜 := 𝕜) n d (Pi.single a 1)).toLinearMap :=
-    veroneseDegDeriv_injective_single n d hd a
-  rw [LinearMap.finrank_range_of_inj hinj', Module.finrank_pi, Fintype.card_fin]
+    Module.finrank 𝕜 (LinearMap.range (veroneseDegDeriv (𝕜 := 𝕜) 4 3 ah437Pt7).toLinearMap) = 5 :=
+  finrank_tangentSpace_of_ne_zero 4 3 (by norm_num) ah437Pt7 (fun a => by
+    fin_cases a <;> norm_num [ah437Pt7])
 
 /-- Each of the 7 tangent spaces has dimension `5`. -/
 theorem finrank_tangentSpace_ah437 (k : Fin 7) :

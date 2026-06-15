@@ -214,7 +214,95 @@ theorem veroneseDegDeriv_apply_eq_zero (n d : ℕ) (hd : 1 ≤ d) (a : Fin (n + 
   · rw [Multiset.count_eq_zero.mpr hk]
     simp
 
+/-- A multiset all of whose element-counts are `≤ b < d` can't be the "all `a`" monomial
+`Sym.replicate d a` (which has count `d` at `a`). -/
+theorem ne_replicate_of_count_le {n d : ℕ} (s : Sym (Fin (n + 1)) d) (b : ℕ)
+    (hb : ∀ x, s.val.count x ≤ b) (hbd : b < d) (a : Fin (n + 1)) :
+    s ≠ Sym.replicate d a := by
+  intro h
+  have := hb a
+  rw [h, Sym.val_replicate, Multiset.count_replicate, if_pos rfl] at this
+  omega
+
+/-- A multiset all of whose element-counts are `≤ b < d - 1` can't be a monomial
+`Xⱼ Xₐ^{d-1}` (`j ≠ a`, which has count `d - 1` at `a`). -/
+theorem ne_veroneseDegElt_of_count_le {n d : ℕ} (hd : 1 ≤ d) (s : Sym (Fin (n + 1)) d) (b : ℕ)
+    (hb : ∀ x, s.val.count x ≤ b) (hbd : b < d - 1) (a j : Fin (n + 1)) (hj : j ≠ a) :
+    s ≠ veroneseDegElt n d hd a j := by
+  intro h
+  have := hb a
+  rw [h, veroneseDegElt_val, Multiset.count_cons, Multiset.count_replicate, if_pos rfl,
+    if_neg (Ne.symm hj)] at this
+  omega
+
 /-! ### §C — `r` points, tangent space dimension `n+1` -/
+
+/-- Closed form for `veroneseDegDeriv n d v dv` at the monomial `X_a^d`, for arbitrary `v`
+(not just `Pi.single a 1`). -/
+theorem veroneseDegDeriv_apply_replicate' (n d : ℕ) (hd : 1 ≤ d) (a : Fin (n + 1))
+    (v dv : Fin (n + 1) → 𝕜) :
+    veroneseDegDeriv n d v dv (Sym.replicate d a) = (d : 𝕜) * (v a) ^ (d - 1) * dv a := by
+  rw [veroneseDegDeriv_apply, Finset.sum_eq_single a]
+  · rw [Sym.val_replicate, Multiset.count_replicate, if_pos rfl]
+    obtain ⟨d', rfl⟩ := Nat.exists_eq_succ_of_ne_zero (by omega : d ≠ 0)
+    rw [Multiset.replicate_succ, Multiset.erase_cons_head, Multiset.map_replicate,
+      Multiset.prod_replicate]
+    simp
+  · intro k _ hk
+    rw [Sym.val_replicate, Multiset.count_replicate, if_neg (Ne.symm hk)]
+    push_cast
+    ring
+  · simp
+
+/-- If every coordinate of `v` is nonzero, `veroneseDegDeriv n d v` is injective — so the
+tangent space at `v` has the maximal possible dimension `n+1`. -/
+theorem veroneseDegDeriv_injective_of_ne_zero (n d : ℕ) (hd : 1 ≤ d) (v : Fin (n + 1) → 𝕜)
+    (hv : ∀ a, v a ≠ 0) : Function.Injective (veroneseDegDeriv n d v) := by
+  intro dv₁ dv₂ heq
+  rw [← sub_eq_zero, ← map_sub] at heq
+  rw [← sub_eq_zero]
+  funext a
+  have h := congrFun heq (Sym.replicate d a)
+  rw [veroneseDegDeriv_apply_replicate' n d hd a] at h
+  simp only [Pi.sub_apply, Pi.zero_apply] at h ⊢
+  have hd0 : (d : 𝕜) ≠ 0 := Nat.cast_ne_zero.mpr (by omega)
+  have hva0 : (v a) ^ (d - 1) ≠ 0 := pow_ne_zero _ (hv a)
+  exact (mul_eq_zero.mp h).resolve_left (mul_ne_zero hd0 hva0)
+
+/-- At any point `v` with every coordinate nonzero, the tangent space has the maximal possible
+dimension `n+1`. -/
+theorem finrank_tangentSpace_of_ne_zero (n d : ℕ) (hd : 1 ≤ d) (v : Fin (n + 1) → 𝕜)
+    (hv : ∀ a, v a ≠ 0) :
+    Module.finrank 𝕜 (LinearMap.range (veroneseDegDeriv (𝕜 := 𝕜) n d v).toLinearMap) = n + 1 := by
+  have hinj' : Function.Injective (veroneseDegDeriv (𝕜 := 𝕜) n d v).toLinearMap :=
+    veroneseDegDeriv_injective_of_ne_zero n d hd v hv
+  rw [LinearMap.finrank_range_of_inj hinj', Module.finrank_pi, Fintype.card_fin]
+
+/-- At any coordinate point `eₐ` (for any `a`, with no constraint `r ≤ n+1`),
+`veroneseDegDeriv n d (Pi.single a 1)` is injective — so its tangent space has the maximal
+possible dimension `n+1`. -/
+theorem veroneseDegDeriv_injective_single (n d : ℕ) (hd : 1 ≤ d) (a : Fin (n + 1)) :
+    Function.Injective (veroneseDegDeriv (𝕜 := 𝕜) n d (Pi.single a 1)) := by
+  intro dv₁ dv₂ heq
+  rw [← sub_eq_zero, ← map_sub] at heq
+  rw [← sub_eq_zero]
+  funext j
+  by_cases hja : j = a
+  · rw [hja]
+    have hr1 := congrFun heq (Sym.replicate d a)
+    rw [veroneseDegDeriv_apply_replicate n d hd a] at hr1
+    have hd0 : (d : 𝕜) ≠ 0 := Nat.cast_ne_zero.mpr (by omega)
+    exact (mul_eq_zero.mp hr1).resolve_left hd0
+  · have hr2 := congrFun heq (veroneseDegElt n d hd a j)
+    rwa [veroneseDegDeriv_apply_cons n d hd a j hja] at hr2
+
+/-- The tangent space at any coordinate point `eₐ` has dimension `n+1`. -/
+theorem finrank_tangentSpace_single (n d : ℕ) (hd : 1 ≤ d) (a : Fin (n + 1)) :
+    Module.finrank 𝕜
+      (LinearMap.range (veroneseDegDeriv (𝕜 := 𝕜) n d (Pi.single a 1)).toLinearMap) = n + 1 := by
+  have hinj' : Function.Injective (veroneseDegDeriv (𝕜 := 𝕜) n d (Pi.single a 1)).toLinearMap :=
+    veroneseDegDeriv_injective_single n d hd a
+  rw [LinearMap.finrank_range_of_inj hinj', Module.finrank_pi, Fintype.card_fin]
 
 omit [CharZero 𝕜] in
 /-- The `k`-th standard basis point `eₖ ∈ 𝕜^{n+1}`, for `k : Fin r` cast into `Fin (n+1)` via
@@ -245,28 +333,10 @@ def veroneseDegFamily (n d r : ℕ) (hr : r ≤ n + 1) (k : Fin r) :
 theorem finrank_tangentSpace_veroneseDegFamily (n d r : ℕ) (hd : 1 ≤ d) (hr : r ≤ n + 1)
     (k : Fin r) :
     Module.finrank 𝕜 (veroneseDegFamily (𝕜 := 𝕜) n d r hr k).tangentSpace = n + 1 := by
-  set a : Fin (n + 1) := Fin.castLE hr k
-  have hinj : Function.Injective (veroneseDegDeriv n d (veroneseDegPt (𝕜 := 𝕜) n r hr k)) := by
-    show Function.Injective (veroneseDegDeriv n d (Pi.single a 1))
-    intro dv₁ dv₂ heq
-    rw [← sub_eq_zero, ← map_sub] at heq
-    rw [← sub_eq_zero]
-    funext j
-    by_cases hja : j = a
-    · rw [hja]
-      have hr1 := congrFun heq (Sym.replicate d a)
-      rw [veroneseDegDeriv_apply_replicate n d hd a] at hr1
-      have hd0 : (d : 𝕜) ≠ 0 := Nat.cast_ne_zero.mpr (by omega)
-      exact (mul_eq_zero.mp hr1).resolve_left hd0
-    · have hr2 := congrFun heq (veroneseDegElt n d hd a j)
-      rwa [veroneseDegDeriv_apply_cons n d hd a j hja] at hr2
-  have hinj' :
-      Function.Injective (veroneseDegDeriv n d (veroneseDegPt (𝕜 := 𝕜) n r hr k)).toLinearMap :=
-    hinj
   show Module.finrank 𝕜
-      (LinearMap.range (veroneseDegDeriv n d (veroneseDegPt (𝕜 := 𝕜) n r hr k)).toLinearMap)
+      (LinearMap.range (veroneseDegDeriv n d (Pi.single (Fin.castLE hr k) (1 : 𝕜))).toLinearMap)
       = n + 1
-  rw [LinearMap.finrank_range_of_inj hinj', Module.finrank_pi, Fintype.card_fin]
+  exact finrank_tangentSpace_single n d hd (Fin.castLE hr k)
 
 /-! ### §D — Disjoint supports, direct sum, non-defectivity for `d ≥ 3` -/
 
