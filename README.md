@@ -103,7 +103,9 @@ The mathematics is organized into the following files:
   (bounding their combined dimension by `34 < 35`) but is itself nonzero;
   following Brambilla–Ottaviani, it is (up to scale) the Hankel-determinant
   cubic of the unique rational normal curve through the 7 points, whose secant
-  variety is singular along that curve.
+  variety is singular along that curve. This is a single explicit
+  configuration. The general-points statement is `ah437_isDefective_general`
+  in `AlexanderHirschowitzCubic.lean`.
 - [`TerraciniLemma/VeroneseAH245.lean`](TerraciniLemma/VeroneseAH245.lean) —
   the `(n,d,r) = (2,4,5)` exceptional case of the Alexander–Hirschowitz
   theorem: `ah245_isDefective` shows `σ₅(v₄(ℙ²)) ⊂ ℙ^{14}` is **defective**,
@@ -113,7 +115,34 @@ The mathematics is organized into the following files:
   `Q = 3x₀x₁ - 4x₀x₂ + x₁x₂` is the unique conic through the 5 points: since
   `∇F = 2Q∇Q` vanishes on `{Q = 0}` and all 5 points lie on this conic,
   `dualQuarticφ` vanishes on all 5 tangent spaces (bounding their combined
-  dimension by `14 < 15`) but is itself nonzero.
+  dimension by `14 < 15`) but is itself nonzero. This is a single explicit
+  configuration. The general-points statement is `ah245_isDefective_general`
+  in `AlexanderHirschowitz.lean`.
+- [`TerraciniLemma/VeroneseForms.lean`](TerraciniLemma/VeroneseForms.lean) —
+  degree-`d` forms on `𝕜^{n+1}` as pullbacks `χ ∘ v_d` of functionals on the
+  ambient space, and the **singular-form bound**
+  `finrank_iSup_tangentSpace_le_of_singular`. If a nonzero form is singular at
+  the points, all their tangent spaces lie in the hyperplane dual to it. Also
+  defines `ForGeneralPoints`: a property holds off the zero locus of some
+  nonzero polynomial in the coordinates of the points.
+- [`TerraciniLemma/AlexanderHirschowitzCubic.lean`](TerraciniLemma/AlexanderHirschowitzCubic.lean)
+  — the `(4,3,7)` case at **general** points, following Brambilla–Ottaviani.
+  An explicit change of coordinates `ahL p = Vᵀ·diag(w)·diag(U)⁻¹·adj(M)`
+  (Vandermonde matrix of the nodes, Lagrange weights) sends seven general
+  points of `ℙ⁴` onto the moment curve and its point at infinity. The Hankel
+  cubic, whose zero set is the secant variety of the curve, is singular there.
+  "General" is witnessed by an explicit nonzero polynomial `ahGenericPoly`.
+- [`TerraciniLemma/AlexanderHirschowitz.lean`](TerraciniLemma/AlexanderHirschowitz.lean)
+  — `alexanderHirschowitz_exceptions_isDefective`: **every**
+  Alexander–Hirschowitz exceptional case is defective at general points.
+  - Quartics `(2,4,5)`, `(3,4,9)`, `(4,4,14)`: the square of a quadric through
+    the `r < binom(n+2,2)` points is a singular quartic. This works for *any*
+    nonzero points.
+  - Quadrics: transferred from `VeroneseGeneral` along `Sym2 α ≃ Sym α 2`.
+  - `(4,3,7)`: proved in the file above.
+
+  Only the defective direction of the theorem is formalized. Showing that all
+  other cases are non-defective is the hard part of Alexander–Hirschowitz.
 - [`TerraciniLemma/Segre.lean`](TerraciniLemma/Segre.lean) — worked examples
   for Segre varieties: the non-defective Segre quadric `ℙ¹ × ℙ¹ ⊂ ℙ³` and the
   defective Segre threefold `ℙ¹ × ℙ¹ × ℙ¹ ⊂ ℙ⁷`.

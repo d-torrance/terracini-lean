@@ -8,6 +8,9 @@ public import TerraciniLemma.VeroneseGeneral
 public import TerraciniLemma.VeroneseDegree
 public import TerraciniLemma.VeroneseAH437
 public import TerraciniLemma.VeroneseAH245
+public import TerraciniLemma.VeroneseForms
+public import TerraciniLemma.AlexanderHirschowitzCubic
+public import TerraciniLemma.AlexanderHirschowitz
 public import TerraciniLemma.Segre
 public import TerraciniLemma.EllipticCurve
 public import TerraciniLemma.Projective
@@ -79,6 +82,26 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
   points: since `∇F = 2Q∇Q` vanishes on `{Q = 0}` and all 5 points lie on this
   conic, `dualQuarticφ` vanishes on all 5 tangent spaces but not on the whole
   ambient space.
+* `TerraciniLemma.VeroneseForms` — degree-`d` forms as pullbacks `χ ∘ v_d` of
+  functionals on the ambient space (closed under products, containing the
+  linear forms; `veroneseFormOf_injective`: the Veronese variety is
+  nondegenerate), the **singular-form bound**
+  `finrank_iSup_tangentSpace_le_of_singular` (a nonzero form singular at the
+  points puts all their tangent spaces in a hyperplane), and
+  `ForGeneralPoints`, the formal meaning of "for general points" (off the zero
+  locus of a nonzero polynomial in the coordinates).
+* `TerraciniLemma.AlexanderHirschowitzCubic` — the `(4,3,7)` case at general
+  points, following Brambilla–Ottaviani: an explicit change of coordinates
+  sends seven general points of `ℙ⁴` onto the moment curve, where the Hankel
+  cubic (the secant variety of the curve) is singular
+  (`ah437_isDefective_general`).
+* `TerraciniLemma.AlexanderHirschowitz` — every Alexander–Hirschowitz
+  exceptional case is defective at general points
+  (`alexanderHirschowitz_exceptions_isDefective`): quartics `(2,4,5)`,
+  `(3,4,9)`, `(4,4,14)` via the square of a quadric through the points,
+  quadrics via `TerraciniLemma.VeroneseGeneral`, and `(4,3,7)` as above.
+  The specific configurations of `VeroneseAH437`/`VeroneseAH245` are now
+  just worked examples.
 * `TerraciniLemma.Segre` — worked examples for Segre varieties: the
   non-defective Segre quadric `ℙ¹ × ℙ¹ ⊂ ℙ³` and the defective Segre
   threefold `ℙ¹ × ℙ¹ × ℙ¹ ⊂ ℙ⁷`.
@@ -164,6 +187,12 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
 | `finrank_ker_dualQuarticφ` | ✓ proved | `ker dualQuarticφ` has dimension `14 = 15 - 1` |
 | `finrank_tangentSpace_ah245` | ✓ proved | each of the 5 tangent spaces of `(2,4,5)` has dimension `3` |
 | `ah245_isDefective` | ✓ proved | `σ₅(v₄(ℙ²))` is Alexander–Hirschowitz defective (the `(2,4,5)` exceptional case) |
+| `finrank_iSup_tangentSpace_le_of_singular` | ✓ proved | a nonzero degree-`d` form singular at the points bounds their tangent span by `binom(n+d,d) - 1` |
+| `veroneseFormOf_injective` | ✓ proved | the Veronese variety is nondegenerate (a nonzero form is a nonzero function) |
+| `finrank_iSup_tangentSpace_quartic_le` | ✓ proved | for any `r < binom(n+2,2)` points, the tangent spaces of `v₄(ℙⁿ)` lie in a hyperplane (dual to `Q²`) |
+| `isDefective_quadric` | ✓ proved | `σ_r(v₂(ℙⁿ))` (degree-`d` model) is defective at any linearly independent points, `2 ≤ r ≤ n` |
+| `ah437_isDefective_general` | ✓ proved | `σ₇(v₃(ℙ⁴))` is defective at general points (Hankel cubic of the rational normal quartic) |
+| `alexanderHirschowitz_exceptions_isDefective` | ✓ proved | every Alexander–Hirschowitz exceptional case is defective at general points |
 | `finrank_finsetSup_eq_sum_of_not_isDefective_subabundant` | ✓ proved | subabundant non-defectivity for `r` points implies it for any sub-collection |
 | `not_isDefective_of_finsetSup_eq_top` | ✓ proved | superabundant non-defectivity for `r` points implies it for any super-collection |
 | `not_isDefective_of_sup_eq_top` | ✓ proved | two-point specialization of the above |
