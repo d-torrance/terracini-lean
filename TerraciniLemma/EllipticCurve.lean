@@ -114,14 +114,28 @@ theorem hasFDerivAt_ellipticChart (p w : Fin 2 → 𝕜) (hw : w ∈ (ellipticFD
       ContinuousLinearMap.id_apply, hc]
   rwa [heq] at hcomp
 
-/-- The local parametrization of the elliptic curve at `p`, built from the implicit function
-theorem using a chosen nonzero kernel vector `w` of `ellipticFDeriv p`. -/
-def ellipticParam (p w : Fin 2 → 𝕜) (hw : w ∈ (ellipticFDeriv p).ker)
+/-- Near `0`, the chart stays on the level set of `ellipticF` through `p`. -/
+theorem eventually_ellipticF_ellipticChart (p w : Fin 2 → 𝕜) (hw : w ∈ (ellipticFDeriv p).ker)
+    (hp' : (ellipticFDeriv p).range = ⊤) :
+    ∀ᶠ t in nhds (0 : 𝕜), ellipticF (ellipticChart p w hw hp' t) = ellipticF p := by
+  set c : (ellipticFDeriv p).ker := ⟨w, hw⟩
+  have hlim : Filter.Tendsto (fun t : 𝕜 => (ellipticF p, t • c)) (nhds 0)
+      (nhds (ellipticF p, 0)) := by
+    have h : Continuous fun t : 𝕜 => (ellipticF p, t • c) :=
+      continuous_const.prodMk (continuous_id.smul continuous_const)
+    convert h.tendsto 0 using 2
+    rw [zero_smul]
+  exact hlim.eventually ((hasStrictFDerivAt_ellipticF p).map_implicitFunction_eq hp')
+
+/-- The local parametrization of the elliptic curve at a point `p` on it, built from the
+implicit function theorem using a chosen nonzero kernel vector `w` of `ellipticFDeriv p`. -/
+def ellipticParam (p w : Fin 2 → 𝕜) (hpX : p ∈ ellipticCurve) (hw : w ∈ (ellipticFDeriv p).ker)
     (hp' : (ellipticFDeriv p).range = ⊤) :
     LocalParam (𝕜 := 𝕜) (𝔸 := 𝕜) ellipticCurve p where
   basePoint := 0
   chart := ellipticChart p w hw hp'
   chart_eval := ellipticChart_zero p w hw hp'
+  chart_mem := (eventually_ellipticF_ellipticChart p w hw hp').mono fun _ ht => ht.trans hpX
   tangent := (ContinuousLinearMap.id 𝕜 𝕜).smulRight w
   hasFDerivAt := hasFDerivAt_ellipticChart p w hw hp'
 
@@ -132,10 +146,12 @@ def ellipticParamPair :
     ∀ i : Fin 2, LocalParam (𝕜 := 𝕜) (𝔸 := 𝕜)
       ellipticCurve (![![(0 : 𝕜), 1], ![2, 3]] i)
   | 0 => ellipticParam ![(0 : 𝕜), 1] ![1, 0]
+      (by simp [ellipticCurve, ellipticF, ellipticPoly, eval_sub, eval_pow, eval_X])
       (by simp)
       (Module.Dual.range_eq_top_of_ne_zero (fun h =>
         by simpa using congrFun (congrArg DFunLike.coe h) ![(0 : 𝕜), 1]))
   | 1 => ellipticParam ![(2 : 𝕜), 3] ![1, 2]
+      (by simp [ellipticCurve, ellipticF, ellipticPoly, eval_sub, eval_pow, eval_X]; norm_num)
       (by simp; ring)
       (Module.Dual.range_eq_top_of_ne_zero (fun h =>
         by simpa using congrFun (congrArg DFunLike.coe h) ![(1 : 𝕜), 0]))

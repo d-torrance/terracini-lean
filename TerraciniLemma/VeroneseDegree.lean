@@ -318,6 +318,7 @@ def veroneseDegParam (n d : ℕ) (v : Fin (n + 1) → 𝕜) :
   basePoint := v
   chart := veroneseDeg n d
   chart_eval := rfl
+  chart_mem := Filter.Eventually.of_forall fun _ => Set.mem_range_self _
   tangent := veroneseDegDeriv n d v
   hasFDerivAt := hasFDerivAt_veroneseDeg n d v
 

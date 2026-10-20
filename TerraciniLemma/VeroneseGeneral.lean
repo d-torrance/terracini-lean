@@ -102,6 +102,7 @@ def veroneseGeneralParam (n : ℕ) (v : Fin (n + 1) → 𝕜) :
   basePoint := v
   chart := veroneseGeneral n
   chart_eval := rfl
+  chart_mem := Filter.Eventually.of_forall fun _ => Set.mem_range_self _
   tangent := veroneseGeneralDeriv n v
   hasFDerivAt := hasFDerivAt_veroneseGeneral n v
 
@@ -440,6 +441,14 @@ theorem veroneseGeneral_sup_eq_top (n : ℕ) :
   rw [finrank_iSup_veroneseGeneral n (n + 1) (le_refl (n + 1)), finrank_ambient_veroneseGeneral]
   have h : n + 2 - (n + 1) = 1 := by omega
   rw [h, Nat.choose_eq_zero_iff.mpr (by norm_num : 1 < 2), Nat.sub_zero]
+
+/-- **`σ_{n+1}(v₂(ℙⁿ))` fills the ambient space**, stated intrinsically: the tangent cone to the
+secant variety at `e₀e₀ᵗ + ⋯ + eₙeₙᵗ` spans all of `Sym2 (Fin (n+1)) → 𝕜`. No
+generic-smoothness hypothesis is needed (`span_tangentConeAt_secantVariety_eq_top`). -/
+theorem veroneseGeneral_span_tangentConeAt_eq_top (n : ℕ) :
+    Submodule.span 𝕜 (tangentConeAt 𝕜 (secantVariety (n + 1) (Set.range (veroneseGeneral n)))
+      (∑ k, veroneseGeneral n (veroneseGeneralPt (𝕜 := 𝕜) n (n + 1) (le_refl (n + 1)) k))) = ⊤ :=
+  span_tangentConeAt_secantVariety_eq_top _ _ (veroneseGeneral_sup_eq_top n)
 
 /-- **Non-defectivity for `r ≥ n + 1`.** Any family of tangent submodules containing the
 `n + 1` tangent spaces `(veroneseGeneralFamily n (n+1) _ k).tangentSpace` (`k : Fin (n+1)`) among

@@ -86,6 +86,7 @@ def parabolaParam (t : 𝕜) :
   basePoint := t
   chart := parabola
   chart_eval := rfl
+  chart_mem := Filter.Eventually.of_forall fun _ => Set.mem_range_self _
   tangent := parabolaDeriv t
   hasFDerivAt := hasFDerivAt_parabola t
 
@@ -234,6 +235,7 @@ def twistedCubicParam (t : 𝕜) :
   basePoint := t
   chart := twistedCubic
   chart_eval := rfl
+  chart_mem := Filter.Eventually.of_forall fun _ => Set.mem_range_self _
   tangent := twistedCubicDeriv t
   hasFDerivAt := hasFDerivAt_twistedCubic t
 

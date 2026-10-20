@@ -124,7 +124,10 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
 | `hasFDerivAt_combinedParam` | ✓ proved | Chain rule for combined parametrization |
 | `range_combinedParam_eq_iSup` | ✓ proved | Im(dΦ) = ⨆ Im(Dfᵢ), both directions |
 | `terraciniLemma_derivative` | ✓ proved | Core Terracini computation |
-| `terraciniLemma` | ✓ proved | From `hdominant` + `hgeneric` (finrank count) |
+| `terraciniLemma` | ✓ proved | From `hdominant` + `hgeneric` (finrank count), for an abstract `T` |
+| `range_combinedDerivative_le_span_tangentConeAt` | ✓ proved | `hdominant` for `T` = span of the tangent cone to `σᵣ(X̂)` at `∑ vᵢ` |
+| `terraciniLemma_tangentCone` | ✓ proved | Terracini's Lemma for the tangent cone, from `hgeneric` alone |
+| `span_tangentConeAt_secantVariety_eq_top` | ✓ proved | if the `T_{vᵢ}X̂` span `E`, so does the tangent cone to `σᵣ(X̂)` (no hypotheses) |
 | `parabola_terracini` | ✓ proved | Worked example: plane conic, σ₂ = 𝕜² |
 | `twistedCubic_terracini` | ✓ proved | Worked example: twisted cubic, combined tangent directions span a hyperplane ⊊ 𝕜³ |
 | `veroneseSurface_terracini` | ✓ proved | Worked example: quadric Veronese surface v₂(ℙ²) ⊂ ℙ⁵ (cone model), σ₂ ⊊ 𝕜⁶ (genuine Alexander–Hirschowitz defect) |
@@ -139,6 +142,7 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
 | `defect_veroneseSurface` | ✓ proved | the defect of `σ₂(v₂(ℙ²))` is exactly `1` |
 | `isDefective_veroneseGeneral_iff` | ✓ proved | `σᵣ(v₂(ℙⁿ)) ⊂ ℙ^N` is Alexander–Hirschowitz defective iff `2 ≤ r ≤ n` |
 | `veroneseGeneral_sup_eq_top` | ✓ proved | `σ_{n+1}(v₂(ℙⁿ))` fills the ambient space (superabundant, non-defective) |
+| `veroneseGeneral_span_tangentConeAt_eq_top` | ✓ proved | the tangent cone to `σ_{n+1}(v₂(ℙⁿ))` spans the ambient space (no hypotheses) |
 | `veroneseGeneral_not_isDefective_of_succ_le` | ✓ proved | `σ_r(v₂(ℙⁿ))` is non-defective for every `r ≥ n+1` |
 | `finrank_range_combinedDerivative_veroneseGeneral_le` | ✓ proved | for any linearly independent `p₀,…,p_{r-1}`, the combined tangent space of `v₂(ℙⁿ)` has dimension `≤ r(n+1) − binom(r,2)` |
 | `isDefective_veroneseGeneral_of_linearIndependent` | ✓ proved | `σᵣ(v₂(ℙⁿ))` is defective at **any** linearly independent `r`-point family with `2 ≤ r ≤ n`, not just coordinate points |
@@ -162,14 +166,15 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
 | `parabola_not_isDefective` | ✓ proved | `σ_r(v₂(ℙ¹))` is non-defective for every `r ≥ 2` |
 | `segre_not_isDefective` | ✓ proved | `σ_r(ℙ¹×ℙ¹⊂ℙ³)` is non-defective for every `r ≥ 2` |
 | `elliptic_not_isDefective` | ✓ proved | `σ_r(y²=x³+1)` is non-defective for every `r ≥ 2` |
-| Generic smoothness | ⚠ hypothesis | `hdominant`/`hgeneric` in `terraciniLemma` |
+| Generic smoothness | ⚠ hypothesis | `hgeneric` in `terraciniLemma_tangentCone` (and `hdominant` too in the abstract-`T` form `terraciniLemma`) |
 
-There are no `sorry`s remaining in this file. The only gap is mathematical,
-not formal: `terraciniLemma` takes `hdominant : Im(dΦ) ≤ T` (easy, since Φ
-maps into σᵣ(X̂)) and `hgeneric : finrank T ≤ finrank Im(dΦ)` (a dimension
-count, the actual content of generic smoothness in characteristic zero) as
-hypotheses, rather than deriving them from a general theory of dominant
-morphisms — which is not yet in Mathlib. The worked examples above discharge
+There are no `sorry`s remaining in the project. The only gap is mathematical,
+not formal: `hgeneric : finrank T ≤ finrank Im(dΦ)` (a dimension count, the
+actual content of generic smoothness in characteristic zero) is a hypothesis,
+rather than being derived from a general theory of dominant morphisms — which
+is not yet in Mathlib. The other half, `hdominant : Im(dΦ) ≤ T`, is proved for
+`T` the span of the tangent cone to σᵣ(X̂) (`terraciniLemma_tangentCone`); the
+abstract-`T` form `terraciniLemma` still takes it as a hypothesis. The worked examples above discharge
 both hypotheses concretely for the plane conic, the (defective) quadric
 Veronese surface, the Segre quadric, the (defective) Segre threefold, and the
 elliptic curve.

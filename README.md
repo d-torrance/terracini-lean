@@ -30,11 +30,11 @@ The proof has two parts of very different character:
 | Part | Content | Status |
 |------|---------|--------|
 | **A** | $d\Phi_{u^0} = \sum_i Df_i \circ \pi_i$, so $\operatorname{Im}(d\Phi) = T_{v_1}\hat X + \cdots + T_{v_r}\hat X$ | **Proved** (chain rule) |
-| **B** | $T_{\sum v_i}\,\hat\sigma_r(\hat X) = \operatorname{Im}(d\Phi)$ for general points | **Assumed** (generic smoothness) |
+| **B** | $T_{\sum v_i}\,\hat\sigma_r(\hat X) = \operatorname{Im}(d\Phi)$ for general points | $\subseteq$ **proved** (tangent cone); $\dim$ count **assumed** (generic smoothness) |
 
 Part A is a straightforward chain-rule calculation. Part B requires the *generic smoothness theorem*: a dominant morphism of smooth irreducible varieties in characteristic zero has surjective differential at general points. This theorem is not yet in Mathlib, so it is split into two hypotheses:
 
-- $\operatorname{Im}(d\Phi) \subseteq T$ (`hdominant`), which holds simply because $\Phi$ maps into $\hat\sigma_r(\hat X)$ — easy in any setting;
+- $\operatorname{Im}(d\Phi) \subseteq T$ (`hdominant`), which holds simply because $\Phi$ maps into $\hat\sigma_r(\hat X)$. This is **proved** when $T$ is the span of Mathlib's tangent cone `tangentConeAt 𝕜 (secantVariety r X) (∑ i, v i)` (`range_combinedDerivative_le_span_tangentConeAt`), because each chart lands in $\hat X$ near its base point;
 - $\dim T \le \dim \operatorname{Im}(d\Phi)$ (`hgeneric`), a dimension count (in practice obtained from a Jacobian-rank computation), which is the actual content of generic smoothness in characteristic zero.
 
 Together these force $\operatorname{Im}(d\Phi) = T$ by a finite-dimensional submodule-equality lemma (`Submodule.eq_of_le_of_finrank_le`) — no containment in the "hard" direction needs to be assumed directly.
@@ -167,21 +167,26 @@ structure LocalParam (X : Set E) (x : E) where
   basePoint : 𝔸
   chart     : 𝔸 → E
   chart_eval : chart basePoint = x
+  chart_mem : ∀ᶠ u in 𝓝 basePoint, chart u ∈ X
   tangent   : 𝔸 →L[𝕜] E
   hasFDerivAt : HasFDerivAt chart tangent basePoint
 ```
-Models a smooth local parametrization of `X` at a point `x`, together with its derivative (= embedded tangent space generator).
+Models a smooth local parametrization of `X` at a point `x` (landing in `X` near the base point), together with its derivative (= embedded tangent space generator).
 
 ### §5 — Terracini's Lemma
 ```
-terraciniLemma          -- T = ⨆ tangentSpace (param i),  given hgeneric + hdominant
+terraciniLemma             -- T = ⨆ tangentSpace (param i),  given hgeneric + hdominant
+terraciniLemma_tangentCone -- same for T = span (tangent cone of σᵣ(X̂)),  given only hgeneric
 terraciniLemma_derivative  -- HasFDerivAt of combined parametrization
+span_tangentConeAt_secantVariety_eq_top  -- if the T_{vᵢ}X̂ span E, so does the tangent cone
 ```
 The main theorem (in finite dimension) takes two hypotheses that together encode generic smoothness:
 - `hdominant : Im(dΦ) ≤ T` — the image of $d\Phi$ lands in the tangent space (because $\Phi$ maps into $\hat\sigma_r(\hat X)$);
 - `hgeneric : finrank T ≤ finrank Im(dΦ)` — a dimension count (characteristic-zero, Jacobian-rank input).
 
 From these, `Submodule.eq_of_le_of_finrank_le` gives $T = \operatorname{Im}(d\Phi)$, and Part A then gives $T = \bigsqcup_i T_{v_i}\hat X$.
+
+`terraciniLemma_tangentCone` fixes $T$ to be the span of the tangent cone to $\hat\sigma_r(\hat X)$ at $\sum v_i$ and proves `hdominant`, leaving only `hgeneric`. When the tangent spaces already span $E$, `hgeneric` is automatic, so `span_tangentConeAt_secantVariety_eq_top` holds with no hypotheses. For example, `veroneseGeneral_span_tangentConeAt_eq_top` shows that $\sigma_{n+1}(v_2(\mathbb{P}^n))$ fills its ambient space.
 
 ### §6 — The projective formulation
 The affine cone result descends to the projective statement
@@ -244,7 +249,7 @@ the remaining members.
 There is exactly one gap in the formalization.
 
 **Generic smoothness.**  
-Assumed as explicit hypotheses `hgeneric` and `hdominant` in `terraciniLemma`. Formalizing this would require either:
+Assumed as the explicit hypothesis `hgeneric` in `terraciniLemma_tangentCone` (the abstract-`T` form `terraciniLemma` also takes `hdominant`, which is proved for the tangent cone). Formalizing this would require either:
 - A general generic smoothness theorem in Mathlib (not yet present), or
 - A case-by-case argument for specific varieties of interest.
 
@@ -254,7 +259,7 @@ Assumed as explicit hypotheses `hgeneric` and `hdominant` in `terraciniLemma`. F
 
 ```bash
 # Install the Lean toolchain (elan downloads it automatically if needed)
-elan toolchain install leanprover/lean4:v4.30.0-rc2
+elan toolchain install leanprover/lean4:v4.35.0
 
 # Fetch prebuilt Mathlib compiled objects (~1 GB)
 lake exe cache get
@@ -263,7 +268,7 @@ lake exe cache get
 lake build TerraciniLemma
 ```
 
-The project uses Mathlib at tag `v4.30.0-rc2`. The `lake exe cache get` step is strongly recommended — building Mathlib from source takes several hours.
+The project uses Mathlib at tag `v4.35.0`. The `lake exe cache get` step is strongly recommended — building Mathlib from source takes several hours.
 
 ## References
 

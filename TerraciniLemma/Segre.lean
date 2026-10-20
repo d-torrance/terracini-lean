@@ -78,6 +78,7 @@ def segreParam (p : 𝕜 × 𝕜) :
   basePoint := p
   chart := segre
   chart_eval := rfl
+  chart_mem := Filter.Eventually.of_forall fun _ => Set.mem_range_self _
   tangent := segreDeriv p
   hasFDerivAt := hasFDerivAt_segre p
 
@@ -276,6 +277,7 @@ def segre3Param (p : 𝕜 × 𝕜 × 𝕜) :
   basePoint := p
   chart := segre3
   chart_eval := rfl
+  chart_mem := Filter.Eventually.of_forall fun _ => Set.mem_range_self _
   tangent := segre3Deriv p
   hasFDerivAt := hasFDerivAt_segre3 p
 

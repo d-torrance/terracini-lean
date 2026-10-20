@@ -1,4 +1,5 @@
 import Mathlib.Analysis.Calculus.FDeriv.Basic
+import Mathlib.Analysis.Calculus.FDeriv.Equiv
 import Mathlib.Analysis.Calculus.FDeriv.Add
 import Mathlib.Analysis.Calculus.FDeriv.Comp
 import Mathlib.Analysis.Calculus.FDeriv.Linear
@@ -27,6 +28,10 @@ This follows from the chain rule and linearity of addition.
 at Σ vᵢ is the image of dΦ. This requires a *generic smoothness* theorem — that
 a dominant morphism of smooth irreducible varieties in characteristic zero has
 surjective differential at general points — which is not currently in Mathlib.
+Only its dimension-count half is assumed: taking T to be the span of Mathlib's
+tangent cone `tangentConeAt 𝕜 (secantVariety r X) (∑ vᵢ)`, the containment
+Im(dΦ) ⊆ T is proved (`range_combinedDerivative_le_span_tangentConeAt`), since
+each chart lands in X̂ near its base point (`LocalParam.chart_mem`).
 
 The file is organized into six sections:
 
@@ -244,8 +249,8 @@ end SecantVariety
 ## §4  Smooth varieties and their tangent spaces
 
 We model a smooth subvariety of E by a collection of local parametrizations.
-At each point x ∈ X, a parametrization f : 𝔸 → E with f(u₀) = x and
-derivative Df at u₀ gives the embedded tangent space Im(Df) ⊆ E.
+At each point x ∈ X, a parametrization f : 𝔸 → E with f(u₀) = x, landing in X
+near u₀, with derivative Df at u₀ gives the embedded tangent space Im(Df) ⊆ E.
 -/
 
 section SmoothVariety
@@ -262,6 +267,8 @@ structure LocalParam (X : Set E) (x : E) where
   /-- The parametrization map. -/
   chart : 𝔸 → E
   chart_eval : chart basePoint = x
+  /-- Near the base point, the chart lands in `X`. -/
+  chart_mem : ∀ᶠ u in 𝓝 basePoint, chart u ∈ X
   /-- Derivative of the chart at the base point. -/
   tangent : 𝔸 →L[𝕜] E
   hasFDerivAt : HasFDerivAt chart tangent basePoint
@@ -284,7 +291,9 @@ has image ∑ᵢ Im(tangentᵢ) = ∑ᵢ T_{vᵢ}X̂.
 
 **(B) Generic smoothness** (assumed as a hypothesis): The image of dΦ is
 contained in the tangent space T to σᵣ(X̂) at ∑ᵢ vᵢ (`hdominant`, easy), and
-dim T ≤ dim Im(dΦ) (`hgeneric`). The latter is a dimension count — in
+dim T ≤ dim Im(dΦ) (`hgeneric`). For T the span of the tangent cone to σᵣ(X̂),
+`hdominant` is a theorem (`range_combinedDerivative_le_span_tangentConeAt`), and
+`terraciniLemma_tangentCone` needs only `hgeneric`. The latter is a dimension count — in
 practice obtained from a Jacobian-rank computation — and is the precise
 content of generic smoothness in characteristic zero: at a general point,
 the differential of a dominant map has rank equal to the dimension of the
@@ -375,6 +384,62 @@ theorem terraciniLemma_basePoint {r : ℕ} {X : Set E}
     (param : ∀ i, LocalParam (𝕜 := 𝕜) (𝔸 := 𝔸) X (v i)) :
     ∑ i, (param i).chart ((param i).basePoint) = ∑ i, v i :=
   Finset.sum_congr rfl fun i _ => (param i).chart_eval
+
+/-- **Dominance, derived.** Every vector in `Im(dΦ)` is tangent to σᵣ(X̂) at `∑ vᵢ`: it lies
+in Mathlib's tangent cone `tangentConeAt 𝕜 (secantVariety r X) (∑ vᵢ)`, because Φ maps a
+neighbourhood of the base point into `secantSet r X ⊆ secantVariety r X`. So `hdominant` holds
+for `T = span (tangentConeAt 𝕜 (secantVariety r X) (∑ vᵢ))`. -/
+theorem range_combinedDerivative_le_span_tangentConeAt {r : ℕ} {X : Set E}
+    {v : Fin r → E} (param : ∀ i, LocalParam (𝕜 := 𝕜) (𝔸 := 𝔸) X (v i)) :
+    LinearMap.range (combinedDerivative (v := v) param).toLinearMap ≤
+      Submodule.span 𝕜 (tangentConeAt 𝕜 (secantVariety r X) (∑ i, v i)) := by
+  rintro _ ⟨w, rfl⟩
+  apply Submodule.subset_span
+  set Φ : (Fin r → 𝔸) → E := fun u => ∑ i, (param i).chart (u i)
+  set u₀ : Fin r → 𝔸 := fun i => (param i).basePoint
+  -- The parameters `u` near `u₀` for which every chart lands in `X`.
+  set U : Set (Fin r → 𝔸) := {u | ∀ i, (param i).chart (u i) ∈ X}
+  have hU : U ∈ 𝓝 u₀ := Filter.eventually_all.mpr fun i =>
+    ((continuous_apply i).tendsto u₀).eventually (param i).chart_mem
+  have hΦ : HasFDerivAt Φ (combinedDerivative (v := v) param) u₀ :=
+    hasFDerivAt_combinedParam _ _ _ fun i => (param i).hasFDerivAt
+  have hw : w ∈ tangentConeAt 𝕜 U u₀ := by
+    rw [tangentConeAt_of_mem_nhds hU]; trivial
+  have hsub : Φ '' U ⊆ secantVariety r X := by
+    rintro _ ⟨u, hu, rfl⟩
+    exact secantSet_subset_secantVariety r X
+      (mem_secantSet_iff.mpr ⟨fun i => (param i).chart (u i), hu, rfl⟩)
+  have hΦu₀ : Φ u₀ = ∑ i, v i := Finset.sum_congr rfl fun i _ => (param i).chart_eval
+  rw [← hΦu₀]
+  exact tangentConeAt_mono hsub (hΦ.hasFDerivWithinAt.mapsTo_tangent_cone hw)
+
+/-- **Terracini's Lemma, tangent-cone form.** With `T` the linear span of the tangent cone to
+σᵣ(X̂) at `∑ vᵢ`, the dominance hypothesis of `terraciniLemma` is a theorem
+(`range_combinedDerivative_le_span_tangentConeAt`), leaving only the generic-smoothness
+dimension count `hgeneric`. -/
+theorem terraciniLemma_tangentCone {r : ℕ} {X : Set E} [FiniteDimensional 𝕜 E]
+    (v : Fin r → E)
+    (param : ∀ i, LocalParam (𝕜 := 𝕜) (𝔸 := 𝔸) X (v i))
+    (hgeneric : Module.finrank 𝕜
+        (Submodule.span 𝕜 (tangentConeAt 𝕜 (secantVariety r X) (∑ i, v i))) ≤
+      Module.finrank 𝕜 (LinearMap.range (combinedDerivative (v := v) param).toLinearMap)) :
+    Submodule.span 𝕜 (tangentConeAt 𝕜 (secantVariety r X) (∑ i, v i)) =
+      ⨆ i : Fin r, (param i).tangentSpace :=
+  terraciniLemma v (fun i => (param i).chart_eval ▸ (param i).chart_mem.self_of_nhds) param _
+    (range_combinedDerivative_le_span_tangentConeAt param) hgeneric
+
+/-- **Unconditional corollary.** If the tangent spaces `T_{vᵢ}X̂` already span `E`, the
+tangent cone to σᵣ(X̂) at `∑ vᵢ` spans `E` too, with no generic-smoothness input: `hgeneric`
+is automatic because `Im(dΦ) = E` has maximal dimension. -/
+theorem span_tangentConeAt_secantVariety_eq_top {r : ℕ} {X : Set E} [FiniteDimensional 𝕜 E]
+    (v : Fin r → E)
+    (param : ∀ i, LocalParam (𝕜 := 𝕜) (𝔸 := 𝔸) X (v i))
+    (htop : ⨆ i : Fin r, (param i).tangentSpace = ⊤) :
+    Submodule.span 𝕜 (tangentConeAt 𝕜 (secantVariety r X) (∑ i, v i)) = ⊤ := by
+  have hrange : LinearMap.range (combinedDerivative (v := v) param).toLinearMap = ⊤ :=
+    (range_combinedParam_eq_iSup (fun i => (param i).tangent)).trans htop
+  rw [← hrange]
+  exact le_antisymm (hrange ▸ le_top) (range_combinedDerivative_le_span_tangentConeAt param)
 
 end TerraciniLemma
 

@@ -126,6 +126,7 @@ def veroneseSurfaceParam (v : Fin 3 → 𝕜) :
   basePoint := v
   chart := veroneseSurface
   chart_eval := rfl
+  chart_mem := Filter.Eventually.of_forall fun _ => Set.mem_range_self _
   tangent := veroneseSurfaceDeriv v
   hasFDerivAt := hasFDerivAt_veroneseSurface v
 
