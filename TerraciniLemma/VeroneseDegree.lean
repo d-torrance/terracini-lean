@@ -218,27 +218,6 @@ theorem veroneseDegDeriv_apply_eq_zero (n d : ℕ) (hd : 1 ≤ d) (a : Fin (n + 
   · rw [Multiset.count_eq_zero.mpr hk]
     simp
 
-/-- A multiset all of whose element-counts are `≤ b < d` can't be the "all `a`" monomial
-`Sym.replicate d a` (which has count `d` at `a`). -/
-theorem ne_replicate_of_count_le {n d : ℕ} (s : Sym (Fin (n + 1)) d) (b : ℕ)
-    (hb : ∀ x, s.val.count x ≤ b) (hbd : b < d) (a : Fin (n + 1)) :
-    s ≠ Sym.replicate d a := by
-  intro h
-  have := hb a
-  rw [h, Sym.val_replicate, Multiset.count_replicate, ite_eq_left rfl] at this
-  omega
-
-/-- A multiset all of whose element-counts are `≤ b < d - 1` can't be a monomial
-`Xⱼ Xₐ^{d-1}` (`j ≠ a`, which has count `d - 1` at `a`). -/
-theorem ne_veroneseDegElt_of_count_le {n d : ℕ} (hd : 1 ≤ d) (s : Sym (Fin (n + 1)) d) (b : ℕ)
-    (hb : ∀ x, s.val.count x ≤ b) (hbd : b < d - 1) (a j : Fin (n + 1)) (hj : j ≠ a) :
-    s ≠ veroneseDegElt n d hd a j := by
-  intro h
-  have := hb a
-  rw [h, veroneseDegElt_val, Multiset.count_cons, Multiset.count_replicate, ite_eq_left rfl,
-    ite_eq_right (Ne.symm hj)] at this
-  omega
-
 /-! ### §C — `r` points, tangent space dimension `n+1` -/
 
 /-- Closed form for `veroneseDegDeriv n d v dv` at the monomial `X_a^d`, for arbitrary `v`
@@ -258,55 +237,39 @@ theorem veroneseDegDeriv_apply_replicate' (n d : ℕ) (hd : 1 ≤ d) (a : Fin (n
     ring
   · simp
 
-/-- If every coordinate of `v` is nonzero, `veroneseDegDeriv n d v` is injective — so the
-tangent space at `v` has the maximal possible dimension `n+1`. -/
-theorem veroneseDegDeriv_injective_of_ne_zero (n d : ℕ) (hd : 1 ≤ d) (v : Fin (n + 1) → 𝕜)
-    (hv : ∀ a, v a ≠ 0) : Function.Injective (veroneseDegDeriv n d v) := by
-  intro dv₁ dv₂ heq
-  rw [← sub_eq_zero, ← map_sub] at heq
-  rw [← sub_eq_zero]
-  funext a
-  have h := congrFun heq (Sym.replicate d a)
-  rw [veroneseDegDeriv_apply_replicate' n d hd a] at h
-  simp only [Pi.sub_apply, Pi.zero_apply] at h ⊢
+/-- If `v ≠ 0`, `veroneseDegDeriv n d v` is injective: pick `a` with `v a ≠ 0`; the monomial
+`X_a^d` forces `dv a = 0`, and then each monomial `Xⱼ X_a^{d-1}` forces `dv j = 0`. -/
+theorem veroneseDegDeriv_injective_of_ne_zero (n d : ℕ) (hd : 1 ≤ d) {v : Fin (n + 1) → 𝕜}
+    (hv : v ≠ 0) : Function.Injective (veroneseDegDeriv n d v) := by
+  classical
+  obtain ⟨a, ha⟩ : ∃ a, v a ≠ 0 := by
+    by_contra! h
+    exact hv (funext h)
+  suffices h : Function.Injective (veroneseDegDeriv n d v).toLinearMap from h
+  rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
+  intro w hw
+  have hw' : ∀ s, veroneseDegDeriv n d v w s = 0 := fun s => congrFun hw s
   have hd0 : (d : 𝕜) ≠ 0 := Nat.cast_ne_zero.mpr (by omega)
-  have hva0 : (v a) ^ (d - 1) ≠ 0 := pow_ne_zero _ (hv a)
-  exact (mul_eq_zero.mp h).resolve_left (mul_ne_zero hd0 hva0)
-
-/-- At any point `v` with every coordinate nonzero, the tangent space has the maximal possible
-dimension `n+1`. -/
-theorem finrank_tangentSpace_of_ne_zero (n d : ℕ) (hd : 1 ≤ d) (v : Fin (n + 1) → 𝕜)
-    (hv : ∀ a, v a ≠ 0) :
-    Module.finrank 𝕜 (LinearMap.range (veroneseDegDeriv (𝕜 := 𝕜) n d v).toLinearMap) = n + 1 := by
-  have hinj' : Function.Injective (veroneseDegDeriv (𝕜 := 𝕜) n d v).toLinearMap :=
-    veroneseDegDeriv_injective_of_ne_zero n d hd v hv
-  rw [LinearMap.finrank_range_of_inj hinj', Module.finrank_pi, Fintype.card_fin]
-
-/-- At any coordinate point `eₐ` (for any `a`, with no constraint `r ≤ n+1`),
-`veroneseDegDeriv n d (Pi.single a 1)` is injective — so its tangent space has the maximal
-possible dimension `n+1`. -/
-theorem veroneseDegDeriv_injective_single (n d : ℕ) (hd : 1 ≤ d) (a : Fin (n + 1)) :
-    Function.Injective (veroneseDegDeriv (𝕜 := 𝕜) n d (Pi.single a 1)) := by
-  intro dv₁ dv₂ heq
-  rw [← sub_eq_zero, ← map_sub] at heq
-  rw [← sub_eq_zero]
+  have hwa : w a = 0 := by
+    have h := hw' (Sym.replicate d a)
+    rw [veroneseDegDeriv_apply_replicate' n d hd a] at h
+    exact (mul_eq_zero.mp h).resolve_left (mul_ne_zero hd0 (pow_ne_zero _ ha))
   funext j
   by_cases hja : j = a
-  · rw [hja]
-    have hr1 := congrFun heq (Sym.replicate d a)
-    rw [veroneseDegDeriv_apply_replicate n d hd a] at hr1
-    have hd0 : (d : 𝕜) ≠ 0 := Nat.cast_ne_zero.mpr (by omega)
-    exact (mul_eq_zero.mp hr1).resolve_left hd0
-  · have hr2 := congrFun heq (veroneseDegElt n d hd a j)
-    rwa [veroneseDegDeriv_apply_cons n d hd a j hja] at hr2
-
-/-- The tangent space at any coordinate point `eₐ` has dimension `n+1`. -/
-theorem finrank_tangentSpace_single (n d : ℕ) (hd : 1 ≤ d) (a : Fin (n + 1)) :
-    Module.finrank 𝕜
-      (LinearMap.range (veroneseDegDeriv (𝕜 := 𝕜) n d (Pi.single a 1)).toLinearMap) = n + 1 := by
-  have hinj' : Function.Injective (veroneseDegDeriv (𝕜 := 𝕜) n d (Pi.single a 1)).toLinearMap :=
-    veroneseDegDeriv_injective_single n d hd a
-  rw [LinearMap.finrank_range_of_inj hinj', Module.finrank_pi, Fintype.card_fin]
+  · rw [hja, hwa]; rfl
+  have h := hw' (veroneseDegElt n d hd a j)
+  rw [veroneseDegDeriv_apply, Finset.sum_eq_single j] at h
+  · rw [veroneseDegElt_val, Multiset.count_cons_self, Multiset.count_replicate,
+      ite_eq_right (Ne.symm hja), Multiset.erase_cons_head, Multiset.map_replicate,
+      Multiset.prod_replicate] at h
+    simpa [pow_ne_zero _ ha] using h
+  · intro k _ hk
+    by_cases hka : k = a
+    · rw [hka, hwa, mul_zero]
+    · rw [veroneseDegElt_val, Multiset.count_cons, Multiset.count_replicate,
+        ite_eq_right (Ne.symm hka), ite_eq_right hk]
+      simp
+  · simp
 
 omit [CharZero 𝕜] in
 /-- The `k`-th standard basis point `eₖ ∈ 𝕜^{n+1}`, for `k : Fin r` cast into `Fin (n+1)` via
@@ -326,6 +289,13 @@ def veroneseDegParam (n d : ℕ) (v : Fin (n + 1) → 𝕜) :
   tangent := veroneseDegDeriv n d v
   hasFDerivAt := hasFDerivAt_veroneseDeg n d v
 
+/-- At any nonzero point, the tangent space to the cone over `v_d(ℙⁿ)` has dimension `n+1`. -/
+theorem finrank_tangentSpace_veroneseDegParam (n d : ℕ) (hd : 1 ≤ d) {v : Fin (n + 1) → 𝕜}
+    (hv : v ≠ 0) : Module.finrank 𝕜 (veroneseDegParam n d v).tangentSpace = n + 1 := by
+  show Module.finrank 𝕜 (LinearMap.range (veroneseDegDeriv (𝕜 := 𝕜) n d v).toLinearMap) = n + 1
+  rw [LinearMap.finrank_range_of_inj (veroneseDegDeriv_injective_of_ne_zero n d hd hv),
+    Module.finrank_pi, Fintype.card_fin]
+
 omit [CharZero 𝕜] in
 /-- The family of `r` local parametrizations of `veroneseDeg n d` at the `r` standard basis
 points `e₀, …, e_{r-1}`. -/
@@ -338,10 +308,7 @@ def veroneseDegFamily (n d r : ℕ) (hr : r ≤ n + 1) (k : Fin r) :
 theorem finrank_tangentSpace_veroneseDegFamily (n d r : ℕ) (hd : 1 ≤ d) (hr : r ≤ n + 1)
     (k : Fin r) :
     Module.finrank 𝕜 (veroneseDegFamily (𝕜 := 𝕜) n d r hr k).tangentSpace = n + 1 := by
-  show Module.finrank 𝕜
-      (LinearMap.range (veroneseDegDeriv n d (Pi.single (Fin.castLE hr k) (1 : 𝕜))).toLinearMap)
-      = n + 1
-  exact finrank_tangentSpace_single n d hd (Fin.castLE hr k)
+  exact finrank_tangentSpace_veroneseDegParam n d hd (by simp [veroneseDegPt])
 
 /-! ### §D — Disjoint supports, direct sum, non-defectivity for `d ≥ 3` -/
 

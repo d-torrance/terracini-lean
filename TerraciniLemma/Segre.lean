@@ -154,7 +154,6 @@ theorem segre_terracini (p₁ p₂ : 𝕜 × 𝕜) (h : p₁ ≠ p₂) :
           (segreParamPair p₁ p₂)).toLinearMap) :=
     le_of_eq (by rw [hrange])
   exact terraciniLemma ![segre p₁, segre p₂]
-    (fun i => by fin_cases i <;> exact ⟨_, rfl⟩)
     (segreParamPair p₁ p₂) ⊤ le_top hgeneric
 
 /-- Sanity check: the Segre quadric example specializes to `ℂ` for free,
@@ -424,7 +423,6 @@ theorem segre3_terracini :
         (segre3ParamPair segre3Pt1 segre3Pt2)).toLinearMap) :=
     le_of_eq (by rw [finrank_ker_segre3Defect, finrank_range_combinedDerivative_segre3])
   exact terraciniLemma ![segre3 segre3Pt1, segre3 segre3Pt2]
-    (fun i => by fin_cases i <;> exact ⟨_, rfl⟩)
     (segre3ParamPair segre3Pt1 segre3Pt2)
     (LinearMap.ker (segre3Defect).toLinearMap) hdominant_segre3 hgeneric
 

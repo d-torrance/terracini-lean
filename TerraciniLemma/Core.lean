@@ -35,15 +35,14 @@ tangent cone `tangentConeAt 𝕜 (secantVariety r X) (∑ vᵢ)`, the containmen
 Im(dΦ) ⊆ T is proved (`range_combinedDerivative_le_span_tangentConeAt`), since
 each chart lands in X̂ near its base point (`LocalParam.chart_mem`).
 
-The file is organized into six sections:
+The file is organized into five sections:
 
-* §1 — the addition map
-* §2 — differentiating the combined parametrization (`combinedDerivative`,
+* §1 — differentiating the combined parametrization (`combinedDerivative`,
   `range_combinedParam_eq_iSup`)
-* §3 — secant varieties (`secantSet`, `secantVariety`)
-* §4 — smooth local parametrizations and their tangent spaces (`LocalParam`)
-* §5 — the statement and proof of `terraciniLemma`
-* §6 — a sketch of the projective formulation
+* §2 — secant varieties (`secantSet`, `secantVariety`)
+* §3 — smooth local parametrizations and their tangent spaces (`LocalParam`)
+* §4 — the statement and proof of `terraciniLemma`
+* §5 — a sketch of the projective formulation
 -/
 
 @[expose] public section
@@ -53,38 +52,7 @@ noncomputable section
 open Set Filter Topology
 
 /-!
-## §1  The addition map
-
-The map Φ : (Fin r → E) → E, Φ(v) = ∑ᵢ vᵢ, is continuous and 𝕜-linear.
-As a continuous linear map it is its own Fréchet derivative everywhere.
--/
-
-section AdditionMap
-
-variable {𝕜 : Type*} [NontriviallyNormedField 𝕜]
-variable {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E]
-
-/-- The addition map (Fin r → E) →L[𝕜] E,  v ↦ ∑ᵢ vᵢ. -/
-def additionMap (r : ℕ) : (Fin r → E) →L[𝕜] E :=
-  ∑ i : Fin r, (ContinuousLinearMap.proj i : (Fin r → E) →L[𝕜] E)
-
-@[simp]
-theorem additionMap_apply (r : ℕ) (v : Fin r → E) :
-    additionMap (𝕜 := 𝕜) r v = ∑ i, v i := by
-  simp [additionMap, sum_apply, ContinuousLinearMap.proj_apply]
-
-/-- The addition map, being linear, is its own Fréchet derivative everywhere. -/
-theorem hasFDerivAt_additionMap (r : ℕ) (v : Fin r → E) :
-    HasFDerivAt (fun v : Fin r → E => ∑ i, v i) (additionMap (𝕜 := 𝕜) r) v := by
-  have heq : (fun v : Fin r → E => ∑ i, v i) = ⇑(additionMap (𝕜 := 𝕜) r) :=
-    funext fun v => (additionMap_apply r v).symm
-  rw [heq]
-  exact (additionMap (𝕜 := 𝕜) r : (Fin r → E) →L[𝕜] E).hasFDerivAt
-
-end AdditionMap
-
-/-!
-## §2  Differentiating the combined parametrization
+## §1  Differentiating the combined parametrization
 
 Given smooth maps fᵢ : 𝔸 → E (local parametrizations of X̂ near vᵢ), the
 combined parametrization Φ(u) = ∑ᵢ fᵢ(uᵢ) has derivative
@@ -198,7 +166,7 @@ theorem range_combinedParam_eq_iSup {r : ℕ}
 end TerraciniDerivative
 
 /-!
-## §3  Secant varieties
+## §2  Secant varieties
 
 The r-th secant variety of X ⊆ E is the closure of all r-fold sums of points
 from X. For a projective variety X ⊂ ℙ(E) this should be interpreted via
@@ -250,7 +218,7 @@ theorem secantVariety_mono {r : ℕ} {X : Set E} (h0 : (0 : E) ∈ X) :
 end SecantVariety
 
 /-!
-## §4  Smooth varieties and their tangent spaces
+## §3  Smooth varieties and their tangent spaces
 
 We model a smooth subvariety of E by a collection of local parametrizations.
 At each point x ∈ X, a parametrization f : 𝔸 → E with f(u₀) = x, landing in X
@@ -285,7 +253,7 @@ def LocalParam.tangentSpace {X : Set E} {x : E} (p : LocalParam (𝕜 := 𝕜) (
 end SmoothVariety
 
 /-!
-## §5  Terracini's Lemma
+## §4  Terracini's Lemma
 
 We now state and prove Terracini's Lemma. The theorem has two parts:
 
@@ -340,7 +308,6 @@ def combinedDerivative {r : ℕ} {X : Set E} {v : Fin r → E}
     Together these give T = Im(dΦ) = ⨆ Im(Dfᵢ) = T_{v₁}X̂ + ⋯ + T_{vᵣ}X̂. -/
 theorem terraciniLemma {r : ℕ} {X : Set E} [FiniteDimensional 𝕜 E]
     (v     : Fin r → E)
-    (_hv   : ∀ i, v i ∈ X)
     (param : ∀ i, LocalParam (𝕜 := 𝕜) (𝔸 := 𝔸) X (v i))
     -- T is the Zariski tangent space to σᵣ(X̂) at ∑ vᵢ
     (T : Submodule 𝕜 E)
@@ -369,7 +336,6 @@ theorem terraciniLemma {r : ℕ} {X : Set E} [FiniteDimensional 𝕜 E]
     This is the core computation of Terracini's Lemma, fully proved from the chain rule. -/
 theorem terraciniLemma_derivative {r : ℕ} {X : Set E}
     (v     : Fin r → E)
-    (_hv   : ∀ i, v i ∈ X)
     (param : ∀ i, LocalParam (𝕜 := 𝕜) (𝔸 := 𝔸) X (v i)) :
     HasFDerivAt
       (fun u : Fin r → 𝔸 => ∑ i, (param i).chart (u i))
@@ -380,14 +346,6 @@ theorem terraciniLemma_derivative {r : ℕ} {X : Set E}
     (fun i => (param i).tangent)
     _
     (fun i => (param i).hasFDerivAt)
-
-/-- **Corollary:** The combined parametrization Φ evaluates to ∑ vᵢ at the base point. -/
-theorem terraciniLemma_basePoint {r : ℕ} {X : Set E}
-    (v     : Fin r → E)
-    (_hv   : ∀ i, v i ∈ X)
-    (param : ∀ i, LocalParam (𝕜 := 𝕜) (𝔸 := 𝔸) X (v i)) :
-    ∑ i, (param i).chart ((param i).basePoint) = ∑ i, v i :=
-  Finset.sum_congr rfl fun i _ => (param i).chart_eval
 
 /-- **Dominance, derived.** Every vector in `Im(dΦ)` is tangent to σᵣ(X̂) at `∑ vᵢ`: it lies
 in Mathlib's tangent cone `tangentConeAt 𝕜 (secantVariety r X) (∑ vᵢ)`, because Φ maps a
@@ -429,7 +387,7 @@ theorem terraciniLemma_tangentCone {r : ℕ} {X : Set E} [FiniteDimensional 𝕜
       Module.finrank 𝕜 (LinearMap.range (combinedDerivative (v := v) param).toLinearMap)) :
     Submodule.span 𝕜 (tangentConeAt 𝕜 (secantVariety r X) (∑ i, v i)) =
       ⨆ i : Fin r, (param i).tangentSpace :=
-  terraciniLemma v (fun i => (param i).chart_eval ▸ (param i).chart_mem.self_of_nhds) param _
+  terraciniLemma v param _
     (range_combinedDerivative_le_span_tangentConeAt param) hgeneric
 
 /-- **Unconditional corollary.** If the tangent spaces `T_{vᵢ}X̂` already span `E`, the
@@ -448,7 +406,7 @@ theorem span_tangentConeAt_secantVariety_eq_top {r : ℕ} {X : Set E} [FiniteDim
 end TerraciniLemma
 
 /-!
-## §6  The projective formulation
+## §5  The projective formulation
 
 In the projective setting, X ⊂ ℙ(E) and its secant variety σᵣ(X) ⊂ ℙ(E) are
 projectivizations of the affine cones X̂ ⊆ E and σ̂ᵣ(X̂) ⊆ E. The embedded
@@ -468,8 +426,8 @@ applying it to both sides of `T = ⨆ i, (param i).tangentSpace` (and using that
 order isomorphisms of complete lattices preserve `iSup`) immediately gives the
 projective statement above. See that file for the precise statement,
 including the caveat that `E` must itself be the affine cone over `X` for the
-result to carry its intended geometric meaning (true for
-`TerraciniLemma.VeroneseSurface`, not for the affine-chart examples).
+result to carry its intended geometric meaning (true for the Veronese
+varieties, not for the affine-chart examples).
 -/
 
 end

@@ -196,11 +196,6 @@ theorem elliptic_terracini :
           ellipticParamPair).toLinearMap) :=
     le_of_eq (by rw [hrange])
   exact terraciniLemma ![![(0 : 𝕜), 1], ![2, 3]]
-    (fun i => by
-      fin_cases i <;>
-        simp [ellipticCurve, ellipticF, ellipticPoly, Fin.isValue,
-          Matrix.cons_val_zero, Matrix.cons_val_one, eval_sub, eval_pow, eval_X, map_one]
-      all_goals ring)
     ellipticParamPair ⊤ le_top hgeneric
 
 /-- Sanity check: the elliptic curve example specializes to `ℂ` for free. -/

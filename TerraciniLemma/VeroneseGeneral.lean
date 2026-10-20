@@ -7,9 +7,8 @@ public import Mathlib.Data.Sym.Card
 /-!
 # General quadric Veronese `v₂(ℙⁿ) ⊂ ℙ^N`
 
-This file generalizes `TerraciniLemma.VeroneseSurface` (the `n = 2`, `r = 2` case) to the
-affine cone over `v₂(ℙⁿ) ⊂ ℙ^N`, `N = binom(n+2,2) - 1`, for an arbitrary number `r ≤ n + 1`
-of general points.
+This file works in the affine cone over `v₂(ℙⁿ) ⊂ ℙ^N`, `N = binom(n+2,2) - 1`, for an
+arbitrary number `r ≤ n + 1` of general points.
 
 The cone `X̂ ⊆ 𝕜^{N+1}` over `v₂(ℙⁿ)` is the set of rank-`≤ 1` symmetric `(n+1) × (n+1)`
 matrices `v vᵗ`. We model the ambient space `𝕜^{N+1}` as `Sym2 (Fin (n+1)) → 𝕜`, one

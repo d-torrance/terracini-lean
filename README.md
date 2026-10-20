@@ -47,7 +47,7 @@ The mathematics is organized into the following files:
   files below and gives the overall statement, file organization, and a
   summary table of proof obligations.
 - [`TerraciniLemma/Core.lean`](TerraciniLemma/Core.lean) — the general theory
-  (§1–§6 below): the addition map, the Terracini derivative computation,
+  (§1–§5 below): the Terracini derivative computation,
   secant varieties, smooth local parametrizations (`LocalParam`), and
   `terraciniLemma` itself.
 - [`TerraciniLemma/PolynomialCalculus.lean`](TerraciniLemma/PolynomialCalculus.lean)
@@ -59,21 +59,12 @@ The mathematics is organized into the following files:
   — worked examples for rational normal curves: the plane conic `v₂(ℙ¹) ⊂ ℙ²`
   (σ₂ fills the plane) and the twisted cubic `v₃(ℙ¹) ⊂ ℙ³` (the two tangent
   directions span a hyperplane, the expected outcome since `2 · dim X < dim ℙ³`).
-- [`TerraciniLemma/VeroneseSurface.lean`](TerraciniLemma/VeroneseSurface.lean)
-  — the quadric Veronese surface `v₂(ℙ²) ⊂ ℙ⁵`, worked directly in the
-  *affine cone* model (ambient `𝕜⁶`, tangent spaces of dimension `3`). This
-  is a genuinely **defective** case: the combined tangent space of two
-  general points is a `5`-dimensional hyperplane `⊊ 𝕜⁶`, even though
-  `min(6, 2·3) = 6` would be the non-defective expectation — the classical
-  Alexander–Hirschowitz defect of `σ₂(v₂(ℙ²))` (the determinantal cubic
-  hypersurface).
 - [`TerraciniLemma/VeroneseGeneral.lean`](TerraciniLemma/VeroneseGeneral.lean)
   — the general quadric Veronese variety `v₂(ℙⁿ) ⊂ ℙ^N`
   (`N = binom(n+2,2) - 1`), worked in the affine cone model (ambient
   `Sym2 (Fin (n+1)) → 𝕜`, of dimension `binom(n+2,2)`, representing symmetric
   `(n+1)×(n+1)` matrices) for arbitrary `n` and arbitrary `r` general points
-  (`1 ≤ r ≤ n+1`). This subsumes `TerraciniLemma/VeroneseSurface.lean`'s
-  `n = 2, r = 2` instance. The main theorem
+  (`1 ≤ r ≤ n+1`). The main theorem
   `isDefective_veroneseGeneral_iff` shows `σᵣ(v₂(ℙⁿ))` is
   Alexander–Hirschowitz defective **iff `2 ≤ r ≤ n`**; `veroneseGeneral_sup_eq_top`
   and `veroneseGeneral_not_isDefective_of_succ_le` show the boundary case
@@ -94,30 +85,6 @@ The mathematics is organized into the following files:
   each of the `r` points are pairwise *disjoint* (in contrast to `d = 2`,
   where they pairwise overlap in exactly one element), so the combined tangent
   space is a direct sum of dimension `r(n+1)`.
-- [`TerraciniLemma/VeroneseAH437.lean`](TerraciniLemma/VeroneseAH437.lean) —
-  the `(n,d,r) = (4,3,7)` exceptional case of the Alexander–Hirschowitz
-  theorem: `ah437_isDefective` shows `σ₇(v₃(ℙ⁴)) ⊂ ℙ^{34}` is **defective**,
-  using 5 coordinate points `e₀,…,e₄` plus two general points
-  `p₆ = (1,1,1,1,1)`, `p₇ = (1,2,3,4,5)`. The certificate is a "dual cubic"
-  linear functional `dualCubicφ'` that vanishes on all 7 tangent spaces
-  (bounding their combined dimension by `34 < 35`) but is itself nonzero;
-  following Brambilla–Ottaviani, it is (up to scale) the Hankel-determinant
-  cubic of the unique rational normal curve through the 7 points, whose secant
-  variety is singular along that curve. This is a single explicit
-  configuration. The general-points statement is `ah437_isDefective_general`
-  in `AlexanderHirschowitzCubic.lean`.
-- [`TerraciniLemma/VeroneseAH245.lean`](TerraciniLemma/VeroneseAH245.lean) —
-  the `(n,d,r) = (2,4,5)` exceptional case of the Alexander–Hirschowitz
-  theorem: `ah245_isDefective` shows `σ₅(v₄(ℙ²)) ⊂ ℙ^{14}` is **defective**,
-  using 3 coordinate points `e₀,e₁,e₂` plus two general points
-  `p₃ = (1,1,1)`, `p₄ = (1,2,3)`. The certificate is a "dual quartic" linear
-  functional `dualQuarticφ` given by the coefficients of `F = Q²`, where
-  `Q = 3x₀x₁ - 4x₀x₂ + x₁x₂` is the unique conic through the 5 points: since
-  `∇F = 2Q∇Q` vanishes on `{Q = 0}` and all 5 points lie on this conic,
-  `dualQuarticφ` vanishes on all 5 tangent spaces (bounding their combined
-  dimension by `14 < 15`) but is itself nonzero. This is a single explicit
-  configuration. The general-points statement is `ah245_isDefective_general`
-  in `AlexanderHirschowitz.lean`.
 - [`TerraciniLemma/VeroneseForms.lean`](TerraciniLemma/VeroneseForms.lean) —
   degree-`d` forms on `𝕜^{n+1}` as pullbacks `χ ∘ v_d` of functionals on the
   ambient space, and the **singular-form bound**
@@ -155,42 +122,33 @@ The mathematics is organized into the following files:
   descends `terraciniLemma` to the projective statement
   `T_{[p]} σᵣ(X) = ⟨T_{[p₁]}X, …, T_{[pᵣ]}X⟩` in `ℙ(E)`, via the order
   isomorphism `Submodule.projectivization` between linear subspaces of `E`
-  and projective subspaces of `ℙ(E)`. Instantiated for the quadric Veronese
-  surface, showing `ℙ(σ₂(v₂(ℙ²)))` is a proper hyperplane `ℙ⁴ ⊊ ℙ⁵`.
-- [`TerraciniLemma/Defect.lean`](TerraciniLemma/Defect.lean) (§7) — packages
+  and projective subspaces of `ℙ(E)`.
+- [`TerraciniLemma/Defect.lean`](TerraciniLemma/Defect.lean) (§6) — packages
   the dimension count from `terraciniLemma` into the classical
   Alexander–Hirschowitz language of *expected dimension* and *defect*:
   `expectedDim S = min(N, ∑ᵢ dim Tᵢ)`, `IsDefective S ↔ dim ⨆ᵢ Tᵢ <
-  expectedDim S`, and `defect S` is the resulting shortfall. Instantiated for
-  the quadric Veronese surface (cone model): the classical defect of
-  `σ₂(v₂(ℙ²))` is exactly `1`. Also proves monotonicity of non-defectivity in
+  expectedDim S`, and `defect S` is the resulting shortfall. Also proves monotonicity of non-defectivity in
   the number of points `r`, in both the subabundant and superabundant
   regimes.
 
-The sections below (§1–§7) live in `TerraciniLemma/Core.lean` and
+The sections below (§1–§6) live in `TerraciniLemma/Core.lean` and
 `TerraciniLemma/Defect.lean`.
 
-### §1 — The addition map
-```
-additionMap r : (Fin r → E) →L[𝕜] E
-```
-The map $v \mapsto \sum_i v_i$ is continuous and $\mathbb{k}$-linear, hence its own Fréchet derivative everywhere.
-
-### §2 — The Terracini computation
+### §1 — The Terracini computation
 ```
 hasFDerivAt_combinedParam   -- dΦ = ∑ Dfᵢ ∘ πᵢ  (chain rule)
 range_combinedParam_eq_iSup -- Im(dΦ) = ⨆ Im(Dfᵢ)  (submodule algebra)
 ```
 The core result: the image of the derivative of $\Phi$ is exactly the sum of the individual tangent spaces. Both directions of the equality are fully proved.
 
-### §3 — Secant varieties
+### §2 — Secant varieties
 ```
 secantSet r X      -- { v₁ + ⋯ + vᵣ | vᵢ ∈ X }
 secantVariety r X  -- closure of the above
 ```
 Basic lemmas: `secantVariety 1 X = X` (for closed `X`), monotonicity in `r`.
 
-### §4 — Smooth parametrizations
+### §3 — Smooth parametrizations
 ```
 structure LocalParam (X : Set E) (x : E) where
   basePoint : 𝔸
@@ -202,7 +160,7 @@ structure LocalParam (X : Set E) (x : E) where
 ```
 Models a smooth local parametrization of `X` at a point `x` (landing in `X` near the base point), together with its derivative (= embedded tangent space generator).
 
-### §5 — Terracini's Lemma
+### §4 — Terracini's Lemma
 ```
 terraciniLemma             -- T = ⨆ tangentSpace (param i),  given hgeneric + hdominant
 terraciniLemma_tangentCone -- same for T = span (tangent cone of σᵣ(X̂)),  given only hgeneric
@@ -217,16 +175,14 @@ From these, `Submodule.eq_of_le_of_finrank_le` gives $T = \operatorname{Im}(d\Ph
 
 `terraciniLemma_tangentCone` fixes $T$ to be the span of the tangent cone to $\hat\sigma_r(\hat X)$ at $\sum v_i$ and proves `hdominant`, leaving only `hgeneric`. When the tangent spaces already span $E$, `hgeneric` is automatic, so `span_tangentConeAt_secantVariety_eq_top` holds with no hypotheses. For example, `veroneseGeneral_span_tangentConeAt_eq_top` shows that $\sigma_{n+1}(v_2(\mathbb{P}^n))$ fills its ambient space.
 
-### §6 — The projective formulation
+### §5 — The projective formulation
 The affine cone result descends to the projective statement
 `T_{[p]} σᵣ(X) = ⟨T_{[p₁]}X, …, T_{[pᵣ]}X⟩` in `ℙ(E)` via the order isomorphism
 `Submodule.projectivization : Submodule 𝕜 E ≃o Projectivization.Subspace 𝕜 E`
 from `Mathlib.LinearAlgebra.Projectivization`. This is formalized in
-[`TerraciniLemma/Projective.lean`](TerraciniLemma/Projective.lean), with the
-quadric Veronese surface as a worked example: `ℙ(σ₂(v₂(ℙ²)))` is a proper
-hyperplane `ℙ⁴ ⊊ ℙ⁵`.
+[`TerraciniLemma/Projective.lean`](TerraciniLemma/Projective.lean).
 
-### §7 — Expected dimension and defect
+### §6 — Expected dimension and defect
 ```
 expectedDim S          -- min (finrank E) (∑ i, finrank (S i))
 IsDefective S          -- finrank (⨆ i, S i) < expectedDim S
@@ -240,9 +196,7 @@ formalized in [`TerraciniLemma/Defect.lean`](TerraciniLemma/Defect.lean).
 
 `IsDefective`/`defect` have their *intended* meaning — genuine
 Alexander–Hirschowitz defectivity of `X = ℙ(X̂)` — only when `E` is the affine
-**cone** over `X`, as for the quadric Veronese surface: `veroneseSurface_isDefective`
-and `defect_veroneseSurface` show `σ₂(v₂(ℙ²))` has defect exactly `1`, matching
-the classical result. (For the affine-**chart** examples — rational normal
+**cone** over `X`, as for the Veronese varieties. (For the affine-**chart** examples — rational normal
 curves, Segre varieties, the elliptic curve — tangent spaces have dimension
 `dim X` rather than `dim X + 1`, so `expectedDim` there is a systematically
 different quantity; `IsDefective`/`defect` are deliberately not instantiated

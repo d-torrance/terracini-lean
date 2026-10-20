@@ -174,49 +174,6 @@ theorem exists_apply_veroneseDeg_ne_zero {n d : ℕ} {χ : Module.Dual 𝕜 (Sym
   by_contra! h
   exact hχ (veroneseFormOf_injective n d (funext h))
 
-/-! ### §B' — Tangent spaces at arbitrary nonzero points -/
-
-/-- If `v ≠ 0`, `veroneseDegDeriv n d v` is injective: pick `a` with `v a ≠ 0`; the monomial
-`X_a^d` forces `dv a = 0`, and then each monomial `Xⱼ X_a^{d-1}` forces `dv j = 0`. -/
-theorem veroneseDegDeriv_injective_of_ne_zero' (n d : ℕ) (hd : 1 ≤ d) {v : Fin (n + 1) → 𝕜}
-    (hv : v ≠ 0) : Function.Injective (veroneseDegDeriv n d v) := by
-  classical
-  obtain ⟨a, ha⟩ : ∃ a, v a ≠ 0 := by
-    by_contra! h
-    exact hv (funext h)
-  suffices h : Function.Injective (veroneseDegDeriv n d v).toLinearMap from h
-  rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
-  intro w hw
-  have hw' : ∀ s, veroneseDegDeriv n d v w s = 0 := fun s => congrFun hw s
-  have hd0 : (d : 𝕜) ≠ 0 := Nat.cast_ne_zero.mpr (by omega)
-  have hwa : w a = 0 := by
-    have h := hw' (Sym.replicate d a)
-    rw [veroneseDegDeriv_apply_replicate' n d hd a] at h
-    exact (mul_eq_zero.mp h).resolve_left (mul_ne_zero hd0 (pow_ne_zero _ ha))
-  funext j
-  by_cases hja : j = a
-  · rw [hja, hwa]; rfl
-  have h := hw' (veroneseDegElt n d hd a j)
-  rw [veroneseDegDeriv_apply, Finset.sum_eq_single j] at h
-  · rw [veroneseDegElt_val, Multiset.count_cons_self, Multiset.count_replicate,
-      ite_eq_right (Ne.symm hja), Multiset.erase_cons_head, Multiset.map_replicate,
-      Multiset.prod_replicate] at h
-    simpa [pow_ne_zero _ ha] using h
-  · intro k _ hk
-    by_cases hka : k = a
-    · rw [hka, hwa, mul_zero]
-    · rw [veroneseDegElt_val, Multiset.count_cons, Multiset.count_replicate,
-        ite_eq_right (Ne.symm hka), ite_eq_right hk]
-      simp
-  · simp
-
-/-- At any nonzero point, the tangent space to the cone over `v_d(ℙⁿ)` has dimension `n+1`. -/
-theorem finrank_tangentSpace_veroneseDegParam (n d : ℕ) (hd : 1 ≤ d) {v : Fin (n + 1) → 𝕜}
-    (hv : v ≠ 0) : Module.finrank 𝕜 (veroneseDegParam n d v).tangentSpace = n + 1 := by
-  show Module.finrank 𝕜 (LinearMap.range (veroneseDegDeriv (𝕜 := 𝕜) n d v).toLinearMap) = n + 1
-  rw [LinearMap.finrank_range_of_inj (veroneseDegDeriv_injective_of_ne_zero' n d hd hv),
-    Module.finrank_pi, Fintype.card_fin]
-
 /-! ### §C — The singular-form bound -/
 
 omit [CharZero 𝕜] in

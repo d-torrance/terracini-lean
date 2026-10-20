@@ -15,7 +15,7 @@ This file contains the case `r = 2`, the plane conic (parabola), and the case
 `r = 3`, the twisted cubic. Further rational normal curve examples can be
 added here following the same `parabolaParamPair`/`twistedCubicParamPair`
 pattern. (For Veronese varieties `v_d(ℙⁿ)` with `n ≥ 2`, see
-`TerraciniLemma.VeroneseSurface`.)
+`TerraciniLemma.VeroneseGeneral` and `TerraciniLemma.VeroneseDegree`.)
 -/
 
 @[expose] public section
@@ -48,7 +48,7 @@ never span `𝕜²`).
 computation: it does not descend via `Submodule.projectivization`
 (`TerraciniLemma.Projective`) to a statement about `ℙ(σ₂(v₂(ℙ¹)))`. For that,
 one would need to redo the computation in the cone `𝕜³`, as
-`TerraciniLemma.VeroneseSurface` does for `v₂(ℙ²)`.
+`TerraciniLemma.VeroneseGeneral` does for `v₂(ℙⁿ)`.
 -/
 
 noncomputable section ParabolaExample
@@ -144,7 +144,6 @@ theorem parabola_terracini (t₁ t₂ : 𝕜) (h : t₁ ≠ t₂) :
           (parabolaParamPair t₁ t₂)).toLinearMap) :=
     le_of_eq (by rw [hrange])
   exact terraciniLemma ![parabola t₁, parabola t₂]
-    (fun i => by fin_cases i <;> exact ⟨_, rfl⟩)
     (parabolaParamPair t₁ t₂) ⊤ le_top hgeneric
 
 /-- Sanity check: the parabola example specializes to `ℂ` for free. -/
@@ -318,7 +317,6 @@ theorem twistedCubic_terracini :
         (twistedCubicParamPair 0 1)).toLinearMap) :=
     le_of_eq (by rw [range_combinedDerivative_twistedCubic])
   exact terraciniLemma ![twistedCubic (0 : 𝕜), twistedCubic 1]
-    (fun i => by fin_cases i <;> exact ⟨_, rfl⟩)
     (twistedCubicParamPair 0 1) (LinearMap.ker twistedCubicDefect.toLinearMap)
     hdominant_twistedCubic hgeneric
 
