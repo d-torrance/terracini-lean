@@ -1,7 +1,9 @@
-import TerraciniLemma.Core
-import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
-import Mathlib.LinearAlgebra.Dual.Lemmas
-import Mathlib.Analysis.Complex.Basic
+module
+
+public import TerraciniLemma.Core
+public import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
+public import Mathlib.LinearAlgebra.Dual.Lemmas
+public import Mathlib.Analysis.Complex.Basic
 
 /-!
 # Worked examples: Segre varieties
@@ -13,6 +15,8 @@ contains two examples:
 * the Segre quadric `ℙ¹ × ℙ¹ ⊂ ℙ³` (non-defective, §`SegreExample`), and
 * the Segre threefold `ℙ¹ × ℙ¹ × ℙ¹ ⊂ ℙ⁷` (defective, §`SegreCubicExample`).
 -/
+
+@[expose] public section
 
 /-!
 ## Example: Terracini's Lemma for the Segre quadric P¹×P¹ ⊂ P³

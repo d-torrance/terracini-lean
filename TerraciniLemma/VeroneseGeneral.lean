@@ -1,6 +1,8 @@
-import TerraciniLemma.PolynomialCalculus
-import TerraciniLemma.Defect
-import Mathlib.Data.Sym.Card
+module
+
+public import TerraciniLemma.PolynomialCalculus
+public import TerraciniLemma.Defect
+public import Mathlib.Data.Sym.Card
 
 /-!
 # General quadric Veronese `v₂(ℙⁿ) ⊂ ℙ^N`
@@ -15,6 +17,8 @@ coordinate per unordered pair `{i, j}` (including `i = j`), representing the ent
 symmetric matrix. By `Sym2.card`, `Fintype.card (Sym2 (Fin (n+1))) = (n+2).choose 2`, matching
 `N + 1 = binom(n+2,2)`.
 -/
+
+@[expose] public section
 
 noncomputable section VeroneseGeneralExample
 

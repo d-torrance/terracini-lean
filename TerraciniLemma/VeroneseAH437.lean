@@ -1,4 +1,6 @@
-import TerraciniLemma.VeroneseDegree
+module
+
+public import TerraciniLemma.VeroneseDegree
 
 /-!
 # `σ₇(v₃(ℙ⁴))` is Alexander–Hirschowitz defective: the `(n,d,r) = (4,3,7)` exceptional case
@@ -38,6 +40,8 @@ for the 7 chosen points.
    (`finrank_tangentSpace_ah437`), so the *expected* dimension is `min(35, 7·5) = 35`.
 4. Since `34 < 35`, `σ₇(v₃(ℙ⁴))` is defective (`ah437_isDefective`).
 -/
+
+@[expose] public section
 
 noncomputable section VeroneseAH437
 

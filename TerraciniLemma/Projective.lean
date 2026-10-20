@@ -1,5 +1,7 @@
-import TerraciniLemma.VeroneseSurface
-import Mathlib.LinearAlgebra.Projectivization.Subspace
+module
+
+public import TerraciniLemma.VeroneseSurface
+public import Mathlib.LinearAlgebra.Projectivization.Subspace
 
 /-!
 # §6 (continued) — The projective formulation
@@ -51,6 +53,8 @@ equations, but the resulting statement is
 about `ℙ(E)` for the *wrong* `E`, not the projective secant variety of the
 intended `X`.
 -/
+
+@[expose] public section
 
 noncomputable section
 

@@ -1,4 +1,6 @@
-import TerraciniLemma.VeroneseDegree
+module
+
+public import TerraciniLemma.VeroneseDegree
 
 /-!
 # `σ₅(v₄(ℙ²))` is Alexander–Hirschowitz defective: the `(n,d,r) = (2,4,5)` exceptional case
@@ -34,6 +36,8 @@ every one of the 5 points.
    (`finrank_tangentSpace_ah245`), so the *expected* dimension is `min(15, 5·3) = 15`.
 4. Since `14 < 15`, `σ₅(v₄(ℙ²))` is defective (`ah245_isDefective`).
 -/
+
+@[expose] public section
 
 noncomputable section VeroneseAH245
 

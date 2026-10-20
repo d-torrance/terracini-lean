@@ -1,8 +1,10 @@
-import TerraciniLemma.VeroneseSurface
-import TerraciniLemma.RationalNormalCurves
-import TerraciniLemma.Segre
-import TerraciniLemma.EllipticCurve
-import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
+module
+
+public import TerraciniLemma.VeroneseSurface
+public import TerraciniLemma.RationalNormalCurves
+public import TerraciniLemma.Segre
+public import TerraciniLemma.EllipticCurve
+public import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 
 /-!
 # §7 — Expected dimension and defect
@@ -45,6 +47,8 @@ tangent spaces have dimension `dim X` (not `dim X + 1`), so `expectedDim` there 
 a systematically different quantity, not (in general) equal to AH-defectivity. We therefore do
 not instantiate `IsDefective`/`defect` for those examples.
 -/
+
+@[expose] public section
 
 noncomputable section
 

@@ -1,6 +1,8 @@
-import TerraciniLemma.Core
-import Mathlib.Analysis.Calculus.Deriv.Polynomial
-import Mathlib.Analysis.Complex.Basic
+module
+
+public import TerraciniLemma.Core
+public import Mathlib.Analysis.Calculus.Deriv.Polynomial
+public import Mathlib.Analysis.Complex.Basic
 
 /-!
 # Worked examples: rational normal curves
@@ -15,6 +17,8 @@ added here following the same `parabolaParamPair`/`twistedCubicParamPair`
 pattern. (For Veronese varieties `v_d(ℙⁿ)` with `n ≥ 2`, see
 `TerraciniLemma.VeroneseSurface`.)
 -/
+
+@[expose] public section
 
 /-!
 ## Example: Terracini's Lemma for a plane conic

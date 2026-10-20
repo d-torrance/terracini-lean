@@ -1,7 +1,9 @@
-import TerraciniLemma.PolynomialCalculus
-import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
-import Mathlib.LinearAlgebra.Dual.Lemmas
-import Mathlib.Analysis.Complex.Basic
+module
+
+public import TerraciniLemma.PolynomialCalculus
+public import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
+public import Mathlib.LinearAlgebra.Dual.Lemmas
+public import Mathlib.Analysis.Complex.Basic
 
 /-!
 # Worked example: the quadric Veronese surface `v₂(ℙ²) ⊂ ℙ⁵` (a genuinely defective case)
@@ -44,6 +46,8 @@ The calculus of the six degree-`2` monomials `v₀², v₁², v₂², v₀v₁, 
 for the elliptic curve, from `TerraciniLemma.PolynomialCalculus`'s generic `MvPolynomial.pderiv`
 ↔ `HasFDerivAt` bridge.
 -/
+
+@[expose] public section
 
 noncomputable section VeroneseSurfaceExample
 

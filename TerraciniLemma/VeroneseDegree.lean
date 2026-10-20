@@ -1,6 +1,8 @@
-import TerraciniLemma.PolynomialCalculus
-import TerraciniLemma.Defect
-import Mathlib.Data.Sym.Card
+module
+
+public import TerraciniLemma.PolynomialCalculus
+public import TerraciniLemma.Defect
+public import Mathlib.Data.Sym.Card
 
 /-!
 # Degree-`d` Veronese ambient space `v_d(ℙⁿ) ⊂ ℙ^N`, and non-defectivity for `d ≥ 3`, `r ≤ n+1`
@@ -21,6 +23,8 @@ combined span is a direct sum of dimension `r(n+1)` — exactly the expected dim
 `σ_r(v_d(ℙⁿ))` is *never* defective for `r ≤ n+1` when `d ≥ 3` (the "easy half" of
 Alexander–Hirschowitz: every defective case with `d ≥ 3` has `r > n+1`).
 -/
+
+@[expose] public section
 
 noncomputable section VeroneseDegreeExample
 

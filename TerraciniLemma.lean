@@ -1,15 +1,17 @@
-import TerraciniLemma.Core
-import TerraciniLemma.PolynomialCalculus
-import TerraciniLemma.RationalNormalCurves
-import TerraciniLemma.VeroneseSurface
-import TerraciniLemma.VeroneseGeneral
-import TerraciniLemma.VeroneseDegree
-import TerraciniLemma.VeroneseAH437
-import TerraciniLemma.VeroneseAH245
-import TerraciniLemma.Segre
-import TerraciniLemma.EllipticCurve
-import TerraciniLemma.Projective
-import TerraciniLemma.Defect
+module
+
+public import TerraciniLemma.Core
+public import TerraciniLemma.PolynomialCalculus
+public import TerraciniLemma.RationalNormalCurves
+public import TerraciniLemma.VeroneseSurface
+public import TerraciniLemma.VeroneseGeneral
+public import TerraciniLemma.VeroneseDegree
+public import TerraciniLemma.VeroneseAH437
+public import TerraciniLemma.VeroneseAH245
+public import TerraciniLemma.Segre
+public import TerraciniLemma.EllipticCurve
+public import TerraciniLemma.Projective
+public import TerraciniLemma.Defect
 
 /-!
 # Terracini's Lemma
@@ -114,6 +116,8 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
 - L. Chiantini, C. Ciliberto, *Weakly defective varieties*, Trans. Amer. Math.
   Soc. **354** (2002), 151–178.
 -/
+
+@[expose] public section
 
 /-!
 ## Summary of proof obligations

@@ -1,9 +1,11 @@
-import TerraciniLemma.PolynomialCalculus
-import Mathlib.Algebra.MvPolynomial.CommRing
-import Mathlib.Analysis.Calculus.ContDiff.RCLike
-import Mathlib.Analysis.Calculus.Implicit
-import Mathlib.Analysis.Complex.Basic
-import Mathlib.LinearAlgebra.Dual.Lemmas
+module
+
+public import TerraciniLemma.PolynomialCalculus
+public import Mathlib.Algebra.MvPolynomial.CommRing
+public import Mathlib.Analysis.Calculus.ContDiff.RCLike
+public import Mathlib.Analysis.Calculus.Implicit
+public import Mathlib.Analysis.Complex.Basic
+public import Mathlib.LinearAlgebra.Dual.Lemmas
 
 /-!
 # Worked example: an elliptic curve via the Implicit Function Theorem
@@ -36,6 +38,8 @@ over `E`. So `elliptic_terracini` is a chart-level computation and does not
 directly feed into `TerraciniLemma.Projective`'s `Submodule.projectivization`
 descent.
 -/
+
+@[expose] public section
 
 noncomputable section EllipticCurveExample
 

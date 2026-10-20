@@ -1,12 +1,14 @@
-import Mathlib.Analysis.Calculus.FDeriv.Basic
-import Mathlib.Analysis.Calculus.FDeriv.Equiv
-import Mathlib.Analysis.Calculus.FDeriv.Add
-import Mathlib.Analysis.Calculus.FDeriv.Comp
-import Mathlib.Analysis.Calculus.FDeriv.Linear
-import Mathlib.Analysis.Calculus.FDeriv.Prod
-import Mathlib.Analysis.Calculus.FDeriv.Pow
-import Mathlib.LinearAlgebra.Span.Basic
-import Mathlib.LinearAlgebra.FiniteDimensional.Basic
+module
+
+public import Mathlib.Analysis.Calculus.FDeriv.Basic
+public import Mathlib.Analysis.Calculus.FDeriv.Equiv
+public import Mathlib.Analysis.Calculus.FDeriv.Add
+public import Mathlib.Analysis.Calculus.FDeriv.Comp
+public import Mathlib.Analysis.Calculus.FDeriv.Linear
+public import Mathlib.Analysis.Calculus.FDeriv.Prod
+public import Mathlib.Analysis.Calculus.FDeriv.Pow
+public import Mathlib.LinearAlgebra.Span.Basic
+public import Mathlib.LinearAlgebra.FiniteDimensional.Basic
 
 /-!
 # Terracini's Lemma: core theory
@@ -43,6 +45,8 @@ The file is organized into six sections:
 * §5 — the statement and proof of `terraciniLemma`
 * §6 — a sketch of the projective formulation
 -/
+
+@[expose] public section
 
 noncomputable section
 

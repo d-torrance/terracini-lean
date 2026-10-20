@@ -1,8 +1,10 @@
-import TerraciniLemma.Core
-import Mathlib.Algebra.MvPolynomial.PDeriv
-import Mathlib.Analysis.Analytic.Polynomial
-import Mathlib.Analysis.Calculus.ContDiff.Defs
-import Mathlib.Analysis.Calculus.FDeriv.Mul
+module
+
+public import TerraciniLemma.Core
+public import Mathlib.Algebra.MvPolynomial.PDeriv
+public import Mathlib.Analysis.Analytic.Polynomial
+public import Mathlib.Analysis.Calculus.ContDiff.Defs
+public import Mathlib.Analysis.Calculus.FDeriv.Mul
 
 /-!
 # Calculus of multivariate polynomials
@@ -14,6 +16,8 @@ parametrized by, polynomials, so Mathlib's *formal* derivative
 (`MvPolynomial.pderiv`) already computes the Fréchet derivative of evaluation. This
 file proves that bridging lemma once, generically.
 -/
+
+@[expose] public section
 
 noncomputable section PolynomialCalculus
 
