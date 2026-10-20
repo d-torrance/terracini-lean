@@ -157,7 +157,7 @@ theorem tangentSpace_veroneseDegParam_two (n : ℕ) (v : Fin (n + 1) → 𝕜) :
 /-- **Quadric defectivity.** For `2 ≤ r ≤ n` and any linearly independent `p₀, …, p_{r-1}`,
 `σ_r(v₂(ℙⁿ))` is defective, transported from
 `isDefective_veroneseGeneral_of_linearIndependent`. -/
-theorem isDefective_quadric {n r : ℕ} (hrn : r ≤ n) (h2r : 2 ≤ r) (p : Fin r → Fin (n + 1) → 𝕜)
+theorem isDefective_quadric_of_linearIndependent {n r : ℕ} (hrn : r ≤ n) (h2r : 2 ≤ r) (p : Fin r → Fin (n + 1) → 𝕜)
     (hp : LinearIndependent 𝕜 p) :
     IsDefective (fun k => (veroneseDegParam n 2 (p k)).tangentSpace) := by
   have h := isDefective_veroneseGeneral_of_linearIndependent hrn p hp h2r
@@ -206,7 +206,59 @@ theorem quadric_isDefective_general {n r : ℕ} (hrn : r ≤ n) (h2r : 2 ≤ r) 
     ForGeneralPoints (𝕜 := 𝕜) r (n + 1)
       (fun p => IsDefective (fun k => (veroneseDegParam n 2 (p k)).tangentSpace)) :=
   (ForGeneralPoints.linearIndependent (by omega)).mono fun p hp =>
-    isDefective_quadric hrn h2r p hp
+    isDefective_quadric_of_linearIndependent hrn h2r p hp
+
+/-- **Quadric defectivity at every configuration** of `r` nonzero points, `2 ≤ r ≤ n`
+(including linearly dependent ones), by semicontinuity from general points. -/
+theorem isDefective_quadric {n r : ℕ} (hrn : r ≤ n) (h2r : 2 ≤ r) (p : Fin r → Fin (n + 1) → 𝕜)
+    (hp : ∀ k, p k ≠ 0) :
+    IsDefective (fun k => (veroneseDegParam n 2 (p k)).tangentSpace) :=
+  isDefective_of_forGeneralPoints (by norm_num) (quadric_isDefective_general hrn h2r) p hp
+
+/-- The tangent spaces at the `n + 1` coordinate points span the ambient space of `v₂(ℙⁿ)`
+(transported from `veroneseGeneral_sup_eq_top`). -/
+theorem iSup_tangentSpace_two_single_eq_top (n : ℕ) :
+    ⨆ j : Fin (n + 1), (veroneseDegParam n 2 (Pi.single j (1 : 𝕜))).tangentSpace = ⊤ := by
+  have h := veroneseGeneral_sup_eq_top (𝕜 := 𝕜) n
+  have hfam : ∀ j, (veroneseGeneralFamily (𝕜 := 𝕜) n (n + 1) le_rfl j).tangentSpace
+      = (veroneseGeneralParam n (Pi.single j (1 : 𝕜))).tangentSpace := fun j => by
+    simp [veroneseGeneralFamily, veroneseGeneralPt]
+  simp_rw [hfam] at h
+  simp_rw [tangentSpace_veroneseDegParam_two, ← Submodule.map_iSup, h, Submodule.map_top,
+    LinearEquiv.range]
+
+/-- **Quadric non-defectivity for `r ≥ n + 1` at general points**: at a configuration
+containing the `n + 1` coordinate points the tangent spaces already fill the ambient space, and
+semicontinuity spreads this to general points. -/
+theorem quadric_not_isDefective_general {n r : ℕ} (hr : n + 1 ≤ r) :
+    ForGeneralPoints (𝕜 := 𝕜) r (n + 1)
+      (fun p => ¬ IsDefective (fun k => (veroneseDegParam n 2 (p k)).tangentSpace)) := by
+  -- the coordinate points `e₀, …, eₙ`, repeated cyclically
+  let p₀ : Fin r → Fin (n + 1) → 𝕜 := fun k =>
+    Pi.single (⟨k % (n + 1), Nat.mod_lt _ n.succ_pos⟩ : Fin (n + 1)) 1
+  refine forGeneralPoints_not_isDefective (by norm_num) p₀ (fun k => by simp [p₀]) ?_
+  have hp₀ : ∀ j : Fin (n + 1), p₀ ⟨j, lt_of_lt_of_le j.2 hr⟩ = Pi.single j 1 := fun j => by
+    show Pi.single _ 1 = _
+    congr 1
+    exact Fin.ext (Nat.mod_eq_of_lt j.2)
+  have htop : ⨆ k, (veroneseDegParam n 2 (p₀ k)).tangentSpace = ⊤ :=
+    eq_top_iff.mpr ((iSup_tangentSpace_two_single_eq_top n).symm.le.trans
+      (iSup_le fun j => le_iSup_of_le ⟨j, lt_of_lt_of_le j.2 hr⟩ (by rw [hp₀])))
+  unfold IsDefective
+  rw [htop, finrank_top, finrank_ambient_veroneseDeg, not_lt]
+  exact (expectedDim_veroneseDegParam_le p₀).trans (min_le_left _ _)
+
+/-- **The Alexander–Hirschowitz theorem for quadrics**: for `r ≥ 1` general points,
+`σ_r(v₂(ℙⁿ))` is defective if and only if `2 ≤ r ≤ n`. -/
+theorem alexanderHirschowitz_quadric {n r : ℕ} (hr : 1 ≤ r) :
+    ForGeneralPoints (𝕜 := 𝕜) r (n + 1) (fun p =>
+      IsDefective (fun k => (veroneseDegParam n 2 (p k)).tangentSpace) ↔ 2 ≤ r ∧ r ≤ n) := by
+  by_cases h : 2 ≤ r ∧ r ≤ n
+  · exact (quadric_isDefective_general h.2 h.1).mono fun p hp => iff_of_true hp h
+  rcases (by omega : r = 1 ∨ n + 1 ≤ r) with rfl | hr'
+  · exact ForGeneralPoints.ne_zero.mono fun p hp =>
+      iff_of_false (not_isDefective_one (by norm_num) p hp) h
+  · exact (quadric_not_isDefective_general hr').mono fun p hp => iff_of_false hp h
 
 /-! ### §3 — All the exceptional cases -/
 
@@ -219,7 +271,8 @@ def IsAHException (n d r : ℕ) : Prop :=
 /-- **The Alexander–Hirschowitz exceptions are defective.** In every exceptional case, the
 tangent spaces to the cone over `v_d(ℙⁿ)` at `r` general points are defective, i.e. (by
 Terracini's Lemma) `σ_r(v_d(ℙⁿ))` has less than the expected dimension. -/
-theorem alexanderHirschowitz_exceptions_isDefective {n d r : ℕ} (h : IsAHException n d r) :
+theorem alexanderHirschowitz_exceptions_isDefective_general {n d r : ℕ}
+    (h : IsAHException n d r) :
     ForGeneralPoints (𝕜 := 𝕜) r (n + 1)
       (fun p => IsDefective (fun k => (veroneseDegParam n d (p k)).tangentSpace)) := by
   rcases h with ⟨rfl, h2r, hrn⟩ | h | h | h | h
@@ -231,5 +284,16 @@ theorem alexanderHirschowitz_exceptions_isDefective {n d r : ℕ} (h : IsAHExcep
   · exact ah349_isDefective_general
   · exact ah4414_isDefective_general
   · exact ah437_isDefective_general
+
+theorem IsAHException.one_le_d {n d r : ℕ} (h : IsAHException n d r) : 1 ≤ d := by
+  rcases h with ⟨rfl, -⟩ | h | h | h | h <;> simp_all
+
+/-- **The Alexander–Hirschowitz exceptions are defective at every configuration of nonzero
+points**, not just general ones: the generic defect propagates by semicontinuity. -/
+theorem alexanderHirschowitz_exceptions_isDefective {n d r : ℕ} (h : IsAHException n d r)
+    (p : Fin r → Fin (n + 1) → 𝕜) (hp : ∀ k, p k ≠ 0) :
+    IsDefective (fun k => (veroneseDegParam n d (p k)).tangentSpace) :=
+  isDefective_of_forGeneralPoints h.one_le_d (alexanderHirschowitz_exceptions_isDefective_general h)
+    p hp
 
 end AlexanderHirschowitz

@@ -2,6 +2,8 @@ module
 
 public import TerraciniLemma.PolynomialCalculus
 public import TerraciniLemma.Defect
+public import TerraciniLemma.Semicontinuity
+public import Mathlib.Algebra.CharZero.Infinite
 public import Mathlib.Data.Sym.Card
 
 /-!
@@ -550,5 +552,156 @@ theorem veroneseDeg_not_isDefective (n d r : ℕ) (hd : 3 ≤ d) (hr : r ≤ n +
   rw [finrank_iSup_veroneseDeg (𝕜 := 𝕜) n d r hd hr, expectedDim_veroneseDeg n d r (by omega) hr,
     min_eq_right hle]
   exact lt_irrefl _
+
+/-! ### §E — Semicontinuity: from one configuration to general points
+
+The combined tangent space at `r` points is the column space of the matrix
+`veroneseTangentMatrix n d r`, whose entries `∂(Xˢ)/∂Xⱼ (pₖ)` are polynomials in the
+coordinates of the points (`finrank_iSup_eq_rank_veroneseTangentMatrix`). By the semicontinuity
+of rank (`TerraciniLemma.Semicontinuity`):
+
+* a lower bound on the tangent span at one configuration holds at general points
+  (`forGeneralPoints_le_finrank_iSup`), so **non-defectivity at one configuration of nonzero
+  points implies non-defectivity at general points** (`forGeneralPoints_not_isDefective`);
+* an upper bound at general points holds at every configuration
+  (`finrank_iSup_le_of_forGeneralPoints`), so **defectivity at general points implies
+  defectivity at every configuration of nonzero points** (`isDefective_of_forGeneralPoints`).
+-/
+
+omit [CharZero 𝕜] in
+/-- The matrix of the combined derivative of the cone parametrization at `r` points, with the
+coordinates `x (k, j)` of the points as indeterminates: the entry in row `s` and column
+`(k, j)` is `∂(Xˢ)/∂Xⱼ` evaluated at the `k`-th point. -/
+def veroneseTangentMatrix (n d r : ℕ) :
+    Matrix (Sym (Fin (n + 1)) d) (Fin r × Fin (n + 1)) (MvPolynomial (Fin r × Fin (n + 1)) 𝕜) :=
+  fun s kj => rename (fun j => (kj.1, j)) (pderiv kj.2 (veroneseDegPoly n d s))
+
+omit [CharZero 𝕜] in
+/-- The combined tangent space at `p` is the column space of `veroneseTangentMatrix` at `p`. -/
+theorem finrank_iSup_eq_rank_veroneseTangentMatrix {n d r : ℕ} (p : Fin r → Fin (n + 1) → 𝕜) :
+    Module.finrank 𝕜 (⨆ k, (veroneseDegParam n d (p k)).tangentSpace : Submodule 𝕜 _)
+      = ((veroneseTangentMatrix n d r).map (eval fun kj => p kj.1 kj.2)).rank := by
+  rw [show (⨆ k, (veroneseDegParam n d (p k)).tangentSpace : Submodule 𝕜 _)
+      = LinearMap.range (combinedDerivative (fun k => veroneseDegParam (𝕜 := 𝕜) n d (p k))).toLinearMap
+    from (range_combinedParam_eq_iSup (fun k => (veroneseDegParam n d (p k)).tangent)).symm,
+    Matrix.rank]
+  -- `dΦ = M(p) ∘ uncurry`
+  have hcomp : (combinedDerivative (fun k => veroneseDegParam (𝕜 := 𝕜) n d (p k))).toLinearMap
+      = ((veroneseTangentMatrix n d r).map (eval fun kj => p kj.1 kj.2)).mulVecLin ∘ₗ
+        (LinearEquiv.curry 𝕜 𝕜 (Fin r) (Fin (n + 1))).symm.toLinearMap := by
+    refine LinearMap.ext fun w => funext fun s => ?_
+    simp [combinedDerivative, veroneseDegParam, veroneseDegDeriv, mvPolynomialDeriv,
+      Matrix.mulVec, dotProduct, veroneseTangentMatrix, eval_rename, Fintype.sum_prod_type,
+      Function.comp_def, coordProj_apply, mul_comm]
+  rw [hcomp, LinearMap.range_comp_of_range_eq_top _ (LinearEquiv.range _)]
+
+omit [CharZero 𝕜] in
+/-- **Lower bounds on the tangent span spread from one configuration to general points.** -/
+theorem forGeneralPoints_le_finrank_iSup {n d r m : ℕ} (p₀ : Fin r → Fin (n + 1) → 𝕜)
+    (h : m ≤ Module.finrank 𝕜 (⨆ k, (veroneseDegParam n d (p₀ k)).tangentSpace : Submodule 𝕜 _)) :
+    ForGeneralPoints r (n + 1) fun p =>
+      m ≤ Module.finrank 𝕜 (⨆ k, (veroneseDegParam n d (p k)).tangentSpace : Submodule 𝕜 _) := by
+  rw [forGeneralPoints_iff_holdsGenerically]
+  rw [finrank_iSup_eq_rank_veroneseTangentMatrix] at h
+  refine (HoldsGenerically.le_rank _ _ h).mono fun x hx => ?_
+  rwa [finrank_iSup_eq_rank_veroneseTangentMatrix]
+
+/-- **Upper bounds on the tangent span at general points hold at every configuration.** -/
+theorem finrank_iSup_le_of_forGeneralPoints {n d r m : ℕ}
+    (h : ForGeneralPoints r (n + 1) fun p =>
+      Module.finrank 𝕜 (⨆ k, (veroneseDegParam n d (p k)).tangentSpace : Submodule 𝕜 _) ≤ m)
+    (p : Fin r → Fin (n + 1) → 𝕜) :
+    Module.finrank 𝕜 (⨆ k, (veroneseDegParam n d (p k)).tangentSpace : Submodule 𝕜 _) ≤ m := by
+  have := CharZero.infinite 𝕜
+  rw [forGeneralPoints_iff_holdsGenerically] at h
+  rw [finrank_iSup_eq_rank_veroneseTangentMatrix]
+  exact HoldsGenerically.rank_le _ (h.mono fun x hx => by
+    rwa [finrank_iSup_eq_rank_veroneseTangentMatrix] at hx) _
+
+/-- At `r` nonzero points the expected dimension is `min(binom(n+d,d), r(n+1))`. -/
+theorem expectedDim_veroneseDegParam {n d r : ℕ} (hd : 1 ≤ d) (p : Fin r → Fin (n + 1) → 𝕜)
+    (hp : ∀ k, p k ≠ 0) :
+    expectedDim (fun k => (veroneseDegParam n d (p k)).tangentSpace)
+      = min ((n + d).choose d) (r * (n + 1)) := by
+  unfold expectedDim
+  rw [finrank_ambient_veroneseDeg, Finset.sum_congr rfl
+    (fun k _ => finrank_tangentSpace_veroneseDegParam n d hd (hp k))]
+  simp
+
+omit [CharZero 𝕜] in
+/-- The expected dimension never exceeds `min(binom(n+d,d), r(n+1))`. -/
+theorem expectedDim_veroneseDegParam_le {n d r : ℕ} (p : Fin r → Fin (n + 1) → 𝕜) :
+    expectedDim (fun k => (veroneseDegParam n d (p k)).tangentSpace)
+      ≤ min ((n + d).choose d) (r * (n + 1)) := by
+  have hk : ∀ k, Module.finrank 𝕜 (veroneseDegParam n d (p k)).tangentSpace ≤ n + 1 := fun k =>
+    (LinearMap.finrank_range_le (veroneseDegDeriv (𝕜 := 𝕜) n d (p k)).toLinearMap).trans
+      (by simp)
+  unfold expectedDim
+  rw [finrank_ambient_veroneseDeg]
+  refine min_le_min le_rfl ?_
+  calc ∑ k, Module.finrank 𝕜 (veroneseDegParam n d (p k)).tangentSpace
+      ≤ ∑ _k : Fin r, (n + 1) := Finset.sum_le_sum fun k _ => hk k
+    _ = r * (n + 1) := by simp
+
+/-- **Non-defectivity at one configuration of nonzero points implies non-defectivity at general
+points.** -/
+theorem forGeneralPoints_not_isDefective {n d r : ℕ} (hd : 1 ≤ d) (p₀ : Fin r → Fin (n + 1) → 𝕜)
+    (hp₀ : ∀ k, p₀ k ≠ 0)
+    (h : ¬ IsDefective (fun k => (veroneseDegParam n d (p₀ k)).tangentSpace)) :
+    ForGeneralPoints (𝕜 := 𝕜) r (n + 1) fun p =>
+      ¬ IsDefective (fun k => (veroneseDegParam n d (p k)).tangentSpace) := by
+  unfold IsDefective at h
+  rw [not_lt, expectedDim_veroneseDegParam hd p₀ hp₀] at h
+  refine (forGeneralPoints_le_finrank_iSup p₀ h).mono fun p hp => ?_
+  unfold IsDefective
+  exact not_lt.mpr ((expectedDim_veroneseDegParam_le p).trans hp)
+
+/-- **Defectivity at general points implies defectivity at every configuration of nonzero
+points.** -/
+theorem isDefective_of_forGeneralPoints {n d r : ℕ} (hd : 1 ≤ d)
+    (h : ForGeneralPoints (𝕜 := 𝕜) r (n + 1) fun p =>
+      IsDefective (fun k => (veroneseDegParam n d (p k)).tangentSpace))
+    (p : Fin r → Fin (n + 1) → 𝕜) (hp : ∀ k, p k ≠ 0) :
+    IsDefective (fun k => (veroneseDegParam n d (p k)).tangentSpace) := by
+  have := CharZero.infinite 𝕜
+  set E := min ((n + d).choose d) (r * (n + 1))
+  -- at general points the span has dimension `< E`, i.e. `≤ E - 1`; hence everywhere
+  have hgen : ForGeneralPoints r (n + 1) fun p =>
+      Module.finrank 𝕜 (⨆ k, (veroneseDegParam n d (p k)).tangentSpace : Submodule 𝕜 _)
+        ≤ E - 1 :=
+    h.mono fun p hp => by
+      have := expectedDim_veroneseDegParam_le (𝕜 := 𝕜) (n := n) (d := d) p
+      unfold IsDefective at hp
+      beta_reduce at hp
+      omega
+  have hE : 0 < E := by
+    obtain ⟨p', hp'⟩ := h.exists_point
+    have := expectedDim_veroneseDegParam_le (𝕜 := 𝕜) (n := n) (d := d) p'
+    unfold IsDefective at hp'
+    beta_reduce at hp'
+    omega
+  unfold IsDefective
+  rw [expectedDim_veroneseDegParam hd p hp]
+  beta_reduce
+  have := finrank_iSup_le_of_forGeneralPoints hgen p
+  omega
+
+/-- **`σ_r(v_d(ℙⁿ))` is non-defective at general points for `d ≥ 3` and `r ≤ n+1`**, lifted
+from the coordinate points by semicontinuity. -/
+theorem veroneseDeg_not_isDefective_general (n d r : ℕ) (hd : 3 ≤ d) (hr : r ≤ n + 1) :
+    ForGeneralPoints r (n + 1) fun p =>
+      ¬ IsDefective (fun k => (veroneseDegParam (𝕜 := 𝕜) n d (p k)).tangentSpace) :=
+  forGeneralPoints_not_isDefective (by omega) (veroneseDegPt n r hr)
+    (fun k => by simp [veroneseDegPt]) (veroneseDeg_not_isDefective n d r hd hr)
+
+/-- **A single point is never defective** (for `d ≥ 1`): one tangent space has the expected
+dimension `n + 1 ≤ binom(n+d,d)`. -/
+theorem not_isDefective_one {n d : ℕ} (hd : 1 ≤ d) (p : Fin 1 → Fin (n + 1) → 𝕜)
+    (hp : ∀ k, p k ≠ 0) :
+    ¬ IsDefective (fun k => (veroneseDegParam n d (p k)).tangentSpace) := by
+  unfold IsDefective
+  rw [expectedDim_veroneseDegParam hd p hp, not_lt, iSup_unique,
+    finrank_tangentSpace_veroneseDegParam n d hd (hp default)]
+  omega
 
 end VeroneseDegreeExample

@@ -23,16 +23,13 @@ In the cone model this reads: if `F = χ ∘ v_d ≠ 0` has zero derivative at e
 chain rule gives `χ ∘ dv_d(pₖ) = 0`, i.e. every tangent space lies in `ker χ`
 (`finrank_iSup_tangentSpace_le_of_singular`).
 
-The file also sets up the bookkeeping for "general points":
+The file also provides:
 
 * `veroneseForms n d` — the degree-`d` forms, as the submodule of functions
   `𝕜^{n+1} → 𝕜` of the shape `χ ∘ v_d`, closed under products (`mul_mem_veroneseForms`) and
   containing all linear forms (`linearMap_mem_veroneseForms`);
 * `veroneseFormOf_injective` — the Veronese variety is nondegenerate: a functional vanishing on
-  the image of `v_d` is zero (equivalently, a nonzero form is a nonzero function);
-* `ForGeneralPoints r m P` — `P` holds for all `r`-tuples of points of `𝕜^m` off the zero
-  locus of a nonzero polynomial in their coordinates, the formal meaning of "for general
-  points".
+  the image of `v_d` is zero (equivalently, a nonzero form is a nonzero function).
 -/
 
 @[expose] public section
@@ -262,62 +259,5 @@ theorem isDefective_of_singular {n d r : ℕ} (hd : 1 ≤ d) (p : Fin r → Fin 
     (hsing : ∀ k, HasFDerivAt F (0 : (Fin (n + 1) → 𝕜) →L[𝕜] 𝕜) (p k)) :
     IsDefective (fun k => (veroneseDegParam n d (p k)).tangentSpace) :=
   isDefective_of_finrank_le hd p hp hN (finrank_iSup_tangentSpace_le_of_singular p hF hF0 hsing)
-
-/-! ### §D — General points -/
-
-omit [CharZero 𝕜] in
-/-- `P` holds **for general `r`-tuples of points of `𝕜^m`**: there is a nonzero polynomial `G`
-in the `r·m` coordinates such that `P p` holds whenever `G(p) ≠ 0`. Over an infinite field the
-locus `G ≠ 0` is a dense Zariski-open set, so this is the classical meaning of "for general
-points". -/
-def ForGeneralPoints (r m : ℕ) (P : (Fin r → Fin m → 𝕜) → Prop) : Prop :=
-  ∃ G : MvPolynomial (Fin r × Fin m) 𝕜, G ≠ 0 ∧
-    ∀ p : Fin r → Fin m → 𝕜, eval (fun ki => p ki.1 ki.2) G ≠ 0 → P p
-
-namespace ForGeneralPoints
-
-variable {r m : ℕ} {P Q : (Fin r → Fin m → 𝕜) → Prop}
-
-omit [CharZero 𝕜] in
-theorem mono (h : ForGeneralPoints r m P) (hPQ : ∀ p, P p → Q p) : ForGeneralPoints r m Q :=
-  let ⟨G, hG, hP⟩ := h
-  ⟨G, hG, fun p hp => hPQ p (hP p hp)⟩
-
-omit [CharZero 𝕜] in
-theorem of_forall (h : ∀ p, P p) : ForGeneralPoints r m P :=
-  ⟨1, one_ne_zero, fun p _ => h p⟩
-
-omit [CharZero 𝕜] in
-theorem and (hP : ForGeneralPoints r m P) (hQ : ForGeneralPoints r m Q) :
-    ForGeneralPoints r m (fun p => P p ∧ Q p) := by
-  obtain ⟨G, hG, hGP⟩ := hP
-  obtain ⟨H, hH, hHQ⟩ := hQ
-  refine ⟨G * H, mul_ne_zero hG hH, fun p hp => ?_⟩
-  rw [map_mul] at hp
-  exact ⟨hGP p (left_ne_zero_of_mul hp), hHQ p (right_ne_zero_of_mul hp)⟩
-
-/-- A property of general points holds for *some* points (over an infinite field), so the
-notion is never vacuous. -/
-theorem exists_point (h : ForGeneralPoints r m P) : ∃ p, P p := by
-  have := CharZero.infinite 𝕜
-  obtain ⟨G, hG, hP⟩ := h
-  by_contra! hno
-  apply hG
-  apply MvPolynomial.funext
-  intro x
-  by_contra hx
-  exact hno (fun k i => x (k, i)) (hP _ (by simpa using hx))
-
-omit [CharZero 𝕜] in
-/-- General points are nonzero (here: have nonzero first coordinate). -/
-theorem ne_zero {m : ℕ} : ForGeneralPoints (𝕜 := 𝕜) r (m + 1) (fun p => ∀ k, p k ≠ 0) := by
-  classical
-  refine ⟨∏ k, X (k, 0), ?_, fun p hp k hk => ?_⟩
-  · rw [Finset.prod_ne_zero_iff]
-    exact fun k _ => X_ne_zero _
-  · rw [map_prod, Finset.prod_ne_zero_iff] at hp
-    simpa [hk] using hp k (Finset.mem_univ _)
-
-end ForGeneralPoints
 
 end VeroneseForms

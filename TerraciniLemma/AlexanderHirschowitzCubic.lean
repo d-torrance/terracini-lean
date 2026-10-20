@@ -441,4 +441,10 @@ theorem ah437_isDefective_general :
   (ForGeneralPoints.ne_zero.and forGeneralPoints_ahGeneric).mono fun _ h =>
     ah437_isDefective_of_generic h.2 h.1
 
+/-- **`σ₇(v₃(ℙ⁴))` is defective at every configuration of seven nonzero points**: the defect at
+general points propagates everywhere by semicontinuity. -/
+theorem ah437_isDefective (p : Fin 7 → Fin 5 → 𝕜) (hp : ∀ k, p k ≠ 0) :
+    IsDefective (fun k => (veroneseDegParam 4 3 (p k)).tangentSpace) :=
+  isDefective_of_forGeneralPoints (by norm_num) ah437_isDefective_general p hp
+
 end AlexanderHirschowitzCubic
