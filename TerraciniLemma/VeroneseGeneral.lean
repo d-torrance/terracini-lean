@@ -459,4 +459,224 @@ theorem veroneseGeneral_not_isDefective_of_succ_le (n : ℕ) {ι : Type*} [Finty
     _ ≤ (Finset.image e Finset.univ).sup S :=
         iSup_le fun k => Finset.le_sup (Finset.mem_image_of_mem e (Finset.mem_univ k))
 
+/-! ### §G — Generic defectivity for any linearly independent `r`-point family
+
+The preceding results prove `isDefective_veroneseGeneral_iff` only for the **coordinate-point
+family** `veroneseGeneralFamily`. This section strengthens the defective direction to work for
+**any** `r` linearly independent vectors `p₀, …, p_{r-1} ∈ 𝕜^{n+1}`.
+
+The key is an explicit `r.choose 2`-dimensional subspace of the kernel of
+`combinedDerivative (fun k => veroneseGeneralParam n (p k))`: for each pair `k < l`, the
+velocity family `w^{k,l}_m = if m = k then p l else if m = l then -p k else 0` lies in the kernel
+(the cross terms cancel by symmetry). These `r.choose 2` kernel elements are linearly independent
+(when `p` is), so the combined tangent span has dimension
+`≤ r·(n+1) − r.choose 2 = (n+2).choose 2 − (n+2−r).choose 2 < expectedDim` for `2 ≤ r ≤ n`.
+-/
+
+omit [CharZero 𝕜] in
+theorem combinedDerivative_veroneseGeneral_apply' (n r : ℕ)
+    (p : Fin r → Fin (n + 1) → 𝕜) (w : Fin r → Fin (n + 1) → 𝕜) (i j : Fin (n + 1)) :
+    combinedDerivative (fun k => veroneseGeneralParam n (p k)) w (s(i, j) : Sym2 (Fin (n + 1)))
+      = ∑ k : Fin r, (p k j * w k i + p k i * w k j) := by
+  simp [combinedDerivative, veroneseGeneralParam, sum_apply,
+    ContinuousLinearMap.comp_apply, coordProj_apply, veroneseGeneralDeriv_apply_mk]
+
+/-- For `k ≠ l`, the velocity family `w^{k,l}_m = if m = k then p l else if m = l then -p k
+else 0` lies in the kernel of `combinedDerivative (fun m => veroneseGeneralParam n (p m))`:
+the two cross terms `p k j · p l i + p k i · p l j` and `p l j · (-p k i) + p l i · (-p k j)`
+cancel. -/
+def veroneseKerElt {n r : ℕ} (p : Fin r → Fin (n + 1) → 𝕜) (k l : Fin r) :
+    Fin r → Fin (n + 1) → 𝕜 :=
+  fun m => if m = k then p l else if m = l then -(p k) else 0
+
+omit [CharZero 𝕜] in
+theorem veroneseKerElt_combinedDerivative_eq_zero {n r : ℕ}
+    (p : Fin r → Fin (n + 1) → 𝕜) {k l : Fin r} (hkl : k ≠ l) :
+    combinedDerivative (fun m => veroneseGeneralParam n (p m)) (veroneseKerElt p k l) = 0 := by
+  ext s
+  induction s using Sym2.ind with | _ i j =>
+  simp only [Pi.zero_apply]
+  rw [combinedDerivative_veroneseGeneral_apply']
+  have hkl' : l ≠ k := Ne.symm hkl
+  have hcomp : ∀ m ∈ ({k, l} : Finset (Fin r))ᶜ,
+      p m j * veroneseKerElt p k l m i + p m i * veroneseKerElt p k l m j = 0 := by
+    intro m hm
+    simp only [Finset.mem_compl, Finset.mem_insert, Finset.mem_singleton, not_or] at hm
+    simp [veroneseKerElt, hm.1, hm.2]
+  rw [← Finset.sum_compl_add_sum ({k, l} : Finset (Fin r)), add_comm,
+    Finset.sum_eq_zero hcomp, add_zero,
+    Finset.sum_insert (mt Finset.mem_singleton.mp hkl), Finset.sum_singleton]
+  simp only [veroneseKerElt, ite_true, ite_eq_right hkl, ite_eq_right hkl', Pi.neg_apply]
+  ring
+
+omit [CharZero 𝕜] in
+/-- The `r.choose 2` kernel elements `veroneseKerElt p k l` (for `k < l`) are linearly
+independent when `p₀, …, p_{r-1}` are linearly independent. -/
+theorem linearIndependent_veroneseKerElt {n r : ℕ} (p : Fin r → Fin (n + 1) → 𝕜)
+    (hp : LinearIndependent 𝕜 p) :
+    LinearIndependent 𝕜
+      (fun kl : {kl : Fin r × Fin r // kl.1 < kl.2} => veroneseKerElt p kl.1.1 kl.1.2) := by
+  classical
+  rw [Fintype.linearIndependent_iff] at hp ⊢
+  rintro c hc ⟨⟨k₀, l₀⟩, hkl₀⟩
+  -- Slot `k₀` of the relation is a linear relation among the `p j`: the coefficient of
+  -- `p j` is `c (k₀, j) - c (j, k₀)` (only one of which is a valid ordered pair).
+  have hslot := congr_fun hc k₀
+  have hexp : ∀ kl : {kl : Fin r × Fin r // kl.1 < kl.2}, veroneseKerElt p kl.1.1 kl.1.2 k₀ =
+      ∑ j, ((if kl.1 = (k₀, j) then 1 else 0) - (if kl.1 = (j, k₀) then 1 else 0) : 𝕜) • p j := by
+    rintro ⟨⟨k, l⟩, hkl⟩
+    simp only [sub_smul, Finset.sum_sub_distrib, ite_smul, one_smul, zero_smul, Prod.mk.injEq]
+    by_cases hk : k₀ = k
+    · subst hk
+      simp [veroneseKerElt, (Fin.ne_of_lt hkl).symm]
+    · by_cases hl : k₀ = l
+      · subst hl
+        simp [veroneseKerElt, hk, eq_comm]
+      · simp [veroneseKerElt, hk, hl, Ne.symm hk, Ne.symm hl]
+  simp only [Finset.sum_apply, Pi.smul_apply, hexp, Finset.smul_sum, smul_smul,
+    Pi.zero_apply] at hslot
+  rw [Finset.sum_comm] at hslot
+  simp_rw [← Finset.sum_smul] at hslot
+  -- By independence of `p`, the coefficient of `p l₀` vanishes, and it is `c (k₀, l₀)`.
+  have hcoef := hp _ hslot l₀
+  simp only [mul_sub, mul_ite, mul_one, mul_zero, Finset.sum_sub_distrib] at hcoef
+  have hsnd : ∀ x : {kl : Fin r × Fin r // kl.1 < kl.2}, ¬ (x : Fin r × Fin r) = (l₀, k₀) :=
+    fun x hx => by have := x.2; rw [hx] at this; exact lt_asymm hkl₀ this
+  have hfst : ∀ x : {kl : Fin r × Fin r // kl.1 < kl.2},
+      (x : Fin r × Fin r) = (k₀, l₀) ↔ x = ⟨(k₀, l₀), hkl₀⟩ := fun x => by rw [Subtype.ext_iff]
+  simpa [hsnd, hfst] using hcoef
+
+omit [CharZero 𝕜] in
+/-- The `r.choose 2` independent kernel elements show `dim ker(combinedDerivative) ≥ r.choose 2`. -/
+theorem finrank_ker_combinedDerivative_veroneseGeneral_ge {n r : ℕ}
+    (p : Fin r → Fin (n + 1) → 𝕜) (hp : LinearIndependent 𝕜 p) :
+    r.choose 2 ≤
+      Module.finrank 𝕜 (LinearMap.ker
+        (combinedDerivative (fun k => veroneseGeneralParam n (p k))).toLinearMap) := by
+  have hli := linearIndependent_veroneseKerElt p hp
+  have hmem : ∀ kl : {kl : Fin r × Fin r // kl.1 < kl.2},
+      veroneseKerElt p kl.1.1 kl.1.2 ∈
+        LinearMap.ker (combinedDerivative (fun k => veroneseGeneralParam n (p k))).toLinearMap := by
+    intro ⟨⟨k, l⟩, hkl⟩
+    simp only [LinearMap.mem_ker, ContinuousLinearMap.coe_coe]
+    exact veroneseKerElt_combinedDerivative_eq_zero p (Fin.ne_of_lt hkl)
+  have hli_ker : LinearIndependent 𝕜
+      (fun kl : {kl : Fin r × Fin r // kl.1 < kl.2} =>
+        (⟨veroneseKerElt p kl.1.1 kl.1.2, hmem kl⟩ :
+          LinearMap.ker
+            (combinedDerivative (fun k => veroneseGeneralParam n (p k))).toLinearMap)) :=
+    LinearIndependent.of_comp (LinearMap.ker _).subtype hli
+  have hcard : Fintype.card {kl : Fin r × Fin r // kl.1 < kl.2} = r.choose 2 := by
+    rw [Fintype.card_subtype, Fintype.card_product_filter_lt, Fintype.card_fin]
+  calc r.choose 2 = Fintype.card {kl : Fin r × Fin r // kl.1 < kl.2} := hcard.symm
+    _ ≤ Module.finrank 𝕜 (LinearMap.ker
+          (combinedDerivative (fun k => veroneseGeneralParam n (p k))).toLinearMap) :=
+        hli_ker.fintype_card_le_finrank
+
+omit [CharZero 𝕜] in
+/-- **Upper bound on the combined tangent span dimension** for an arbitrary linearly independent
+`r`-point family: at most `r·(n+1) − r.choose 2 = (n+2).choose 2 − (n+2−r).choose 2`. -/
+theorem finrank_range_combinedDerivative_veroneseGeneral_le {n r : ℕ}
+    (p : Fin r → Fin (n + 1) → 𝕜) (hp : LinearIndependent 𝕜 p) :
+    Module.finrank 𝕜 (LinearMap.range
+        (combinedDerivative (fun k => veroneseGeneralParam n (p k))).toLinearMap)
+      ≤ r * (n + 1) - r.choose 2 := by
+  have hker := finrank_ker_combinedDerivative_veroneseGeneral_ge p hp
+  have hrn := (combinedDerivative (fun k => veroneseGeneralParam n (p k))).toLinearMap
+    |>.finrank_range_add_finrank_ker
+  have hsrc : Module.finrank 𝕜 (Fin r → Fin (n + 1) → 𝕜) = r * (n + 1) := by
+    simp only [Module.finrank_pi_fintype, Fintype.card_fin, Module.finrank_self,
+               Finset.sum_const, Finset.card_univ, smul_eq_mul, mul_one]
+  omega
+
+/-- `veroneseGeneralDeriv n v` is injective for any nonzero `v`. -/
+theorem injective_veroneseGeneralDeriv_of_ne_zero (n : ℕ) (v : Fin (n + 1) → 𝕜) (hv : v ≠ 0) :
+    Function.Injective (veroneseGeneralDeriv n v) := by
+  obtain ⟨k', hk'⟩ : ∃ k' : Fin (n + 1), v k' ≠ 0 := by
+    contrapose! hv; ext a; exact hv a
+  intro dv₁ dv₂ heq
+  have hzero : veroneseGeneralDeriv n v (dv₁ - dv₂) = 0 := by rw [map_sub, heq, sub_self]
+  have ha : ∀ a : Fin (n + 1), v a * (dv₁ - dv₂) k' + v k' * (dv₁ - dv₂) a = 0 := fun a => by
+    have := congr_fun hzero (s(k', a) : Sym2 (Fin (n + 1)))
+    rwa [veroneseGeneralDeriv_apply_mk, Pi.zero_apply] at this
+  have hk'zero : (dv₁ - dv₂) k' = 0 := by
+    have h2 : (2 : 𝕜) * (v k' * (dv₁ - dv₂) k') = 0 :=
+      calc (2 : 𝕜) * (v k' * (dv₁ - dv₂) k')
+          = v k' * (dv₁ - dv₂) k' + v k' * (dv₁ - dv₂) k' := by ring
+        _ = 0 := ha k'
+    have hvx : v k' * (dv₁ - dv₂) k' = 0 := (mul_eq_zero.mp h2).resolve_left two_ne_zero
+    exact (mul_eq_zero.mp hvx).resolve_left hk'
+  funext a
+  have hda : (dv₁ - dv₂) a = 0 := by
+    have ha_eq := ha a
+    rw [hk'zero, mul_zero, zero_add] at ha_eq
+    exact (mul_eq_zero.mp ha_eq).resolve_left hk'
+  rw [Pi.sub_apply] at hda
+  exact sub_eq_zero.mp hda
+
+/-- The tangent space to the cone over `v₂(ℙⁿ)` at any nonzero `v` has dimension `n + 1`. -/
+theorem finrank_tangentSpace_veroneseGeneralParam_of_ne_zero (n : ℕ) (v : Fin (n + 1) → 𝕜)
+    (hv : v ≠ 0) :
+    Module.finrank 𝕜 (veroneseGeneralParam n v).tangentSpace = n + 1 := by
+  show Module.finrank 𝕜 (LinearMap.range (veroneseGeneralDeriv n v).toLinearMap) = n + 1
+  rw [LinearMap.finrank_range_of_inj (injective_veroneseGeneralDeriv_of_ne_zero n v hv),
+    Module.finrank_pi, Fintype.card_fin]
+
+/-- **Generic defectivity of `σ_r(v₂(ℙⁿ))`** for any `r` linearly independent points with
+`2 ≤ r ≤ n`. Unlike `isDefective_veroneseGeneral_iff`, this works for **any** `r` linearly
+independent vectors, not just coordinate points — the defect bound `r.choose 2 ≥ 1` applies
+uniformly to any such configuration. -/
+theorem isDefective_veroneseGeneral_of_linearIndependent {n r : ℕ} (hrn : r ≤ n)
+    (p : Fin r → Fin (n + 1) → 𝕜) (hp : LinearIndependent 𝕜 p) (h2r : 2 ≤ r) :
+    IsDefective (fun k => (veroneseGeneralParam n (p k)).tangentSpace) := by
+  classical
+  unfold IsDefective expectedDim
+  -- Each tangent space has dim n+1 (since each p k ≠ 0 by linear independence)
+  have hne : ∀ k : Fin r, p k ≠ 0 := hp.ne_zero
+  have htdim : ∀ k : Fin r,
+      Module.finrank 𝕜 (veroneseGeneralParam n (p k)).tangentSpace = n + 1 :=
+    fun k => finrank_tangentSpace_veroneseGeneralParam_of_ne_zero n (p k) (hne k)
+  rw [show (∑ k : Fin r, Module.finrank 𝕜 (veroneseGeneralParam n (p k)).tangentSpace)
+      = r * (n + 1) by simp [htdim, Finset.sum_const, Finset.card_univ, Fintype.card_fin]]
+  -- The combined span dim ≤ r*(n+1) - r.choose 2
+  have hrange_le := finrank_range_combinedDerivative_veroneseGeneral_le p hp
+  -- The combined span = range(combinedDerivative)
+  rw [show (⨆ k, (veroneseGeneralParam n (p k)).tangentSpace : Submodule 𝕜 _)
+      = LinearMap.range (combinedDerivative (fun k => veroneseGeneralParam n (p k))).toLinearMap
+    from (range_combinedParam_eq_iSup (fun k => (veroneseGeneralParam n (p k)).tangent)).symm]
+  -- We need: finrank(range) < min(ambient, r*(n+1))
+  -- Use: finrank(range) ≤ r*(n+1) - r.choose 2 < min(ambient, r*(n+1))
+  have h_choose_pos : 0 < r.choose 2 := Nat.choose_pos h2r
+  -- r*(n+1) - r.choose 2 < r*(n+1)
+  have h_lt_sum : r * (n + 1) - r.choose 2 < r * (n + 1) :=
+    Nat.sub_lt (Nat.mul_pos (by omega) (Nat.succ_pos n)) h_choose_pos
+  -- r*(n+1) - r.choose 2 < ambient = (n+2).choose 2
+  have h_lt_amb : r * (n + 1) - r.choose 2 < (n + 2).choose 2 := by
+    have heq : r * (n + 1) - r.choose 2 = (n + 2).choose 2 - (n + 2 - r).choose 2 := by
+      obtain ⟨m, rfl⟩ := Nat.exists_eq_add_of_le hrn
+      rw [show r + m + 2 - r = m + 2 by omega]
+      have two_mul_choose : ∀ a : ℕ, 2 * a.choose 2 = a * (a - 1) := fun a => by
+        rw [Nat.choose_two_right, Nat.mul_div_cancel' (Nat.even_mul_pred_self a).two_dvd]
+      have hA := two_mul_choose r
+      have hB := two_mul_choose (m + 2)
+      have hD := two_mul_choose (r + m + 2)
+      -- `C(r+m+2, 2) = C(r, 2) + C(m+2, 2) + r(m+2)` and `r(r+m+1) = 2 C(r, 2) + r(m+2)`
+      rcases r with _ | s
+      · simp
+      · simp only [Nat.add_sub_cancel, show s + 1 + m + 2 - 1 = s + m + 2 by omega,
+          show m + 2 - 1 = m + 1 by omega] at hA hB hD
+        have : (s + 1 + m + 2).choose 2
+            = (s + 1).choose 2 + (m + 2).choose 2 + (s + 1) * (m + 2) := by
+          nlinarith
+        have : (s + 1) * (s + 1 + m + 1) = 2 * (s + 1).choose 2 + (s + 1) * (m + 2) := by
+          rw [hA]; ring
+        omega
+    rw [heq]
+    have hpos : 0 < (n + 2 - r).choose 2 := Nat.choose_pos (by omega)
+    have hpos_amb : 0 < (n + 2).choose 2 := Nat.choose_pos (by omega)
+    exact Nat.sub_lt hpos_amb hpos
+  apply lt_of_le_of_lt hrange_le
+  rw [finrank_ambient_veroneseGeneral]
+  omega
+
 end VeroneseGeneralExample

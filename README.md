@@ -41,7 +41,7 @@ Together these force $\operatorname{Im}(d\Phi) = T$ by a finite-dimensional subm
 
 ## File Overview
 
-The mathematics is organized into six files:
+The mathematics is organized into the following files:
 
 - [`TerraciniLemma.lean`](TerraciniLemma.lean) — top-level module: imports the
   files below and gives the overall statement, file organization, and a
@@ -78,6 +78,10 @@ The mathematics is organized into six files:
   Alexander–Hirschowitz defective **iff `2 ≤ r ≤ n`**; `veroneseGeneral_sup_eq_top`
   and `veroneseGeneral_not_isDefective_of_succ_le` show the boundary case
   `r = n+1` fills the ambient space and every `r ≥ n+1` is non-defective.
+  `isDefective_veroneseGeneral_of_linearIndependent` extends the defective
+  direction from coordinate points to *any* `r` linearly independent points: the
+  `binom(r,2)` velocity families `wᵏˡ` (`p_l` in slot `k`, `-p_k` in slot `l`)
+  are independent elements of the kernel of `dΦ`.
 - [`TerraciniLemma/VeroneseDegree.lean`](TerraciniLemma/VeroneseDegree.lean)
   — the degree-`d` Veronese variety `v_d(ℙⁿ) ⊂ ℙ^N`
   (`N = binom(n+d,d) - 1`), worked in the affine cone model (ambient

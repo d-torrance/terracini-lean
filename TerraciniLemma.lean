@@ -140,6 +140,8 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
 | `isDefective_veroneseGeneral_iff` | ✓ proved | `σᵣ(v₂(ℙⁿ)) ⊂ ℙ^N` is Alexander–Hirschowitz defective iff `2 ≤ r ≤ n` |
 | `veroneseGeneral_sup_eq_top` | ✓ proved | `σ_{n+1}(v₂(ℙⁿ))` fills the ambient space (superabundant, non-defective) |
 | `veroneseGeneral_not_isDefective_of_succ_le` | ✓ proved | `σ_r(v₂(ℙⁿ))` is non-defective for every `r ≥ n+1` |
+| `finrank_range_combinedDerivative_veroneseGeneral_le` | ✓ proved | for any linearly independent `p₀,…,p_{r-1}`, the combined tangent space of `v₂(ℙⁿ)` has dimension `≤ r(n+1) − binom(r,2)` |
+| `isDefective_veroneseGeneral_of_linearIndependent` | ✓ proved | `σᵣ(v₂(ℙⁿ))` is defective at **any** linearly independent `r`-point family with `2 ≤ r ≤ n`, not just coordinate points |
 | `finrank_ambient_veroneseDeg` | ✓ proved | ambient space of `v_d(ℙⁿ)` has dimension `binom(n+d,d)` |
 | `finrank_tangentSpace_veroneseDegFamily` | ✓ proved | each coordinate-point tangent space of `v_d(ℙⁿ)` has dimension `n+1` |
 | `finrank_iSup_veroneseDeg` | ✓ proved | for `d ≥ 3`, `r ≤ n+1` coordinate points, the combined tangent space has dimension exactly `r(n+1)` (direct sum, disjoint supports) |
