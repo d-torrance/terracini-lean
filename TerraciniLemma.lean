@@ -55,25 +55,36 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
   shows `σ_r(v_d(ℙⁿ))` is *not* Alexander–Hirschowitz defective: the per-point
   tangent space supports are pairwise disjoint (unlike the `d = 2` case, where
   they pairwise overlap in one element), so the combined tangent space is an
-  honest direct sum of dimension `r(n+1)`.
+  honest direct sum of dimension `r(n+1)`. §E identifies the tangent span with
+  the column space of a polynomial matrix, so non-defectivity at one
+  configuration spreads to general points (`forGeneralPoints_not_isDefective`,
+  giving `veroneseDeg_not_isDefective_general`) and defectivity at general
+  points spreads to every configuration of nonzero points
+  (`isDefective_of_forGeneralPoints`).
+* `TerraciniLemma.Semicontinuity` — `HoldsGenerically`/`ForGeneralPoints`
+  (off the zero locus of a nonzero polynomial in the coordinates) and the
+  semicontinuity of the rank of a matrix of polynomials: a rank lower bound at
+  one point holds generically (`HoldsGenerically.le_rank`), and a generic rank
+  upper bound holds everywhere (`HoldsGenerically.rank_le`), via
+  `Matrix.le_rank_iff_exists_submatrix_det_ne_zero`.
 * `TerraciniLemma.VeroneseForms` — degree-`d` forms as pullbacks `χ ∘ v_d` of
   functionals on the ambient space (closed under products, containing the
   linear forms; `veroneseFormOf_injective`: the Veronese variety is
   nondegenerate), the **singular-form bound**
   `finrank_iSup_tangentSpace_le_of_singular` (a nonzero form singular at the
-  points puts all their tangent spaces in a hyperplane), and
-  `ForGeneralPoints`, the formal meaning of "for general points" (off the zero
-  locus of a nonzero polynomial in the coordinates).
+  points puts all their tangent spaces in a hyperplane).
 * `TerraciniLemma.AlexanderHirschowitzCubic` — the `(4,3,7)` case at general
   points, following Brambilla–Ottaviani: an explicit change of coordinates
   sends seven general points of `ℙ⁴` onto the moment curve, where the Hankel
   cubic (the secant variety of the curve) is singular
   (`ah437_isDefective_general`).
 * `TerraciniLemma.AlexanderHirschowitz` — every Alexander–Hirschowitz
-  exceptional case is defective at general points
+  exceptional case is defective at every configuration of nonzero points
   (`alexanderHirschowitz_exceptions_isDefective`): quartics `(2,4,5)`,
   `(3,4,9)`, `(4,4,14)` via the square of a quadric through the points,
-  quadrics via `TerraciniLemma.VeroneseGeneral`, and `(4,3,7)` as above.
+  quadrics via `TerraciniLemma.VeroneseGeneral`, and `(4,3,7)` as above. Also
+  the full theorem for quadrics (`alexanderHirschowitz_quadric`): at `r ≥ 1`
+  general points, `σ_r(v₂(ℙⁿ))` is defective iff `2 ≤ r ≤ n`.
 * `TerraciniLemma.Segre` — worked examples for Segre varieties: the
   non-defective Segre quadric `ℙ¹ × ℙ¹ ⊂ ℙ³` and the defective Segre
   threefold `ℙ¹ × ℙ¹ × ℙ¹ ⊂ ℙ⁷`.
@@ -144,7 +155,13 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
 | `finrank_iSup_tangentSpace_quartic_le` | ✓ proved | for any `r < binom(n+2,2)` points, the tangent spaces of `v₄(ℙⁿ)` lie in a hyperplane (dual to `Q²`) |
 | `isDefective_quadric` | ✓ proved | `σ_r(v₂(ℙⁿ))` (degree-`d` model) is defective at any linearly independent points, `2 ≤ r ≤ n` |
 | `ah437_isDefective_general` | ✓ proved | `σ₇(v₃(ℙ⁴))` is defective at general points (Hankel cubic of the rational normal quartic) |
-| `alexanderHirschowitz_exceptions_isDefective` | ✓ proved | every Alexander–Hirschowitz exceptional case is defective at general points |
+| `HoldsGenerically.le_rank` | ✓ proved | a rank lower bound for a polynomial matrix at one point holds at general points |
+| `HoldsGenerically.rank_le` | ✓ proved | a rank upper bound for a polynomial matrix at general points holds everywhere |
+| `forGeneralPoints_not_isDefective` | ✓ proved | non-defectivity of `v_d(ℙⁿ)` at one nonzero configuration implies it at general points |
+| `isDefective_of_forGeneralPoints` | ✓ proved | defectivity of `v_d(ℙⁿ)` at general points implies it at every nonzero configuration |
+| `veroneseDeg_not_isDefective_general` | ✓ proved | `σ_r(v_d(ℙⁿ))` is non-defective at general points for `d ≥ 3`, `r ≤ n+1` |
+| `alexanderHirschowitz_quadric` | ✓ proved | AH for quadrics: at `r ≥ 1` general points, `σ_r(v₂(ℙⁿ))` is defective iff `2 ≤ r ≤ n` |
+| `alexanderHirschowitz_exceptions_isDefective` | ✓ proved | every Alexander–Hirschowitz exceptional case is defective at every configuration of nonzero points |
 | `finrank_finsetSup_eq_sum_of_not_isDefective_subabundant` | ✓ proved | subabundant non-defectivity for `r` points implies it for any sub-collection |
 | `not_isDefective_of_finsetSup_eq_top` | ✓ proved | superabundant non-defectivity for `r` points implies it for any super-collection |
 | `not_isDefective_of_sup_eq_top` | ✓ proved | two-point specialization of the above |

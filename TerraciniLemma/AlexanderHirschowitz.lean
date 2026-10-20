@@ -173,34 +173,6 @@ theorem isDefective_quadric_of_linearIndependent {n r : ℕ} (hrn : r ≤ n) (h2
     finrank_ambient_veroneseDeg]
   rwa [finrank_ambient_veroneseGeneral] at h
 
-omit [CharZero 𝕜] in
-/-- `r ≤ n + 1` general points of `𝕜^{n+1}` are linearly independent: the polynomial is the
-leading `r × r` minor of the coordinate matrix. -/
-theorem ForGeneralPoints.linearIndependent {n r : ℕ} (hr : r ≤ n + 1) :
-    ForGeneralPoints (𝕜 := 𝕜) r (n + 1) (fun p => LinearIndependent 𝕜 p) := by
-  classical
-  let A : Matrix (Fin r) (Fin r) (MvPolynomial (Fin r × Fin (n + 1)) 𝕜) :=
-    fun k i => MvPolynomial.X (k, Fin.castLE hr i)
-  refine ⟨A.det, fun h => ?_, fun p hp => ?_⟩
-  · -- At the coordinate points `e₀, …, e_{r-1}` the minor is `det 1 = 1`.
-    have h1 := congrArg (MvPolynomial.eval fun ki : Fin r × Fin (n + 1) =>
-      (Pi.single (Fin.castLE hr ki.1) 1 : Fin (n + 1) → 𝕜) ki.2) h
-    rw [RingHom.map_det, map_zero] at h1
-    have hone : (MvPolynomial.eval fun ki : Fin r × Fin (n + 1) =>
-        (Pi.single (Fin.castLE hr ki.1) 1 : Fin (n + 1) → 𝕜) ki.2).mapMatrix A = 1 := by
-      ext k i
-      show MvPolynomial.eval _ (MvPolynomial.X _) = _
-      rw [MvPolynomial.eval_X]
-      simp [Matrix.one_apply, Pi.single_apply, eq_comm]
-    rw [hone, Matrix.det_one] at h1
-    exact one_ne_zero h1
-  · rw [RingHom.map_det] at hp
-    have hrows := Matrix.linearIndependent_rows_of_det_ne_zero hp
-    refine LinearIndependent.of_comp (LinearMap.funLeft 𝕜 𝕜 (Fin.castLE hr)) ?_
-    convert hrows using 1
-    funext k i
-    exact (MvPolynomial.eval_X (f := fun ki : Fin r × Fin (n + 1) => p ki.1 ki.2) (k, Fin.castLE hr i)).symm
-
 /-- `σ_r(v₂(ℙⁿ))` is defective at general points for `2 ≤ r ≤ n`. -/
 theorem quadric_isDefective_general {n r : ℕ} (hrn : r ≤ n) (h2r : 2 ≤ r) :
     ForGeneralPoints (𝕜 := 𝕜) r (n + 1)

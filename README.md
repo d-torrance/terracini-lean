@@ -84,14 +84,25 @@ The mathematics is organized into the following files:
   Alexander–Hirschowitz defective: the `n+1`-element tangent-space supports at
   each of the `r` points are pairwise *disjoint* (in contrast to `d = 2`,
   where they pairwise overlap in exactly one element), so the combined tangent
-  space is a direct sum of dimension `r(n+1)`.
+  space is a direct sum of dimension `r(n+1)`. The tangent span is the column
+  space of a matrix of polynomials in the points' coordinates, so by
+  semicontinuity this lifts to general points
+  (`veroneseDeg_not_isDefective_general`). In the other direction, defectivity
+  at general points implies defectivity at every configuration of nonzero
+  points (`isDefective_of_forGeneralPoints`).
+- [`TerraciniLemma/Semicontinuity.lean`](TerraciniLemma/Semicontinuity.lean)
+  — "for general points" (`HoldsGenerically`, `ForGeneralPoints`: off the zero
+  locus of a nonzero polynomial in the coordinates) and the semicontinuity of
+  rank for matrices of polynomials. A rank lower bound at one point holds at
+  general points (`HoldsGenerically.le_rank`), and a rank upper bound at general
+  points holds everywhere (`HoldsGenerically.rank_le`). The key linear algebra
+  is `Matrix.le_rank_iff_exists_submatrix_det_ne_zero`: over a field,
+  `k ≤ rank A` iff some `k × k` minor of `A` is nonzero.
 - [`TerraciniLemma/VeroneseForms.lean`](TerraciniLemma/VeroneseForms.lean) —
   degree-`d` forms on `𝕜^{n+1}` as pullbacks `χ ∘ v_d` of functionals on the
   ambient space, and the **singular-form bound**
   `finrank_iSup_tangentSpace_le_of_singular`. If a nonzero form is singular at
-  the points, all their tangent spaces lie in the hyperplane dual to it. Also
-  defines `ForGeneralPoints`: a property holds off the zero locus of some
-  nonzero polynomial in the coordinates of the points.
+  the points, all their tangent spaces lie in the hyperplane dual to it.
 - [`TerraciniLemma/AlexanderHirschowitzCubic.lean`](TerraciniLemma/AlexanderHirschowitzCubic.lean)
   — the `(4,3,7)` case at **general** points, following Brambilla–Ottaviani.
   An explicit change of coordinates `ahL p = Vᵀ·diag(w)·diag(U)⁻¹·adj(M)`
@@ -101,15 +112,19 @@ The mathematics is organized into the following files:
   "General" is witnessed by an explicit nonzero polynomial `ahGenericPoly`.
 - [`TerraciniLemma/AlexanderHirschowitz.lean`](TerraciniLemma/AlexanderHirschowitz.lean)
   — `alexanderHirschowitz_exceptions_isDefective`: **every**
-  Alexander–Hirschowitz exceptional case is defective at general points.
+  Alexander–Hirschowitz exceptional case is defective at every configuration
+  of nonzero points (by semicontinuity from general points).
   - Quartics `(2,4,5)`, `(3,4,9)`, `(4,4,14)`: the square of a quadric through
     the `r < binom(n+2,2)` points is a singular quartic. This works for *any*
     nonzero points.
   - Quadrics: transferred from `VeroneseGeneral` along `Sym2 α ≃ Sym α 2`.
   - `(4,3,7)`: proved in the file above.
 
-  Only the defective direction of the theorem is formalized. Showing that all
-  other cases are non-defective is the hard part of Alexander–Hirschowitz.
+  For quadrics the full theorem is proved: `alexanderHirschowitz_quadric`
+  says that at `r ≥ 1` general points, `σ_r(v₂(ℙⁿ))` is defective iff
+  `2 ≤ r ≤ n`. For `d ≥ 3`, non-defectivity is proved only for `r ≤ n+1`.
+  Showing that all other cases are non-defective is the hard part of
+  Alexander–Hirschowitz.
 - [`TerraciniLemma/Segre.lean`](TerraciniLemma/Segre.lean) — worked examples
   for Segre varieties: the non-defective Segre quadric `ℙ¹ × ℙ¹ ⊂ ℙ³` and the
   defective Segre threefold `ℙ¹ × ℙ¹ × ℙ¹ ⊂ ℙ⁷`.

@@ -243,12 +243,10 @@ theorem isDefective_of_finrank_le {n d r : ℕ} (hd : 1 ≤ d) (p : Fin r → Fi
     (hle : Module.finrank 𝕜 (⨆ k, (veroneseDegParam n d (p k)).tangentSpace : Submodule 𝕜 _)
       ≤ (n + d).choose d - 1) :
     IsDefective (fun k => (veroneseDegParam n d (p k)).tangentSpace) := by
-  have hdim : ∀ k, Module.finrank 𝕜 (veroneseDegParam n d (p k)).tangentSpace = n + 1 :=
-    fun k => finrank_tangentSpace_veroneseDegParam n d hd (hp k)
   have hpos : 0 < (n + d).choose d := Nat.choose_pos (by omega)
-  unfold IsDefective expectedDim
-  simp only [hdim, Finset.sum_const, Finset.card_univ, Fintype.card_fin, smul_eq_mul,
-    finrank_ambient_veroneseDeg]
+  unfold IsDefective
+  rw [expectedDim_veroneseDegParam hd p hp]
+  beta_reduce
   omega
 
 /-- **Defectivity from a singular form**: combine `finrank_iSup_tangentSpace_le_of_singular`

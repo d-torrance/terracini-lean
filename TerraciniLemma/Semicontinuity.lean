@@ -230,6 +230,36 @@ theorem ne_zero {m : ℕ} : ForGeneralPoints (𝕜 := 𝕜) r (m + 1) (fun p => 
   · rw [map_prod, Finset.prod_ne_zero_iff] at hp
     simpa [hk] using hp k (Finset.mem_univ _)
 
+/-- **`r ≤ m` general points of `𝕜^m` are linearly independent**: the `r × m` coordinate matrix
+has rank `r` at the coordinate points `e₀, …, e_{r-1}`, hence at general points
+(`HoldsGenerically.le_rank`). -/
+theorem linearIndependent {r m : ℕ} (hr : r ≤ m) :
+    ForGeneralPoints (𝕜 := 𝕜) r m (fun p => LinearIndependent 𝕜 p) := by
+  classical
+  let M : Matrix (Fin r) (Fin m) (MvPolynomial (Fin r × Fin m) 𝕜) := fun k i => X (k, i)
+  have hM : ∀ x : Fin r × Fin m → 𝕜, M.map (eval x) = Matrix.of fun k i => x (k, i) :=
+    fun x => by ext k i; exact MvPolynomial.eval_X (f := x) (k, i)
+  -- an `r × m` matrix of rank `≥ r` has linearly independent rows
+  have key : ∀ p : Fin r → Fin m → 𝕜, r ≤ (Matrix.of p).rank → LinearIndependent 𝕜 p :=
+    fun p h => by
+      have hle := (Matrix.of p).rank_le_card_height
+      have hrow : (Matrix.of p).row = p := rfl
+      rw [Fintype.card_fin] at hle
+      rw [Matrix.rank_eq_finrank_span_row, hrow] at h hle
+      rw [linearIndependent_iff_card_eq_finrank_span, Fintype.card_fin, Set.finrank]
+      omega
+  let e : Fin r → Fin m → 𝕜 := fun k => Pi.single (Fin.castLE hr k) 1
+  have h₀ : r ≤ (M.map (eval fun ki => e ki.1 ki.2)).rank := by
+    have hrow : (Matrix.of fun k i => e k i).row = e := rfl
+    have hli : LinearIndependent 𝕜 e := by
+      have := (Pi.basisFun 𝕜 (Fin m)).linearIndependent.comp _ (Fin.castLE_injective hr)
+      convert this using 1
+      funext k
+      simp [e]
+    rw [hM, Matrix.rank_eq_finrank_span_row, hrow, finrank_span_eq_card hli, Fintype.card_fin]
+  rw [forGeneralPoints_iff_holdsGenerically]
+  exact (HoldsGenerically.le_rank M _ h₀).mono fun x hx => key _ (by rwa [hM] at hx)
+
 end ForGeneralPoints
 
 end GeneralPoints
