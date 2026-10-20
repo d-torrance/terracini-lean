@@ -6,6 +6,7 @@ public import TerraciniLemma.RationalNormalCurves
 public import TerraciniLemma.VeroneseGeneral
 public import TerraciniLemma.VeroneseDegree
 public import TerraciniLemma.Semicontinuity
+public import TerraciniLemma.RankCertificate
 public import TerraciniLemma.VeroneseForms
 public import TerraciniLemma.AlexanderHirschowitzCubic
 public import TerraciniLemma.AlexanderHirschowitz
