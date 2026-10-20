@@ -297,7 +297,7 @@ omit [CharZero 𝕜] in
 theorem combinedDerivative_ah245_apply (w : Fin 5 → Fin 3 → 𝕜) (s : Sym (Fin 3) 4) :
     combinedDerivative (ah245Family (𝕜 := 𝕜)) w s
       = ∑ k : Fin 5, veroneseDegDeriv 2 4 (ah245Pt k) (w k) s := by
-  simp [combinedDerivative, ah245Family, veroneseDegParam, ContinuousLinearMap.sum_apply,
+  simp [combinedDerivative, ah245Family, veroneseDegParam, sum_apply,
     ContinuousLinearMap.comp_apply, coordProj_apply, Finset.sum_apply]
 
 /-- The combined tangent space of the 5 points is contained in `ker dualQuarticφ`. -/

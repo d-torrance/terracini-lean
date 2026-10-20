@@ -95,8 +95,8 @@ theorem mvPolynomialDeriv_veronesePoly (v : Fin 3 → 𝕜) (i : Fin 6) :
   · apply ContinuousLinearMap.ext
     intro dv
     simp [mvPolynomialDeriv, veronesePoly, veroneseSurfaceDerivComp, Fin.sum_univ_three,
-      coordProj_apply, eval_mul, eval_X, smul_eq_mul, ContinuousLinearMap.add_apply,
-      ContinuousLinearMap.smul_apply]
+      coordProj_apply, eval_mul, eval_X, smul_eq_mul, add_apply,
+      smul_apply]
 
 omit [CharZero 𝕜] in
 /-- `veroneseSurfaceDeriv v` is the Fréchet derivative of `veroneseSurface` at `v`. -/
@@ -118,7 +118,7 @@ theorem veroneseSurfaceDeriv_apply' (v dv : Fin 3 → 𝕜) :
   funext i
   fin_cases i <;>
     simp [veroneseSurfaceDeriv_apply, veroneseSurfaceDerivComp, coordProj_apply,
-      ContinuousLinearMap.add_apply, ContinuousLinearMap.smul_apply, smul_eq_mul]
+      add_apply, smul_apply, smul_eq_mul]
 
 /-- The local parametrization of `veroneseSurface` (the cone over `v₂(ℙ²)`) at parameter `v`. -/
 def veroneseSurfaceParam (v : Fin 3 → 𝕜) :
@@ -155,7 +155,7 @@ theorem combinedDerivative_veroneseSurface_apply (w : Fin 2 → Fin 3 → 𝕜) 
       ![2 * w 0 0, 2 * w 1 1, 0, w 0 1 + w 1 0, w 0 2, w 1 2] := by
   funext i
   simp only [combinedDerivative, veroneseSurfaceParamPair, veroneseSurfaceParam, Fin.sum_univ_two,
-    ContinuousLinearMap.add_apply, ContinuousLinearMap.comp_apply, coordProj_apply,
+    add_apply, ContinuousLinearMap.comp_apply, coordProj_apply,
     veroneseSurfaceDeriv_apply', Pi.add_apply]
   fin_cases i <;> simp
 

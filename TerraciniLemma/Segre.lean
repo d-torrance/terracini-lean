@@ -110,7 +110,7 @@ theorem combinedDerivative_segre_surjective (p₁ p₂ : 𝕜 × 𝕜) (h : p₁
     set dt₁ : 𝕜 := (c - s₂ * b - t₂ * a) / (s₁ - s₂) with hdt₁
     refine ⟨![(0, dt₁), (a, b - dt₁)], ?_⟩
     simp only [combinedDerivative, segreParamPair, segreParam, Fin.sum_univ_two,
-      ContinuousLinearMap.add_apply, ContinuousLinearMap.comp_apply, coordProj_apply,
+      add_apply, ContinuousLinearMap.comp_apply, coordProj_apply,
       Matrix.cons_val_zero, Matrix.cons_val_one, segreDeriv_apply, Prod.mk_add_mk]
     rw [Prod.mk.injEq, Prod.mk.injEq]
     refine ⟨by ring, by ring, ?_⟩
@@ -122,7 +122,7 @@ theorem combinedDerivative_segre_surjective (p₁ p₂ : 𝕜 × 𝕜) (h : p₁
     set ds₁ : 𝕜 := (c - s₂ * b - t₂ * a) / (t₁ - t₂) with hds₁
     refine ⟨![(ds₁, 0), (a - ds₁, b)], ?_⟩
     simp only [combinedDerivative, segreParamPair, segreParam, Fin.sum_univ_two,
-      ContinuousLinearMap.add_apply, ContinuousLinearMap.comp_apply, coordProj_apply,
+      add_apply, ContinuousLinearMap.comp_apply, coordProj_apply,
       Matrix.cons_val_zero, Matrix.cons_val_one, segreDeriv_apply, Prod.mk_add_mk]
     rw [Prod.mk.injEq, Prod.mk.injEq]
     refine ⟨by ring, by ring, ?_⟩
@@ -304,7 +304,7 @@ theorem combinedDerivative_segre3_apply (w : Fin 2 → 𝕜 × 𝕜 × 𝕜) (i 
       (segre3ParamPair segre3Pt1 segre3Pt2) w i =
       segre3DerivComp segre3Pt1 i (w 0) + segre3DerivComp segre3Pt2 i (w 1) := by
   simp only [combinedDerivative, segre3ParamPair, segre3Param, Fin.sum_univ_two,
-    ContinuousLinearMap.add_apply, ContinuousLinearMap.comp_apply, coordProj_apply,
+    add_apply, ContinuousLinearMap.comp_apply, coordProj_apply,
     Pi.add_apply, segre3Deriv_apply]
 
 /-- The combined derivative of the two-point parametrization at
@@ -330,7 +330,7 @@ theorem combinedDerivative_segre3_injective :
   have h4 := key 4
   have h5 := key 5
   simp only [segre3DerivComp, proj1_apply, proj2_apply, proj3_apply,
-    ContinuousLinearMap.add_apply, ContinuousLinearMap.smul_apply, smul_eq_mul,
+    add_apply, smul_apply, smul_eq_mul,
     zero_mul, one_mul, zero_add, add_zero] at h0 h1 h2 h3 h4 h5
   have e1 : (2 : 𝕜) * ((u - v) 1).1 = 0 := by linear_combination h3 + h4 - h5
   have hw1a : ((u - v) 1).1 = 0 := (mul_eq_zero.mp e1).resolve_left two_ne_zero
@@ -376,7 +376,7 @@ theorem hdominant_segre3 :
   simp only [LinearMap.mem_ker, ContinuousLinearMap.coe_coe, segre3Defect_apply,
     combinedDerivative_segre3_apply, segre3DerivComp,
     proj1_apply, proj2_apply, proj3_apply,
-    ContinuousLinearMap.add_apply, ContinuousLinearMap.smul_apply, smul_eq_mul,
+    add_apply, smul_apply, smul_eq_mul,
     zero_mul, one_mul, zero_add, add_zero]
   ring
 

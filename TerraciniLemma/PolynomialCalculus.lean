@@ -33,7 +33,7 @@ theorem hasFDerivAt_eval_mvPolynomial (p : MvPolynomial (Fin n) 𝕜) (x : Fin n
   | C a => simpa [mvPolynomialDeriv, pderiv_C] using hasFDerivAt_const a x
   | add p q hp hq =>
       simpa [mvPolynomialDeriv, eval_add, map_add, add_smul, Finset.sum_add_distrib]
-        using hp.add hq
+        using hp.fun_add hq
   | mul_X p i hp =>
       have hproj : HasFDerivAt (fun y : Fin n → 𝕜 => y i) (coordProj (𝕜 := 𝕜) n i) x :=
         hasFDerivAt_coordProj n i x
@@ -48,9 +48,9 @@ theorem hasFDerivAt_eval_mvPolynomial (p : MvPolynomial (Fin n) 𝕜) (x : Fin n
           rw [pderiv_mul, map_add, map_mul, map_mul, eval_X]
           by_cases h : i = j
           · subst h
-            rw [pderiv_X_self, map_one, mul_one, if_pos rfl]
+            rw [pderiv_X_self, map_one, mul_one, ite_eq_left rfl]
             module
-          · rw [pderiv_X_of_ne h, map_zero, mul_zero, if_neg h]
+          · rw [pderiv_X_of_ne h, map_zero, mul_zero, ite_eq_right h]
             module
         calc mvPolynomialDeriv (p * X i) x
             = ∑ j, (x i • (eval x (pderiv j p) • coordProj (𝕜 := 𝕜) (𝔸 := 𝕜) n j)

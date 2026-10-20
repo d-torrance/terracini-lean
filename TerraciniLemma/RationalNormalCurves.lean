@@ -111,7 +111,7 @@ theorem combinedDerivative_parabola_surjective (t₁ t₂ : 𝕜) (h : t₁ ≠ 
   set s₁ : 𝕜 := (b - 2 * t₂ * a) / (2 * (t₁ - t₂)) with hs₁
   refine ⟨![s₁, a - s₁], ?_⟩
   simp only [combinedDerivative, parabolaParamPair, parabolaParam, Fin.sum_univ_two,
-    ContinuousLinearMap.add_apply, ContinuousLinearMap.comp_apply, coordProj_apply,
+    add_apply, ContinuousLinearMap.comp_apply, coordProj_apply,
     Matrix.cons_val_zero, Matrix.cons_val_one,
     parabolaDeriv_apply, Prod.mk_add_mk]
   rw [Prod.mk.injEq]
@@ -255,7 +255,7 @@ omit [CharZero 𝕜] in
 @[simp]
 theorem twistedCubicDefect_apply (q : 𝕜 × 𝕜 × 𝕜) :
     twistedCubicDefect q = 3 * q.2.1 - 2 * q.2.2 := by
-  simp [twistedCubicDefect, ContinuousLinearMap.sub_apply, ContinuousLinearMap.smul_apply,
+  simp [twistedCubicDefect, sub_apply, smul_apply,
     ContinuousLinearMap.comp_apply, smul_eq_mul]
 
 omit [CharZero 𝕜] in
@@ -265,7 +265,7 @@ theorem combinedDerivative_twistedCubic_apply (w : Fin 2 → 𝕜) :
     combinedDerivative (v := ![twistedCubic (0 : 𝕜), twistedCubic 1])
       (twistedCubicParamPair 0 1) w = (w 0 + w 1, 2 * w 1, 3 * w 1) := by
   simp [combinedDerivative, twistedCubicParamPair, twistedCubicParam, Fin.sum_univ_two,
-    ContinuousLinearMap.add_apply, ContinuousLinearMap.comp_apply, coordProj_apply,
+    add_apply, ContinuousLinearMap.comp_apply, coordProj_apply,
     twistedCubicDeriv_apply, Prod.mk_add_mk]
 
 omit [CharZero 𝕜] in

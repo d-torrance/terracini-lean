@@ -1,4 +1,5 @@
 import TerraciniLemma.PolynomialCalculus
+import Mathlib.Algebra.MvPolynomial.CommRing
 import Mathlib.Analysis.Calculus.ContDiff.RCLike
 import Mathlib.Analysis.Calculus.Implicit
 import Mathlib.Analysis.Complex.Basic
@@ -151,7 +152,7 @@ theorem combinedDerivative_elliptic_surjective :
   funext i
   fin_cases i <;>
     simp only [combinedDerivative, ellipticParamPair, ellipticParam, Fin.sum_univ_two,
-      ContinuousLinearMap.add_apply, ContinuousLinearMap.comp_apply, coordProj_apply,
+      add_apply, ContinuousLinearMap.comp_apply, coordProj_apply,
       Fin.isValue, Fin.reduceFinMk, Matrix.cons_val_zero, Matrix.cons_val_one,
       ContinuousLinearMap.smulRight_apply, ContinuousLinearMap.id_apply,
       Pi.add_apply, Pi.smul_apply, smul_eq_mul]

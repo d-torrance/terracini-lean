@@ -161,7 +161,7 @@ theorem not_nodup_veroneseDegElt (a j' : Fin 5) (hj' : j' ≠ a) :
   rw [veroneseDegElt_val, Multiset.nodup_iff_count_le_one]
   push Not
   refine ⟨a, ?_⟩
-  rw [Multiset.count_cons, Multiset.count_replicate, if_neg (Ne.symm hj'), if_pos rfl]
+  rw [Multiset.count_cons, Multiset.count_replicate, ite_eq_right (Ne.symm hj'), ite_eq_left rfl]
   norm_num
 
 /-- A squarefree multiset can't equal a non-squarefree one. -/
@@ -243,7 +243,7 @@ omit [CharZero 𝕜] in
 theorem combinedDerivative_ah437_apply (w : Fin 7 → Fin 5 → 𝕜) (s : Sym (Fin 5) 3) :
     combinedDerivative (ah437Family (𝕜 := 𝕜)) w s
       = ∑ k : Fin 7, veroneseDegDeriv 4 3 (ah437Pt k) (w k) s := by
-  simp [combinedDerivative, ah437Family, veroneseDegParam, ContinuousLinearMap.sum_apply,
+  simp [combinedDerivative, ah437Family, veroneseDegParam, sum_apply,
     ContinuousLinearMap.comp_apply, coordProj_apply, Finset.sum_apply]
 
 /-- The combined tangent space of the 7 points is contained in `ker dualCubicφ'`. -/

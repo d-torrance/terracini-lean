@@ -74,8 +74,8 @@ theorem mvPolynomialDeriv_veroneseGeneralPoly_mk (n : ℕ) (v : Fin (n + 1) → 
   apply ContinuousLinearMap.ext
   intro dv
   rw [hpoly]
-  simp only [mvPolynomialDeriv, ContinuousLinearMap.sum_apply, ContinuousLinearMap.smul_apply,
-    coordProj_apply, smul_eq_mul, hterm, ContinuousLinearMap.add_apply]
+  simp only [mvPolynomialDeriv, sum_apply, smul_apply,
+    coordProj_apply, smul_eq_mul, hterm, add_apply]
   rw [Finset.sum_add_distrib, Finset.sum_ite_eq Finset.univ i (fun k => v j * dv k),
     Finset.sum_ite_eq Finset.univ j (fun k => v i * dv k)]
   simp
@@ -131,12 +131,12 @@ theorem finrank_tangentSpace_veroneseGeneralFamily (n r : ℕ) (hr : r ≤ n + 1
     funext a
     by_cases ha : a = k'
     · have h2 := hsub' (s(k', k') : Sym2 (Fin (n + 1)))
-      rw [veroneseGeneralDeriv_apply_mk, hpt, if_pos rfl, one_mul] at h2
+      rw [veroneseGeneralDeriv_apply_mk, hpt, ite_eq_left rfl, one_mul] at h2
       rw [ha, Pi.sub_apply]
       have h2' : (2 : 𝕜) * (dv₁ - dv₂) k' = 0 := by rw [two_mul]; exact h2
       exact (mul_eq_zero.mp h2').resolve_left two_ne_zero
     · have h2 := hsub' (s(k', a) : Sym2 (Fin (n + 1)))
-      rw [veroneseGeneralDeriv_apply_mk, hpt, hpt, if_neg ha, if_pos rfl] at h2
+      rw [veroneseGeneralDeriv_apply_mk, hpt, hpt, ite_eq_right ha, ite_eq_left rfl] at h2
       rw [Pi.sub_apply]
       simpa using h2
   have hinj' :
@@ -159,7 +159,7 @@ theorem combinedDerivative_veroneseGeneral_apply (n r : ℕ) (hr : r ≤ n + 1)
     combinedDerivative (veroneseGeneralFamily (𝕜 := 𝕜) n r hr) w (s(i, j) : Sym2 (Fin (n + 1)))
       = ∑ k : Fin r, (veroneseGeneralPt (𝕜 := 𝕜) n r hr k j * w k i
           + veroneseGeneralPt (𝕜 := 𝕜) n r hr k i * w k j) := by
-  simp [combinedDerivative, veroneseGeneralFamily, veroneseGeneralParam, ContinuousLinearMap.sum_apply,
+  simp [combinedDerivative, veroneseGeneralFamily, veroneseGeneralParam, sum_apply,
     ContinuousLinearMap.comp_apply, coordProj_apply, Finset.sum_apply, veroneseGeneralDeriv_apply_mk]
 
 omit [CharZero 𝕜] in
@@ -171,15 +171,15 @@ theorem sum_ite_castLE_eq {r n : ℕ} (hr : r ≤ n + 1) (a : Fin (n + 1)) (F : 
   split_ifs with h
   · have hcast : Fin.castLE hr (⟨a.val, h⟩ : Fin r) = a := Fin.ext rfl
     rw [Finset.sum_eq_single (⟨a.val, h⟩ : Fin r)]
-    · rw [if_pos hcast.symm]
+    · rw [ite_eq_left hcast.symm]
     · intro k _ hk
-      rw [if_neg]
+      rw [ite_eq_right]
       intro hc
       exact hk (Fin.castLE_injective hr (hcast.trans hc)).symm
     · intro hmem
       exact absurd (Finset.mem_univ _) hmem
   · refine Finset.sum_eq_zero fun k _ => ?_
-    rw [if_neg]
+    rw [ite_eq_right]
     intro hc
     exact h (by rw [hc]; exact k.isLt)
 
@@ -228,8 +228,8 @@ theorem range_combinedDerivative_veroneseGeneral (n r : ℕ) (hr : r ≤ n + 1) 
     have hcjk : Fin.castLE hr k ≠ j := by
       intro hc
       exact hj (hc ▸ k.isLt)
-    rw [veroneseGeneralPt_apply, veroneseGeneralPt_apply, if_neg (Ne.symm hcjk),
-      if_neg (Ne.symm hcik)]
+    rw [veroneseGeneralPt_apply, veroneseGeneralPt_apply, ite_eq_right (Ne.symm hcjk),
+      ite_eq_right (Ne.symm hcik)]
     ring
   · intro f hf
     rw [mem_veroneseTangentSum] at hf
@@ -252,19 +252,19 @@ theorem range_combinedDerivative_veroneseGeneral (n r : ℕ) (hr : r ≤ n + 1) 
     rw [Finset.sum_add_distrib, sum_ite_castLE_eq hr j (fun k => w k i),
       sum_ite_castLE_eq hr i (fun k => w k j)]
     by_cases hjr : j.val < r <;> by_cases hir : i.val < r
-    · rw [dif_pos hjr, dif_pos hir]
+    · rw [dite_eq_left hjr, dite_eq_left hir]
       have hcj : Fin.castLE hr (⟨j.val, hjr⟩ : Fin r) = j := Fin.ext rfl
       have hci : Fin.castLE hr (⟨i.val, hir⟩ : Fin r) = i := Fin.ext rfl
-      simp only [hw, hcj, hci, if_pos hir, if_pos hjr, Sym2.eq_swap (a := j) (b := i)]
+      simp only [hw, hcj, hci, ite_eq_left hir, ite_eq_left hjr, Sym2.eq_swap (a := j) (b := i)]
       field_simp
       ring
-    · rw [dif_pos hjr, dif_neg hir]
+    · rw [dite_eq_left hjr, dite_eq_right hir]
       have hcj : Fin.castLE hr (⟨j.val, hjr⟩ : Fin r) = j := Fin.ext rfl
-      simp only [hw, hcj, if_neg hir, Sym2.eq_swap (a := j) (b := i), add_zero]
-    · rw [dif_neg hjr, dif_pos hir]
+      simp only [hw, hcj, ite_eq_right hir, Sym2.eq_swap (a := j) (b := i), add_zero]
+    · rw [dite_eq_right hjr, dite_eq_left hir]
       have hci : Fin.castLE hr (⟨i.val, hir⟩ : Fin r) = i := Fin.ext rfl
-      simp only [hw, hci, if_neg hjr, zero_add]
-    · rw [dif_neg hjr, dif_neg hir, add_zero]
+      simp only [hw, hci, ite_eq_right hjr, zero_add]
+    · rw [dite_eq_right hjr, dite_eq_right hir, add_zero]
       refine (hf s(i, j) ?_).symm
       intro a ha
       rcases Sym2.mem_iff.mp ha with rfl | rfl
@@ -305,7 +305,7 @@ theorem finShiftDown_finShiftUp (n r : ℕ) (hr : r ≤ n + 1) (b : Fin (n + 1 -
 via shifting indices down by `r`. -/
 def badPairsEquiv (n r : ℕ) (hr : r ≤ n + 1) :
     ↥(badPairs n r) ≃ Sym2 (Fin (n + 1 - r)) where
-  toFun p := Sym2.pmap (finShiftDown n r) p.1 p.2
+  toFun p := Sym2.pmap (finShiftDown n r) p.1 fun a ha => p.2 a ha
   invFun t := ⟨Sym2.map (finShiftUp n r hr) t, by
     intro a ha
     obtain ⟨b, _, rfl⟩ := Sym2.mem_map.mp ha
@@ -350,7 +350,7 @@ theorem finrank_veroneseTangentSum (n r : ℕ) (hr : r ≤ n + 1) :
   have hrange : LinearMap.range g = ⊤ := LinearMap.range_eq_top.mpr hsurj
   have hrn := LinearMap.finrank_range_add_finrank_ker g
   rw [hrange, hker, finrank_top, finrank_ambient_veroneseGeneral] at hrn
-  haveI : Fintype ↥(badPairs n r) := Fintype.ofEquiv _ (badPairsEquiv n r hr).symm
+  have : Fintype ↥(badPairs n r) := Fintype.ofEquiv _ (badPairsEquiv n r hr).symm
   have hcard : Fintype.card ↥(badPairs n r) = (n + 2 - r).choose 2 := by
     rw [Fintype.card_congr (badPairsEquiv n r hr), Sym2.card, Fintype.card_fin]
     congr 1

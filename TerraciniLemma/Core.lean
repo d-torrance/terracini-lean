@@ -62,7 +62,7 @@ def additionMap (r : ℕ) : (Fin r → E) →L[𝕜] E :=
 @[simp]
 theorem additionMap_apply (r : ℕ) (v : Fin r → E) :
     additionMap (𝕜 := 𝕜) r v = ∑ i, v i := by
-  simp [additionMap, ContinuousLinearMap.sum_apply, ContinuousLinearMap.proj_apply]
+  simp [additionMap, sum_apply, ContinuousLinearMap.proj_apply]
 
 /-- The addition map, being linear, is its own Fréchet derivative everywhere. -/
 theorem hasFDerivAt_additionMap (r : ℕ) (v : Fin r → E) :
@@ -165,7 +165,7 @@ theorem range_combinedParam_eq_iSup {r : ℕ}
     -- Switch from LinearMap.toLinearMap to the underlying CLM coercion
     change (∑ i : Fin r, (Df i).comp (coordProj r i)) u ∈
            ⨆ i : Fin r, LinearMap.range (Df i).toLinearMap
-    simp only [ContinuousLinearMap.sum_apply, ContinuousLinearMap.comp_apply,
+    simp only [sum_apply, ContinuousLinearMap.comp_apply,
                coordProj_apply]
     -- Goal: ∑ i, Df i (u i) ∈ ⨆ i, Im(Df i)
     apply Submodule.sum_mem
@@ -180,7 +180,7 @@ theorem range_combinedParam_eq_iSup {r : ℕ}
     rintro y ⟨a, rfl⟩
     refine ⟨Pi.single i a, ?_⟩
     change (∑ j : Fin r, (Df j).comp (coordProj r j)) (Pi.single i a) = Df i a
-    simp only [ContinuousLinearMap.sum_apply, ContinuousLinearMap.comp_apply, coordProj_apply]
+    simp only [sum_apply, ContinuousLinearMap.comp_apply, coordProj_apply]
     rw [Finset.sum_eq_single i
         (fun j _ hji => by rw [Pi.single_eq_of_ne hji, map_zero])
         (fun h => absurd (Finset.mem_univ i) h),

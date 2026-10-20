@@ -74,7 +74,7 @@ theorem eval_pderiv_multisetMapProdX (n : ℕ) (s : Multiset (Fin (n + 1)))
     simp only [pderiv_X, Pi.single_apply, apply_ite (eval v), map_zero, map_one]
     by_cases hak : a = k
     · subst hak
-      rw [Multiset.erase_cons_head, if_pos rfl, if_pos rfl]
+      rw [Multiset.erase_cons_head, ite_eq_left rfl, ite_eq_left rfl]
       rcases Nat.eq_zero_or_pos (s'.count a) with h0 | hpos
       · simp [h0]
       · obtain ⟨t, ht⟩ := Multiset.exists_cons_of_mem (Multiset.count_pos.mp hpos)
@@ -83,7 +83,7 @@ theorem eval_pderiv_multisetMapProdX (n : ℕ) (s : Multiset (Fin (n + 1)))
         push_cast
         ring
     · rw [Multiset.erase_cons_tail s' hak, Multiset.map_cons, Multiset.prod_cons,
-        if_neg hak, if_neg (Ne.symm hak)]
+        ite_eq_right hak, ite_eq_right (Ne.symm hak)]
       push_cast
       ring
 
@@ -109,7 +109,7 @@ theorem veroneseDegDeriv_apply (n d : ℕ) (v dv : Fin (n + 1) → 𝕜) (s : Sy
     veroneseDegDeriv n d v dv s
       = ∑ k : Fin (n + 1), (s.val.count k : 𝕜) * (Multiset.map v (s.val.erase k)).prod * dv k := by
   simp only [veroneseDegDeriv, ContinuousLinearMap.pi_apply, mvPolynomialDeriv, veroneseDegPoly,
-    ContinuousLinearMap.sum_apply, ContinuousLinearMap.smul_apply, coordProj_apply, smul_eq_mul,
+    sum_apply, smul_apply, coordProj_apply, smul_eq_mul,
     eval_pderiv_multisetMapProdX]
 
 omit [CharZero 𝕜] in
@@ -132,13 +132,13 @@ theorem veroneseDegDeriv_apply_replicate (n d : ℕ) (hd : 1 ≤ d) (a : Fin (n 
     veroneseDegDeriv n d (Pi.single a 1) dv (Sym.replicate d a) = (d : 𝕜) * dv a := by
   rw [veroneseDegDeriv_apply, Finset.sum_eq_single a]
   · obtain ⟨d', rfl⟩ := Nat.exists_eq_succ_of_ne_zero (by omega : d ≠ 0)
-    rw [Sym.val_replicate, Multiset.count_replicate, if_pos rfl, Multiset.replicate_succ,
+    rw [Sym.val_replicate, Multiset.count_replicate, ite_eq_left rfl, Multiset.replicate_succ,
       Multiset.erase_cons_head, prod_map_single,
-      if_pos (fun x hx => Multiset.eq_of_mem_replicate hx)]
+      ite_eq_left (fun x hx => Multiset.eq_of_mem_replicate hx)]
     push_cast
     ring
   · intro k _ hk
-    rw [Sym.val_replicate, Multiset.count_replicate, if_neg (Ne.symm hk)]
+    rw [Sym.val_replicate, Multiset.count_replicate, ite_eq_right (Ne.symm hk)]
     push_cast
     ring
   · simp
@@ -161,8 +161,8 @@ theorem veroneseDegDeriv_apply_cons (n d : ℕ) (hd : 1 ≤ d) (a j : Fin (n + 1
   rw [veroneseDegDeriv_apply]
   rw [Finset.sum_eq_single j]
   · rw [veroneseDegElt_val, Multiset.count_cons_self, Multiset.count_replicate,
-      if_neg (Ne.symm hj), Multiset.erase_cons_head, prod_map_single,
-      if_pos (fun x hx => Multiset.eq_of_mem_replicate hx)]
+      ite_eq_right (Ne.symm hj), Multiset.erase_cons_head, prod_map_single,
+      ite_eq_left (fun x hx => Multiset.eq_of_mem_replicate hx)]
     push_cast
     ring
   · intro k _ hk
@@ -173,9 +173,9 @@ theorem veroneseDegDeriv_apply_cons (n d : ℕ) (hd : 1 ≤ d) (a j : Fin (n + 1
         exact (Multiset.mem_erase_of_ne hj).mpr (Multiset.mem_cons_self j _)
       have hnall : ¬ (∀ x ∈ (j ::ₘ Multiset.replicate (d - 1) a).erase k, x = a) :=
         fun hcon => hj (hcon j hmem)
-      rw [prod_map_single, if_neg hnall]
+      rw [prod_map_single, ite_eq_right hnall]
       ring
-    · rw [Multiset.count_cons, Multiset.count_replicate, if_neg (Ne.symm hka), if_neg hk]
+    · rw [Multiset.count_cons, Multiset.count_replicate, ite_eq_right (Ne.symm hka), ite_eq_right hk]
       push_cast
       ring
   · simp
@@ -209,7 +209,7 @@ theorem veroneseDegDeriv_apply_eq_zero (n d : ℕ) (hd : 1 ≤ d) (a : Fin (n + 
         exact h1 (Subtype.ext
           ((Multiset.eq_replicate.mpr ⟨s.2, hall_s⟩).trans (Sym.val_replicate).symm))
       · exact h2 k hka (Subtype.ext (hcons.trans (veroneseDegElt_val n d hd a k).symm))
-    · rw [if_neg hall]
+    · rw [ite_eq_right hall]
       ring
   · rw [Multiset.count_eq_zero.mpr hk]
     simp
@@ -221,7 +221,7 @@ theorem ne_replicate_of_count_le {n d : ℕ} (s : Sym (Fin (n + 1)) d) (b : ℕ)
     s ≠ Sym.replicate d a := by
   intro h
   have := hb a
-  rw [h, Sym.val_replicate, Multiset.count_replicate, if_pos rfl] at this
+  rw [h, Sym.val_replicate, Multiset.count_replicate, ite_eq_left rfl] at this
   omega
 
 /-- A multiset all of whose element-counts are `≤ b < d - 1` can't be a monomial
@@ -231,8 +231,8 @@ theorem ne_veroneseDegElt_of_count_le {n d : ℕ} (hd : 1 ≤ d) (s : Sym (Fin (
     s ≠ veroneseDegElt n d hd a j := by
   intro h
   have := hb a
-  rw [h, veroneseDegElt_val, Multiset.count_cons, Multiset.count_replicate, if_pos rfl,
-    if_neg (Ne.symm hj)] at this
+  rw [h, veroneseDegElt_val, Multiset.count_cons, Multiset.count_replicate, ite_eq_left rfl,
+    ite_eq_right (Ne.symm hj)] at this
   omega
 
 /-! ### §C — `r` points, tangent space dimension `n+1` -/
@@ -243,13 +243,13 @@ theorem veroneseDegDeriv_apply_replicate' (n d : ℕ) (hd : 1 ≤ d) (a : Fin (n
     (v dv : Fin (n + 1) → 𝕜) :
     veroneseDegDeriv n d v dv (Sym.replicate d a) = (d : 𝕜) * (v a) ^ (d - 1) * dv a := by
   rw [veroneseDegDeriv_apply, Finset.sum_eq_single a]
-  · rw [Sym.val_replicate, Multiset.count_replicate, if_pos rfl]
+  · rw [Sym.val_replicate, Multiset.count_replicate, ite_eq_left rfl]
     obtain ⟨d', rfl⟩ := Nat.exists_eq_succ_of_ne_zero (by omega : d ≠ 0)
     rw [Multiset.replicate_succ, Multiset.erase_cons_head, Multiset.map_replicate,
       Multiset.prod_replicate]
     simp
   · intro k _ hk
-    rw [Sym.val_replicate, Multiset.count_replicate, if_neg (Ne.symm hk)]
+    rw [Sym.val_replicate, Multiset.count_replicate, ite_eq_right (Ne.symm hk)]
     push_cast
     ring
   · simp
@@ -356,7 +356,7 @@ theorem veroneseDegElt_injective (n d : ℕ) (hd : 1 ≤ d) (a : Fin (n + 1)) :
   have hcount := congrArg (fun s => Multiset.count j s.val) heq
   simp only [veroneseDegElt_val, Multiset.count_cons] at hcount
   by_contra hne
-  rw [if_neg hne] at hcount
+  rw [ite_eq_right hne] at hcount
   simp at hcount
 
 /-- The `n+1`-element support of the tangent space at `eₐ`: the monomials `X_a^d` and
@@ -431,7 +431,7 @@ theorem combinedDerivative_veroneseDeg_apply (n d r : ℕ) (hr : r ≤ n + 1)
     (w : Fin r → Fin (n + 1) → 𝕜) (s : Sym (Fin (n + 1)) d) :
     combinedDerivative (veroneseDegFamily (𝕜 := 𝕜) n d r hr) w s
       = ∑ k : Fin r, veroneseDegDeriv n d (veroneseDegPt (𝕜 := 𝕜) n r hr k) (w k) s := by
-  simp [combinedDerivative, veroneseDegFamily, veroneseDegParam, ContinuousLinearMap.sum_apply,
+  simp [combinedDerivative, veroneseDegFamily, veroneseDegParam, sum_apply,
     ContinuousLinearMap.comp_apply, coordProj_apply, Finset.sum_apply]
 
 /-- **The combined tangent space of the `r ≤ n+1` coordinate points, for `d ≥ 3`,** is exactly
@@ -479,7 +479,7 @@ theorem range_combinedDerivative_veroneseDeg (n d r : ℕ) (hd : 3 ≤ d) (hr : 
               (veroneseDegElt n d hd1 (Fin.castLE hr k₀) j)
               = f (veroneseDegElt n d hd1 (Fin.castLE hr k₀) j)
           rw [veroneseDegDeriv_apply_cons n d hd1 (Fin.castLE hr k₀) j hj, hw]
-          simp only [if_neg hj]
+          simp only [ite_eq_right hj]
       · intro k _ hk
         apply veroneseDegDeriv_apply_eq_zero_of_notMem n d hd1 (Fin.castLE hr k) s
         intro hmem
@@ -512,7 +512,7 @@ theorem finrank_veroneseDegTangentSum (n d r : ℕ) (hd : 1 ≤ d) (hr : r ≤ n
     constructor
     · intro hfz s hs
       have h := congrFun hfz ⟨s, by simpa using hs⟩
-      simpa using h
+      simpa [hg] using h
     · intro hfz
       funext p
       obtain ⟨s, hs⟩ := p
