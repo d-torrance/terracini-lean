@@ -6,6 +6,9 @@ public import TerraciniLemma.RationalNormalCurves
 public import TerraciniLemma.VeroneseGeneral
 public import TerraciniLemma.VeroneseDegree
 public import TerraciniLemma.Semicontinuity
+public import TerraciniLemma.DifferentialHorace
+public import TerraciniLemma.VeroneseLinear
+public import TerraciniLemma.AHStep
 public import TerraciniLemma.RankCertificate
 public import TerraciniLemma.CubicLattice
 public import TerraciniLemma.CubicInduction
@@ -91,6 +94,23 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
   quadrics via `TerraciniLemma.VeroneseGeneral`, and `(4,3,7)` as above. Also
   the full theorem for quadrics (`alexanderHirschowitz_quadric`): at `r ≥ 1`
   general points, `σ_r(v₂(ℙⁿ))` is defective iff `2 ≤ r ≤ n`.
+* `TerraciniLemma.DifferentialHorace` — the differential Horace lemma in
+  linear-algebra form (`differentialHorace`): for vectors `b_j(t)` moving along
+  a polynomial path, `W + span b(t)` has, for general `t`, dimension at least
+  that of `W + span b(0) + D`, where `D` holds the first-order terms of the
+  relations between the `b_j(0)` and `W`. This is the step of the
+  Alexander–Hirschowitz induction for `d ≥ 4` that fixes the arithmetic.
+* `TerraciniLemma.VeroneseLinear` — linear changes of coordinates act on the
+  Veronese cone (`symPow`), mapping tangent spaces to tangent spaces; up to
+  `n` points can be moved into a hyperplane without lowering the dimension of
+  their tangent span (`exists_linear_zero_of_lt`).
+* `TerraciniLemma.AHStep` — **the inductive step of the Alexander–Hirschowitz
+  theorem** (Brambilla–Ottaviani, Theorem 6.4): `AHHolds.step` derives
+  `AH_{n+1,d+2}(k)` from `AH_{n,d+2}(u)`, `AH_{n+1,d+1}(k-u)` and
+  `AH_{n+1,d}(k-u-ε)`. The residual map `resid` splits along `H = {x₀ = 0}`,
+  and `horace_step` combines the differential Horace lemma with the split:
+  for general `t`, moving points `γᵢ ∈ H` to `γᵢ + t e₀` gives
+  `dim ≥ dim (trace with Φ²|H ∪ Γ) + dim (residual with Φ ∪ Σ² ∪ Γ²|H)`.
 * `TerraciniLemma.RankCertificate` — kernel-checkable certificates that an
   integer matrix has rank `≥ k` over any field of characteristic zero
   (`le_rank_of_check`), computed by Macaulay2 via Macaulean (`m2/`,
@@ -177,6 +197,9 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
 | `ah437_isDefective_general` | ✓ proved | `σ₇(v₃(ℙ⁴))` is defective at general points (Hankel cubic of the rational normal quartic) |
 | `HoldsGenerically.le_rank` | ✓ proved | a rank lower bound for a polynomial matrix at one point holds at general points |
 | `HoldsGenerically.rank_le` | ✓ proved | a rank upper bound for a polynomial matrix at general points holds everywhere |
+| `differentialHorace` | ✓ proved | differential Horace lemma: for general `t`, `dim (W + span b(t)) ≥ dim (W + span b(0) + D)` |
+| `horace_step` | ✓ proved | the Horace step: moving points of `H` off `H`, the span is at least trace + residual for general `t` |
+| `AHHolds.step` | ✓ proved | the Alexander–Hirschowitz induction step (Brambilla–Ottaviani, Thm 6.4), from `AH_{n,d+2}(u)`, `AH_{n+1,d+1}(k-u)`, `AH_{n+1,d}(k-u-ε)` |
 | `forGeneralPoints_not_isDefective` | ✓ proved | non-defectivity of `v_d(ℙⁿ)` at one nonzero configuration implies it at general points |
 | `isDefective_of_forGeneralPoints` | ✓ proved | defectivity of `v_d(ℙⁿ)` at general points implies it at every nonzero configuration |
 | `veroneseDeg_not_isDefective_general` | ✓ proved | `σ_r(v_d(ℙⁿ))` is non-defective at general points for `d ≥ 3`, `r ≤ n+1` |

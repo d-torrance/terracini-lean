@@ -127,10 +127,27 @@ The mathematics is organized into the following files:
   proved only for `r ≤ n+1`.
 - [`TerraciniLemma/RankCertificate.lean`](TerraciniLemma/RankCertificate.lean)
   — rank certificates: row and column indices of a `k × k` minor of an
-  integer matrix `A`, an integer matrix `B` and `D ≠ 0` with
-  `B · A[rows, cols] = D · 1`. `le_rank_of_check` proves `k ≤ rank A` over any
-  field of characteristic zero; `check` is computable, so a certificate is
+  integer matrix `A`, a prime `p` and a matrix `B` with
+  `B · A[rows, cols] ≡ 1 (mod p)`. `le_rank_of_check` proves `k ≤ rank A` over
+  any field of characteristic zero; `check` is computable, so a certificate is
   verified by `decide +kernel`.
+- [`TerraciniLemma/DifferentialHorace.lean`](TerraciniLemma/DifferentialHorace.lean)
+  — the differential Horace lemma in linear-algebra form
+  (`differentialHorace`): if vectors `b_j(t)` move along a polynomial path,
+  then for general `t`, `dim (W + span b(t)) ≥ dim (W + span b(0) + D)`, where
+  `D = {∑ c_j b_j'(0) : ∑ c_j b_j(0) ∈ W}`. No schemes or limits are needed;
+  the limit is lower semicontinuity of rank in `t`.
+- [`TerraciniLemma/VeroneseLinear.lean`](TerraciniLemma/VeroneseLinear.lean)
+  — linear changes of coordinates on the Veronese cone: they map tangent
+  spaces to tangent spaces, so up to `n` points can be moved into a hyperplane
+  without lowering the dimension of their tangent span.
+- [`TerraciniLemma/AHStep.lean`](TerraciniLemma/AHStep.lean) — **the
+  inductive step of the Alexander–Hirschowitz theorem** (Brambilla–Ottaviani,
+  Theorem 6.4), `AHHolds.step`: `AH_{n,d+2}(u)`, `AH_{n+1,d+1}(k-u)` and
+  `AH_{n+1,d}(k-u-ε)` give `AH_{n+1,d+2}(k)`. The proof splits along the
+  hyperplane `x₀ = 0` with the residual map `resid` (`G ↦ x₀ G` on
+  conditions), and `horace_step` combines the split with the differential
+  Horace lemma; no case split on `k` is needed.
 - The cubic induction —
   [`CubicLattice`](TerraciniLemma/CubicLattice.lean),
   [`CubicInduction`](TerraciniLemma/CubicInduction.lean),
