@@ -7,9 +7,14 @@ public import TerraciniLemma.VeroneseGeneral
 public import TerraciniLemma.VeroneseDegree
 public import TerraciniLemma.Semicontinuity
 public import TerraciniLemma.RankCertificate
+public import TerraciniLemma.CubicLattice
+public import TerraciniLemma.CubicInduction
+public import TerraciniLemma.CubicBaseCases
+public import TerraciniLemma.CubicInductionMain
 public import TerraciniLemma.VeroneseForms
 public import TerraciniLemma.AlexanderHirschowitzCubic
 public import TerraciniLemma.AlexanderHirschowitz
+public import TerraciniLemma.AlexanderHirschowitzCubicGeneral
 public import TerraciniLemma.Segre
 public import TerraciniLemma.EllipticCurve
 public import TerraciniLemma.Projective
@@ -86,6 +91,20 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
   quadrics via `TerraciniLemma.VeroneseGeneral`, and `(4,3,7)` as above. Also
   the full theorem for quadrics (`alexanderHirschowitz_quadric`): at `r ≥ 1`
   general points, `σ_r(v₂(ℙⁿ))` is defective iff `2 ≤ r ≤ n`.
+* `TerraciniLemma.RankCertificate` — kernel-checkable certificates that an
+  integer matrix has rank `≥ k` over any field of characteristic zero
+  (`le_rank_of_check`), computed by Macaulay2 via Macaulean (`m2/`,
+  `Generator/`, `lake exe certificates`).
+* `TerraciniLemma.CubicLattice`, `TerraciniLemma.CubicInduction`,
+  `TerraciniLemma.CubicBaseCases`, `TerraciniLemma.CubicInductionMain` — the
+  Brambilla–Ottaviani three-level induction for cubics, in the linear-algebra
+  form of Torrance–Vannieuwenhoven: points specialized to a lattice of
+  coordinate subspaces, the specialization and trace steps, base cases from
+  rank certificates (`TerraciniLemma.CubicCertificates`), and the
+  superabundant (`super₀`) and subabundant (`sub₀`) chains.
+* `TerraciniLemma.AlexanderHirschowitzCubicGeneral` — **the
+  Alexander–Hirschowitz theorem for cubics** (`alexanderHirschowitz_cubic`): at
+  `r` general points, `σ_r(v₃(ℙⁿ))` is defective iff `(n, r) = (4, 7)`.
 * `TerraciniLemma.Segre` — worked examples for Segre varieties: the
   non-defective Segre quadric `ℙ¹ × ℙ¹ ⊂ ℙ³` and the defective Segre
   threefold `ℙ¹ × ℙ¹ × ℙ¹ ⊂ ℙ⁷`.
@@ -162,6 +181,7 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
 | `isDefective_of_forGeneralPoints` | ✓ proved | defectivity of `v_d(ℙⁿ)` at general points implies it at every nonzero configuration |
 | `veroneseDeg_not_isDefective_general` | ✓ proved | `σ_r(v_d(ℙⁿ))` is non-defective at general points for `d ≥ 3`, `r ≤ n+1` |
 | `alexanderHirschowitz_quadric` | ✓ proved | AH for quadrics: at `r ≥ 1` general points, `σ_r(v₂(ℙⁿ))` is defective iff `2 ≤ r ≤ n` |
+| `alexanderHirschowitz_cubic` | ✓ proved | AH for cubics: at `r` general points, `σ_r(v₃(ℙⁿ))` is defective iff `(n, r) = (4, 7)` (Brambilla–Ottaviani induction + kernel-checked rank certificates) |
 | `alexanderHirschowitz_exceptions_isDefective` | ✓ proved | every Alexander–Hirschowitz exceptional case is defective at every configuration of nonzero points |
 | `finrank_finsetSup_eq_sum_of_not_isDefective_subabundant` | ✓ proved | subabundant non-defectivity for `r` points implies it for any sub-collection |
 | `not_isDefective_of_finsetSup_eq_top` | ✓ proved | superabundant non-defectivity for `r` points implies it for any super-collection |

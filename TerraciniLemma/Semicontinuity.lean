@@ -101,7 +101,7 @@ def HoldsGenerically (σ : Type*) (P : (σ → 𝕜) → Prop) : Prop :=
 
 namespace HoldsGenerically
 
-variable {P Q : (σ → 𝕜) → Prop}
+variable {τ : Type*} {P Q : (σ → 𝕜) → Prop}
 
 theorem mono (h : HoldsGenerically σ P) (hPQ : ∀ x, P x → Q x) : HoldsGenerically σ Q :=
   let ⟨G, hG, hP⟩ := h
@@ -117,6 +117,15 @@ theorem and (hP : HoldsGenerically σ P) (hQ : HoldsGenerically σ Q) :
   refine ⟨G * H, mul_ne_zero hG hH, fun x hx => ?_⟩
   rw [map_mul] at hx
   exact ⟨hGP x (left_ne_zero_of_mul hx), hHQ x (right_ne_zero_of_mul hx)⟩
+
+/-- Pulling back along an injective map of coordinates: if `P` holds for general `y : τ → 𝕜`,
+then `P (x ∘ φ)` holds for general `x : σ → 𝕜`. -/
+theorem comap {R : (τ → 𝕜) → Prop} (h : HoldsGenerically τ R) {φ : τ → σ}
+    (hφ : Function.Injective φ) : HoldsGenerically σ fun x => R (x ∘ φ) := by
+  obtain ⟨G, hG, hR⟩ := h
+  refine ⟨rename φ G, fun h0 => hG (rename_injective φ hφ (by rw [h0, map_zero])), fun x hx => ?_⟩
+  rw [eval_rename] at hx
+  exact hR _ hx
 
 variable [Infinite 𝕜]
 

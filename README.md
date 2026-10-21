@@ -122,9 +122,41 @@ The mathematics is organized into the following files:
 
   For quadrics the full theorem is proved: `alexanderHirschowitz_quadric`
   says that at `r ≥ 1` general points, `σ_r(v₂(ℙⁿ))` is defective iff
-  `2 ≤ r ≤ n`. For `d ≥ 3`, non-defectivity is proved only for `r ≤ n+1`.
-  Showing that all other cases are non-defective is the hard part of
-  Alexander–Hirschowitz.
+  `2 ≤ r ≤ n`. For cubics the full theorem is proved too
+  (`alexanderHirschowitz_cubic`, below). For `d ≥ 4`, non-defectivity is
+  proved only for `r ≤ n+1`.
+- [`TerraciniLemma/RankCertificate.lean`](TerraciniLemma/RankCertificate.lean)
+  — rank certificates: row and column indices of a `k × k` minor of an
+  integer matrix `A`, an integer matrix `B` and `D ≠ 0` with
+  `B · A[rows, cols] = D · 1`. `le_rank_of_check` proves `k ≤ rank A` over any
+  field of characteristic zero; `check` is computable, so a certificate is
+  verified by `decide +kernel`.
+- The cubic induction —
+  [`CubicLattice`](TerraciniLemma/CubicLattice.lean),
+  [`CubicInduction`](TerraciniLemma/CubicInduction.lean),
+  [`CubicBaseCases`](TerraciniLemma/CubicBaseCases.lean),
+  [`CubicInductionMain`](TerraciniLemma/CubicInductionMain.lean): the
+  Brambilla–Ottaviani three-level induction, in the linear-algebra form of
+  Torrance–Vannieuwenhoven (Trans. AMS **374** (2021), Example 4.9). Points of
+  `ℙ^{t+4}` are specialized to a lattice of coordinate subspaces `U₀, U₁, U₂`.
+  A specialization step (Pascal's rule plus semicontinuity) and a trace step
+  (Grassmann's formula along the embedding missing a block) give the
+  superabundant chain (`super₀`: `⌈N/(n+1)⌉` points fill) and the subabundant
+  chain (`sub₀`: for `t ≡ 1 mod 3`, `⌊N/(n+1)⌋` points are independent).
+- [`TerraciniLemma/CubicCertificates/`](TerraciniLemma/CubicCertificates) —
+  the base cases: integer points and rank certificates, **generated** by
+  `lake exe certificates` (Macaulay2 via
+  [Macaulean](https://github.com/Macaulean/Macaulean), with the extension in
+  [`m2/terracini.m2`](m2/terracini.m2)) and checked by the kernel. Building
+  the project does not need Macaulay2. Kernel checks are memory-hungry, so
+  each certificate is checked in chunks of rows (one declaration each), and
+  each file imports the previous one so that Lake checks them one at a time;
+  the peak is a few gigabytes.
+- [`TerraciniLemma/AlexanderHirschowitzCubicGeneral.lean`](TerraciniLemma/AlexanderHirschowitzCubicGeneral.lean)
+  — **the Alexander–Hirschowitz theorem for cubics**,
+  `alexanderHirschowitz_cubic`: at `r` general points, `σ_r(v₃(ℙⁿ))` is
+  defective iff `(n, r) = (4, 7)`. For `n ≥ 5` it uses the two chains; for
+  `n ≤ 4` it uses certificates directly.
 - [`TerraciniLemma/Segre.lean`](TerraciniLemma/Segre.lean) — worked examples
   for Segre varieties: the non-defective Segre quadric `ℙ¹ × ℙ¹ ⊂ ℙ³` and the
   defective Segre threefold `ℙ¹ × ℙ¹ × ℙ¹ ⊂ ℙ⁷`.

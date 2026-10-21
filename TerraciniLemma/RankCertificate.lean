@@ -1,82 +1,100 @@
 module
 
 public import TerraciniLemma.Semicontinuity
+public import Mathlib.Data.ZMod.Basic
 
 /-!
 # Rank certificates
 
-A *rank certificate* for an integer matrix `A` (stored as a list of rows) consists of row
-indices `rows`, column indices `cols` (both of length `k`), an integer `k × k` matrix `B`, and a
-nonzero integer `D` with `B · A[rows, cols] = D · 1`. It proves that the `k × k` minor
-`A[rows, cols]` is invertible over any field of characteristic zero, hence that `A` has rank
-`≥ k` there (`le_rank_of_check`).
+A *rank certificate* for an integer matrix `A` (given by its entry function) consists of row
+indices `rows`, column indices `cols` (both of length `k`), a modulus `p ≥ 2`, and a `k × k`
+matrix `B` of natural numbers with `B · A[rows, cols] ≡ 1 (mod p)`. Then `det A[rows, cols]` is
+a unit mod `p`, so it is a nonzero integer, and `A` has rank `≥ k` over any field of
+characteristic zero (`le_rank_of_check`).
 
 Certificates are computed by Macaulay2 (see `m2/terracini.m2` and the generator in
 `Generator/`), stored in Lean source files, and checked by the kernel: `check` is a plain
-computable function, so `check A c = true` is proved by `decide +kernel`. To keep the stored
-data cheap to elaborate, the entries of `B` are stored as natural numbers in *zigzag*
-encoding (`0, -1, 1, -2, 2, … ↦ 0, 1, 2, 3, 4, …`).
+computable function, so `check A m n c = true` is proved by `decide +kernel`. Working mod `p`
+keeps the entries of `B` small and the check in natural-number arithmetic, which the kernel
+performs with GMP.
+
+The kernel caches every intermediate term while checking a declaration, so its memory grows
+with the size of the computation. Large certificates are therefore checked in chunks of rows
+of `B`, one declaration per chunk (`checkRows_append`, `check_of_checkRows`).
 -/
 
 @[expose] public section
 
 namespace RankCertificate
 
-/-- Zigzag decoding: `2k ↦ k` and `2k + 1 ↦ -(k + 1)`. -/
-def unzigzag (z : Nat) : Int :=
-  if z % 2 = 0 then ((z / 2 : Nat) : Int) else -(((z / 2 : Nat) : Int) + 1)
-
 /-- A rank certificate, as produced by Macaulay2. -/
 structure Cert where
-  /-- Row indices of the invertible minor. -/
+  /-- Row indices of the minor. -/
   rows : List Nat
-  /-- Column indices of the invertible minor. -/
+  /-- Column indices of the minor. -/
   cols : List Nat
-  /-- The rows of `B`, zigzag-encoded. -/
+  /-- The rows of `B`, with entries in `[0, p)`. -/
   inv : List (List Nat)
-  /-- The scalar `D` with `B · A[rows, cols] = D · 1`. -/
-  den : Nat
-
-/-- The `(i, j)` entry of a matrix stored as a list of rows (`0` out of range). -/
-def entry (A : List (List Int)) (i j : Nat) : Int := (A.getD i []).getD j 0
+  /-- The modulus `p`. -/
+  modulus : Nat
 
 /-- Dot product of two lists (truncating to the shorter one). -/
-def dot : List Int → List Int → Int
+def dot : List Nat → List Nat → Nat
   | a :: as, b :: bs => a * b + dot as bs
   | _, _ => 0
 
-/-- Check one row `r` of `B` against all the columns `cs` of the minor, starting at column
-index `j`: the products must be `D` on the diagonal (`i = j`) and `0` elsewhere. -/
-def checkRow (D : Int) (r : List Int) (i : Nat) : List (List Int) → Nat → Bool
-  | c :: cs, j => (dot r c == if i == j then D else 0) && checkRow D r i cs (j + 1)
+/-- Check one row `r` of `B` against all the columns `cs` of the minor (reduced mod `p`),
+starting at column index `j`: the products must be `1` on the diagonal (`i = j`) and `0`
+elsewhere, mod `p`. -/
+def checkRow (p : Nat) (r : List Nat) (i : Nat) : List (List Nat) → Nat → Bool
+  | c :: cs, j => (dot r c % p == if i == j then 1 else 0) && checkRow p r i cs (j + 1)
   | [], _ => true
 
 /-- Check all rows of `B` (starting at row index `i`) against the columns `cols` of the
 minor. -/
-def checkRows (D : Int) (cols : List (List Int)) : Nat → List (List Int) → Bool
-  | i, r :: rs => checkRow D r i cols 0 && checkRows D cols (i + 1) rs
+def checkRows (p : Nat) (cols : List (List Nat)) : Nat → List (List Nat) → Bool
+  | i, r :: rs => checkRow p r i cols 0 && checkRows p cols (i + 1) rs
   | _, [] => true
 
-/-- The columns of the minor `A[rows, cols]`. -/
-def minorCols (A : List (List Int)) (rows cols : List Nat) : List (List Int) :=
-  cols.map fun j => rows.map fun i => entry A i j
+/-- The columns of the minor `A[rows, cols]`, reduced mod `p`. -/
+def minorCols (A : Nat → Nat → Int) (p : Nat) (rows cols : List Nat) : List (List Nat) :=
+  cols.map fun j => rows.map fun i => (A i j % p).toNat
 
-/-- Check a certificate for an `m × n` integer matrix `A`. -/
-def check (A : List (List Int)) (m n : Nat) (c : Cert) : Bool :=
-  c.den != 0 &&
+/-- The shape conditions of a certificate for an `m × n` matrix. -/
+def checkShape (m n : Nat) (c : Cert) : Bool :=
+  2 ≤ c.modulus &&
   c.cols.length == c.rows.length &&
   c.inv.length == c.rows.length &&
   c.inv.all (fun r => r.length == c.rows.length) &&
-  c.rows.all (· < m) && c.cols.all (· < n) &&
-  checkRows (c.den : Int) (minorCols A c.rows c.cols) 0 (c.inv.map (·.map unzigzag))
+  c.rows.all (· < m) && c.cols.all (· < n)
+
+/-- Check a certificate for an `m × n` integer matrix `A`. -/
+def check (A : Nat → Nat → Int) (m n : Nat) (c : Cert) : Bool :=
+  checkShape m n c && checkRows c.modulus (minorCols A c.modulus c.rows c.cols) 0 c.inv
+
+theorem checkRows_append {p : Nat} {cols : List (List Nat)} {i j : Nat}
+    {B₁ B₂ : List (List Nat)} (h₁ : checkRows p cols i B₁ = true)
+    (h₂ : checkRows p cols j B₂ = true) (hj : i + B₁.length = j) :
+    checkRows p cols i (B₁ ++ B₂) = true := by
+  induction B₁ generalizing i with
+  | nil => simpa [← hj] using h₂
+  | cons r rs ih =>
+    simp only [List.cons_append, checkRows, Bool.and_eq_true] at h₁ ⊢
+    exact ⟨h₁.1, ih h₁.2 (by simp at hj; omega)⟩
+
+theorem check_of_checkRows {A : Nat → Nat → Int} {m n : Nat} {c : Cert}
+    (h₁ : checkShape m n c = true)
+    (h₂ : checkRows c.modulus (minorCols A c.modulus c.rows c.cols) 0 c.inv = true) :
+    check A m n c = true := by
+  simp [check, h₁, h₂]
 
 /-! ### Soundness -/
 
-/-- The matrix with entries `entry A i j`. -/
-def toMatrix (A : List (List Int)) (m n : Nat) : Matrix (Fin m) (Fin n) ℤ :=
-  Matrix.of fun i j => entry A i j
+/-- The `m × n` matrix with entries `A i j`. -/
+def toMatrix (A : Nat → Nat → Int) (m n : Nat) : Matrix (Fin m) (Fin n) ℤ :=
+  Matrix.of fun i j => A i j
 
-theorem dot_eq_sum {k : Nat} (u v : List Int) (hu : u.length = k) (hv : v.length = k) :
+theorem dot_eq_sum {k : Nat} (u v : List Nat) (hu : u.length = k) (hv : v.length = k) :
     dot u v = ∑ t : Fin k, u.getD t 0 * v.getD t 0 := by
   induction k generalizing u v with
   | zero =>
@@ -89,9 +107,9 @@ theorem dot_eq_sum {k : Nat} (u v : List Int) (hu : u.length = k) (hv : v.length
     rw [dot, ih as bs hu hv, Fin.sum_univ_succ]
     simp
 
-theorem checkRow_spec {D : Int} {r : List Int} {i : Nat} :
-    ∀ (cs : List (List Int)) (j : Nat), checkRow D r i cs j = true →
-      ∀ t : Fin cs.length, dot r cs[t] = if i = j + t then D else 0
+theorem checkRow_spec {p : Nat} {r : List Nat} {i : Nat} :
+    ∀ (cs : List (List Nat)) (j : Nat), checkRow p r i cs j = true →
+      ∀ t : Fin cs.length, dot r cs[t] % p = if i = j + t then 1 else 0
   | [], _, _, t => t.elim0
   | c :: cs, j, h, t => by
     simp only [checkRow, Bool.and_eq_true, beq_iff_eq] at h
@@ -100,10 +118,10 @@ theorem checkRow_spec {D : Int} {r : List Int} {i : Nat} :
     · have := checkRow_spec cs (j + 1) h.2 t
       simpa [Nat.add_assoc, Nat.add_comm 1] using this
 
-theorem checkRows_spec {D : Int} {cols : List (List Int)} :
-    ∀ (B : List (List Int)) (i : Nat), checkRows D cols i B = true →
+theorem checkRows_spec {p : Nat} {cols : List (List Nat)} :
+    ∀ (B : List (List Nat)) (i : Nat), checkRows p cols i B = true →
       ∀ (s : Fin B.length) (t : Fin cols.length),
-        dot B[s] cols[t] = if i + s = t then D else 0
+        dot B[s] cols[t] % p = if i + s = t then 1 else 0
   | [], _, _, s => s.elim0
   | r :: rs, i, h, s => by
     simp only [checkRows, Bool.and_eq_true] at h
@@ -112,55 +130,59 @@ theorem checkRows_spec {D : Int} {cols : List (List Int)} :
     · have := checkRows_spec rs (i + 1) h.2 s t
       simpa [Nat.add_assoc, Nat.add_comm 1] using this
 
+/-- Reducing mod `p` commutes with the cast to `ZMod p`. -/
+theorem cast_toNat_emod {p : Nat} (hp : p ≠ 0) (a : Int) :
+    (((a % p).toNat : Nat) : ZMod p) = (a : ZMod p) := by
+  rw [← Int.cast_natCast, Int.toNat_of_nonneg (Int.emod_nonneg _ (by exact_mod_cast hp)),
+    ZMod.intCast_mod]
+
 /-- **Soundness of rank certificates.** If `check A m n c` holds, the `k × k` minor of `A`
-selected by the certificate is invertible over any field of characteristic zero, so `A` has
-rank `≥ k` there, where `k` is the number of rows in the certificate. -/
-theorem le_rank_of_check {𝕜 : Type*} [Field 𝕜] [CharZero 𝕜] {A : List (List Int)} {m n : Nat}
+selected by the certificate has nonzero determinant, so `A` has rank `≥ k` over any field of
+characteristic zero, where `k` is the number of rows in the certificate. -/
+theorem le_rank_of_check {𝕜 : Type*} [Field 𝕜] [CharZero 𝕜] {A : Nat → Nat → Int} {m n : Nat}
     {c : Cert} (h : check A m n c = true) :
     c.rows.length ≤ ((toMatrix A m n).map (Int.cast : ℤ → 𝕜)).rank := by
-  simp only [check, Bool.and_eq_true, bne_iff_ne, ne_eq, beq_iff_eq, List.all_eq_true,
+  simp only [check, checkShape, Bool.and_eq_true, beq_iff_eq, List.all_eq_true,
     decide_eq_true_eq] at h
-  obtain ⟨⟨⟨⟨⟨⟨hD, hcols⟩, hinv⟩, hinvRows⟩, hrows⟩, hcolsLt⟩, hcheck⟩ := h
+  obtain ⟨⟨⟨⟨⟨⟨hp, hcols⟩, hinv⟩, hinvRows⟩, hrows⟩, hcolsLt⟩, hcheck⟩ := h
+  set p := c.modulus
+  have : Fact (1 < p) := ⟨hp⟩
   set k := c.rows.length
   -- the row and column selections of the minor
   let f : Fin k → Fin m := fun s => ⟨c.rows[s], hrows _ (List.getElem_mem _)⟩
   let g : Fin k → Fin n := fun t =>
     ⟨c.cols[t.cast hcols.symm], hcolsLt _ (List.getElem_mem _)⟩
-  -- the certificate matrix `B`
-  let B : Matrix (Fin k) (Fin k) ℤ := Matrix.of fun s t =>
-    unzigzag ((c.inv.getD s []).getD t 0)
-  -- `B · A[rows, cols] = D · 1` over `ℤ`
-  have hBA : B * (toMatrix A m n).submatrix f g = (c.den : ℤ) • 1 := by
+  let M : Matrix (Fin k) (Fin k) ℤ := (toMatrix A m n).submatrix f g
+  -- the certificate matrix `B`, over `ZMod p`
+  let B : Matrix (Fin k) (Fin k) (ZMod p) := Matrix.of fun s t => ((c.inv.getD s []).getD t 0 : ℕ)
+  -- `B · M = 1` over `ZMod p`
+  have hBM : B * (Int.castRingHom (ZMod p)).mapMatrix M = 1 := by
     ext s t
-    have hs : (s : Nat) < (c.inv.map (·.map unzigzag)).length := by simp [hinv]
-    have ht : (t : Nat) < (minorCols A c.rows c.cols).length := by simp [minorCols, hcols]
-    have := checkRows_spec _ 0 hcheck ⟨s, hs⟩ ⟨t, ht⟩
+    have hs : (s : Nat) < c.inv.length := by simp [hinv, k]
+    have ht : (t : Nat) < (minorCols A p c.rows c.cols).length := by simp [minorCols, hcols, k]
+    have h1 := checkRows_spec _ 0 hcheck ⟨s, hs⟩ ⟨t, ht⟩
     rw [dot_eq_sum (k := k) _ _ (by simp [hinvRows _ (List.getElem_mem _)])
-      (by simp [minorCols, k])] at this
-    simp only [Matrix.mul_apply, Matrix.submatrix_apply, toMatrix, Matrix.of_apply,
-      Matrix.smul_apply, Matrix.one_apply, smul_eq_mul, B, f, g]
-    rw [show (∑ u : Fin k, unzigzag ((c.inv.getD s []).getD u 0) *
-          entry A c.rows[u] c.cols[Fin.cast hcols.symm t])
-        = ∑ u : Fin k, ((c.inv.map (fun r : List Nat => r.map unzigzag))[s]'hs).getD u 0 *
-          ((minorCols A c.rows c.cols)[t]'ht).getD u 0 from
-      Finset.sum_congr rfl fun u _ => by
-        have hu : (u : Nat) < c.rows.length := u.isLt
-        simp [minorCols, List.getD_eq_getElem?_getD, List.getElem?_map, hinvRows _
-          (List.getElem_mem _), hinv, List.getElem?_eq_getElem hu]]
-    refine Eq.trans ?_ (this.trans ?_)
-    · rfl
+      (by simp [minorCols, k])] at h1
+    have h2 := congrArg (Nat.cast : ℕ → ZMod p) h1
+    rw [ZMod.natCast_mod] at h2
+    push_cast at h2
+    simp only [Matrix.mul_apply, RingHom.mapMatrix_apply, Matrix.map_apply,
+      Matrix.submatrix_apply, toMatrix, Matrix.of_apply, Matrix.one_apply, B, M, f, g]
+    refine Eq.trans (Finset.sum_congr rfl fun u _ => ?_) (h2.trans ?_)
+    · have hu : (u : Nat) < c.rows.length := u.isLt
+      simp [minorCols, List.getD_eq_getElem?_getD, List.getElem?_eq_getElem hs,
+        List.getElem?_eq_getElem hu, cast_toNat_emod (show p ≠ 0 by omega)]
     · simp [Fin.ext_iff]
-  -- hence `det B · det A[rows, cols] = D ^ k ≠ 0` in `𝕜`
+  -- hence `det M` is a unit mod `p`, so it is nonzero
+  have hdetM : M.det ≠ 0 := by
+    intro h0
+    have h3 := congrArg Matrix.det hBM
+    rw [Matrix.det_mul, ← RingHom.map_det, h0, map_zero, mul_zero, Matrix.det_one] at h3
+    exact zero_ne_one h3
   have hdet : (((toMatrix A m n).map (Int.cast : ℤ → 𝕜)).submatrix f g).det ≠ 0 := by
-    have h1 := congrArg (fun M : Matrix (Fin k) (Fin k) ℤ => ((Int.castRingHom 𝕜) M.det)) hBA
-    simp only [Matrix.det_mul, map_mul, Matrix.det_smul, Matrix.det_one, mul_one,
-      Fintype.card_fin, map_pow, eq_intCast, Int.cast_natCast] at h1
-    have hD' : ((c.den : 𝕜)) ^ k ≠ 0 := pow_ne_zero _ (Nat.cast_ne_zero.mpr hD)
-    rw [← h1] at hD'
     rw [show ((toMatrix A m n).map (Int.cast : ℤ → 𝕜)).submatrix f g
-        = (Int.castRingHom 𝕜).mapMatrix ((toMatrix A m n).submatrix f g) from rfl,
-      ← RingHom.map_det]
-    simpa using right_ne_zero_of_mul hD'
+        = (Int.castRingHom 𝕜).mapMatrix M from rfl, ← RingHom.map_det]
+    simpa using hdetM
   exact Matrix.le_rank_of_submatrix_det_ne_zero f g hdet
 
 end RankCertificate

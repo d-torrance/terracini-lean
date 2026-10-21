@@ -35,25 +35,30 @@ addLoadMethod("Matrix",
 -- rank certificates --
 ---------------------
 
+-- The certificates work modulo a prime p: if B * A' = id over ZZ/p for a square
+-- submatrix A' of an integer matrix A, then det A' is nonzero mod p, hence nonzero, so
+-- A has rank >= #rows over every field of characteristic zero.
+certificateModulus = 2147483647
+
 -- input:
---   Amrdi: MRDI-serialized matrix over ZZ or QQ
+--   Amrdi: MRDI-serialized matrix over ZZ
 -- output: a hash table
---   "rows", "cols" => indices of an invertible maximal minor A' of A
---   "denominator"  => a positive integer D
---   "inverse"      => MRDI-serialized integer matrix B with B * A' = D * id
--- so that #rows = rank A.
+--   "rows", "cols" => indices of a maximal minor A' of A, invertible mod p
+--   "modulus"      => the prime p
+--   "inverse"      => MRDI-serialized integer matrix B, entries in [0, p), with
+--                     B * A' = id mod p
+-- so that #rows = rank of A mod p.
 
 registerMethod(server, "rankCertificate", Amrdi -> (
-	A := sub(loadMRDI Amrdi, QQ);
+	p := certificateModulus;
+	A := sub(loadMRDI Amrdi, ZZ/p);
 	cols := columnRankProfile mutableMatrix A;
 	rows := rowRankProfile mutableMatrix A_cols;
-	A' := A^rows_cols;
-	Ainv := inverse A';
-	D := lcm prepend(1, apply(flatten entries Ainv, denominator));
+	Ainv := inverse A^rows_cols;
 	hashTable {
 	    "rows" => rows,
 	    "cols" => cols,
-	    "denominator" => D,
-	    "inverse" => saveMRDI(lift(D * Ainv, ZZ),
+	    "modulus" => p,
+	    "inverse" => saveMRDI(matrix applyTable(entries lift(Ainv, ZZ), x -> x % p),
 		Namespace => "Lean",
 		ToString => false)}))

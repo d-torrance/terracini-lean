@@ -1,11 +1,14 @@
-import Generator.RankCertificate
+import Generator.Cubic
 
 open Generator
 
-def main : IO Unit := do
+/-- `lake exe certificates [name …]`: run the named jobs (all jobs if none are given). -/
+def main (args : List String) : IO Unit := do
   let (_, m2) ← startM2Server
   loadExtension m2
-  -- smoke test
-  let A : IntMatrix := ⟨[[1, 2, 3], [2, 4, 6], [0, 1, 1], [1, -1, 5]]⟩
-  let c ← rankCertificate m2 A
-  IO.println (c.toLean "toy")
+  -- each certificate file imports the previous one (see `CubicJob.run`)
+  let imports := "TerraciniLemma.CubicBaseCases" ::
+    cubicJobs.map (s!"TerraciniLemma.CubicCertificates.{·.name}")
+  for (job, imp) in cubicJobs.zip imports do
+    if args.isEmpty || args.contains job.name then
+      job.run m2 imp

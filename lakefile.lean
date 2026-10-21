@@ -13,7 +13,7 @@ require Macaulean from git
 lean_lib «TerraciniLemma»
 
 /-- Computes the rank certificates of the base cases with Macaulay2 (via Macaulean) and
-writes them to `TerraciniLemma/Certificates/`. Run from the repository root:
+writes them to `TerraciniLemma/CubicCertificates/`. Run from the repository root:
 `lake exe certificates`. -/
 lean_lib Generator
 

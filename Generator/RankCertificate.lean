@@ -35,7 +35,7 @@ instance : MrdiType IntMatrix where
 structure RankCertificateReply where
   rows : List Nat
   cols : List Nat
-  denominator : Nat
+  modulus : Nat
   inverse : Mrdi
 
 instance : FromJson RankCertificateReply where
@@ -43,18 +43,15 @@ instance : FromJson RankCertificateReply where
     pure {
       rows := ← json.getObjValAs? (List Nat) "rows"
       cols := ← json.getObjValAs? (List Nat) "cols"
-      denominator := ← json.getObjValAs? Nat "denominator"
+      modulus := ← json.getObjValAs? Nat "modulus"
       inverse := ← json.getObjValAs? Mrdi "inverse" }
 
 /-- A rank certificate, as written to Lean source (`RankCertificate.Cert`). -/
 structure Cert where
   rows : List Nat
   cols : List Nat
-  inv : List (List Int)
-  den : Nat
-
-/-- Zigzag encoding, inverse to `RankCertificate.unzigzag`. -/
-def zigzag (z : Int) : Nat := if 0 ≤ z then 2 * z.toNat else 2 * (-z).toNat - 1
+  inv : List (List Nat)
+  modulus : Nat
 
 /-- Load this repository's extension into the running Macaulean server. -/
 def loadExtension (m2 : Macaulay2) : IO Unit := do
@@ -70,16 +67,61 @@ def rankCertificate (m2 : Macaulay2) (A : IntMatrix) : IO Cert := do
     | throw <| .userError s!"unexpected reply from Macaulay2: {reply}"
   let .ok inv ← runMrdiIO (fromMrdi? (α := IntMatrix) reply.inverse)
     | throw <| .userError "could not decode the inverse"
-  pure ⟨reply.rows, reply.cols, inv.rows, reply.denominator⟩
+  pure ⟨reply.rows, reply.cols, inv.rows.map (·.map Int.toNat), reply.modulus⟩
 
-/-- Lean source for a certificate named `name`. -/
-def Cert.toLean (c : Cert) (name : String) : String :=
+/-- The number of multiply-adds the kernel performs per declaration when checking a
+certificate. The kernel caches every intermediate term of a declaration, so this bounds its
+memory use (about 15 KB per multiply-add). -/
+def chunkBudget : Nat := 150000
+
+/-- Lean source for a certificate `<name>Cert` for the matrix `A` (a Lean term of type
+`ℕ → ℕ → ℤ`) with `m` rows and `n` columns, checked by the theorem `<name>Check`. The rows of
+the inverse are split into chunks `<name>Inv<k>`, each checked in its own declaration
+`<name>Check<k>` (see `chunkBudget`). -/
+def Cert.toLean (c : Cert) (name A m n : String) : String := Id.run do
   let showList {α} [ToString α] (l : List α) := "[" ++ ", ".intercalate (l.map toString) ++ "]"
-  s!"def {name} : RankCertificate.Cert where
+  let k := c.rows.length
+  let size := max 1 (chunkBudget / max 1 (k * k))
+  let chunks := (List.range ((k + size - 1) / size)).map fun q => (q * size, (c.inv.drop (q * size)).take size)
+  let chunks := if chunks.isEmpty then [(0, [])] else chunks
+  let mut src := ""
+  for (q, (start, rows)) in chunks.zipIdx.map (fun (x, q) => (q, x)) do
+    src := src ++ s!"/-- Rows {start} to {start + rows.length - 1} of the inverse in `{name}Cert`. -/
+def {name}Inv{q} : List (List Nat) :=
+  {showList (rows.map showList)}
+
+"
+  -- `Inv0 ++ (Inv1 ++ (⋯))`, nested to the right like the chain of `checkRows_append`s below
+  -- (`++` associates to the left, and a mismatch makes the elaborator evaluate the appends)
+  let invTerm := (List.range chunks.length).foldr (init := "") fun q acc =>
+    if q + 1 = chunks.length then s!"{name}Inv{q}" else s!"{name}Inv{q} ++ ({acc})"
+  src := src ++ s!"/-- The rank certificate `{name}Cert` (rank {k}). -/
+def {name}Cert : RankCertificate.Cert where
   rows := {showList c.rows}
   cols := {showList c.cols}
-  inv := {showList (c.inv.map fun r => showList (r.map zigzag))}
-  den := {c.den}
+  inv := {invTerm}
+  modulus := {c.modulus}
 "
+  for (q, (start, _)) in chunks.zipIdx.map (fun (x, q) => (q, x)) do
+    src := src ++ s!"
+/-- The kernel checks the rows of `{name}Inv{q}`. -/
+theorem {name}Check{q} : RankCertificate.checkRows {name}Cert.modulus
+    (RankCertificate.minorCols ({A}) {name}Cert.modulus
+      {name}Cert.rows {name}Cert.cols)
+    {start} {name}Inv{q} = true := by
+  decide +kernel
+"
+  -- `checkRows_append (Check0) (checkRows_append (Check1) (⋯) rfl) rfl`
+  let combined := (List.range chunks.length).foldr (init := "") fun q acc =>
+    if q + 1 = chunks.length then s!"{name}Check{q}"
+    else s!"(RankCertificate.checkRows_append {name}Check{q}\n      {acc} rfl)"
+  src := src ++ s!"
+/-- The kernel checks the certificate. -/
+theorem {name}Check : RankCertificate.check ({A}) ({m})
+    ({n}) {name}Cert = true :=
+  RankCertificate.check_of_checkRows (by decide +kernel)
+    {combined}
+"
+  return src
 
 end Generator
