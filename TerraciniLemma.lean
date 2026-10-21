@@ -9,6 +9,9 @@ public import TerraciniLemma.Semicontinuity
 public import TerraciniLemma.DifferentialHorace
 public import TerraciniLemma.VeroneseLinear
 public import TerraciniLemma.AHStep
+public import TerraciniLemma.AHArith
+public import TerraciniLemma.DegreeCertificate
+public import TerraciniLemma.AlexanderHirschowitzGeneral
 public import TerraciniLemma.RankCertificate
 public import TerraciniLemma.CubicLattice
 public import TerraciniLemma.CubicInduction
@@ -111,6 +114,21 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
   and `horace_step` combines the differential Horace lemma with the split:
   for general `t`, moving points `γᵢ ∈ H` to `γᵢ + t e₀` gives
   `dim ≥ dim (trace with Φ²|H ∪ Γ) + dim (residual with Φ ∪ Σ² ∪ Γ²|H)`.
+  `AHHolds.horace` is the step with Brambilla–Ottaviani's inequalities in
+  place of the exact count (their Theorem 4.1).
+* `TerraciniLemma.AHArith` — the arithmetic of the induction
+  (Brambilla–Ottaviani, Lemma 6.3): the hypotheses of the step for the
+  standard choice of `u, ε`, symbolically for `n ≥ 9` or `d ≥ 9`
+  (`stepOK_of_big`) and by computation otherwise (`stepOK_box`).
+* `TerraciniLemma.DegreeCertificate` — rank certificates for tangent spaces
+  of `v_e(ℙⁿ)` in any degree, used for `AH_{5,4}(21)`
+  (`TerraciniLemma.AHCertificates`).
+* `TerraciniLemma.AlexanderHirschowitzGeneral` — **the Alexander–Hirschowitz
+  theorem** (`alexanderHirschowitz`): at `r` general points, `σ_r(v_d(ℙⁿ))` is
+  defective iff `(n, d, r)` is an exception (`IsAHException`). The induction
+  on `(n, d)` starts from `ℙ⁰`, rational normal curves (`AHHolds.line`),
+  quadrics and cubics; the exceptional neighbours and `(ℙ⁷, 4)` use explicit
+  Horace steps.
 * `TerraciniLemma.RankCertificate` — kernel-checkable certificates that an
   integer matrix has rank `≥ k` over any field of characteristic zero
   (`le_rank_of_check`), computed by Macaulay2 via Macaulean (`m2/`,
@@ -204,6 +222,7 @@ p in the linear span ⟨p₁, …, pᵣ⟩, the embedded tangent space to σᵣ(
 | `isDefective_of_forGeneralPoints` | ✓ proved | defectivity of `v_d(ℙⁿ)` at general points implies it at every nonzero configuration |
 | `veroneseDeg_not_isDefective_general` | ✓ proved | `σ_r(v_d(ℙⁿ))` is non-defective at general points for `d ≥ 3`, `r ≤ n+1` |
 | `alexanderHirschowitz_quadric` | ✓ proved | AH for quadrics: at `r ≥ 1` general points, `σ_r(v₂(ℙⁿ))` is defective iff `2 ≤ r ≤ n` |
+| `alexanderHirschowitz` | ✓ proved | **the Alexander–Hirschowitz theorem**: at `r` general points, `σ_r(v_d(ℙⁿ))` is defective iff `(n, d, r)` is one of the exceptions (Brambilla–Ottaviani induction, differential Horace lemma in linear-algebra form, one kernel-checked rank certificate) |
 | `alexanderHirschowitz_cubic` | ✓ proved | AH for cubics: at `r` general points, `σ_r(v₃(ℙⁿ))` is defective iff `(n, r) = (4, 7)` (Brambilla–Ottaviani induction + kernel-checked rank certificates) |
 | `alexanderHirschowitz_exceptions_isDefective` | ✓ proved | every Alexander–Hirschowitz exceptional case is defective at every configuration of nonzero points |
 | `finrank_finsetSup_eq_sum_of_not_isDefective_subabundant` | ✓ proved | subabundant non-defectivity for `r` points implies it for any sub-collection |

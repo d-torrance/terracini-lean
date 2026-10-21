@@ -672,12 +672,17 @@ def AHHolds (n d k : ℕ) : Prop :=
   ∃ p : Fin k → Fin (n + 1) → 𝕜, min ((n + d).choose d) (k * (n + 1))
     ≤ Module.finrank 𝕜 ((⨆ i, (veroneseDegParam n d (p i)).tangentSpace : Submodule 𝕜 _))
 
-/-- **The Alexander–Hirschowitz step** (Brambilla–Ottaviani, Theorem 6.4). In `ℙ^{n+1}` and
-degree `d + 2`, choose `u` and `ε ≤ n` with `(n+1)u + ε + N_{d+1} = k(n+2)`. Then
-`AH_{n,d+2}(u)` (the trace), `AH_{n+1,d+1}(k-u)` and `AH_{n+1,d}(k-u-ε)` filling (the residual)
-give `AH_{n+1,d+2}(k)`. -/
-theorem AHHolds.step {n d k u ε : ℕ} (hd : 1 ≤ d) (hε : ε ≤ n) (hεu : ε ≤ u) (hk : u + ε ≤ k)
-    (hu : (n + 1) * u + ε + (n + 1 + (d + 1)).choose (d + 1) = k * (n + 2))
+/-- **The Horace step for double points** (Brambilla–Ottaviani, Theorems 4.1 and 6.4). In
+`ℙ^{n+1}` and degree `d + 2`, put `u` points on `H`, move `ε ≤ min(n, u)` of the remaining `k - u`
+points onto `H` and off again, and suppose the trace (`(n+1)u + ε` conditions in degree `d + 2`
+on `H`) and the residual (`(k-u)(n+2) - ε + u` conditions in degree `d + 1`) are both
+subabundant or both superabundant. Then `AH_{n,d+2}(u)` (the trace), `AH_{n+1,d+1}(k-u)`, and
+`AH_{n+1,d}(k-u-ε)` filling (the residual) give `AH_{n+1,d+2}(k)`. -/
+theorem AHHolds.horace {n d k u ε : ℕ} (hd : 1 ≤ d) (hε : ε ≤ n) (hεu : ε ≤ u) (hk : u + ε ≤ k)
+    (hcase : ((n + 1) * u + ε ≤ (n + (d + 2)).choose (d + 2) ∧
+        (k - u) * (n + 2) + u ≤ (n + 1 + (d + 1)).choose (d + 1) + ε) ∨
+      ((n + (d + 2)).choose (d + 2) ≤ (n + 1) * u + ε ∧
+        (n + 1 + (d + 1)).choose (d + 1) + ε ≤ (k - u) * (n + 2) + u))
     (hfill : (n + 1 + d).choose d ≤ (k - u - ε) * (n + 2))
     (htr : AHHolds 𝕜 n (d + 2) u) (hres : AHHolds 𝕜 (n + 1) (d + 1) (k - u))
     (hres₂ : AHHolds 𝕜 (n + 1) d (k - u - ε)) :
@@ -688,14 +693,14 @@ theorem AHHolds.step {n d k u ε : ℕ} (hd : 1 ≤ d) (hε : ε ≤ n) (hεu : 
   set NH := (n + (d + 2)).choose (d + 2) with hNH
   set N1 := (n + 1 + (d + 1)).choose (d + 1) with hN1
   set Nd := (n + 1 + d).choose d with hNd
+  set R0 := min N1 ((k - u) * (n + 2)) with hR0
   -- arithmetic
   have hka : k = a + u + ε := by omega
-  have hmul : k * (n + 2) = a * (n + 2) + u * n + 2 * u + ε * n + 2 * ε := by
-    rw [hka]; ring
-  have hmul' : (n + 1) * u = u * n + u := by ring
-  have hku : (k - u) * (n + 2) = a * (n + 2) + ε * n + 2 * ε := by
-    rw [show k - u = a + ε by omega]; ring
-  have hNN : N1 = a * (n + 2) + ε * n + ε + u := by omega
+  have hkk : k * (n + 2) = (k - u) * (n + 2) + (n + 1) * u + u := by
+    conv_lhs => rw [show k = (k - u) + u by omega]
+    ring
+  have hεku : ε ≤ (k - u) * (n + 2) := le_trans (by omega : ε ≤ k - u) (Nat.le_mul_of_pos_right _
+    (by omega))
   -- parameters: the points `σᵢ ∉ H`, `φ_b ∈ H` and `γᵢ ∈ H`
   let Prm := (Fin a × Fin (n + 2)) ⊕ (Fin u × Fin (n + 1)) ⊕ (Fin ε × Fin (n + 1))
   let Pσ : Fin a → Fin (n + 2) → MvPolynomial Prm 𝕜 := fun i l => X (.inl (i, l))
@@ -784,14 +789,14 @@ theorem AHHolds.step {n d k u ε : ℕ} (hd : 1 ≤ d) (hε : ε ≤ n) (hεu : 
     have hc : u * (n + 1) = (n + 1) * u := mul_comm _ _
     exact le_trans (by omega) h2
   -- the residual, before adding `Φ`: `AH_{n+1,d+1}(k-u)` with `ε` of the points moved into `H`
-  have GD : HoldsGenerically (𝕜 := 𝕜) Prm fun x => (k - u) * (n + 2) - ε
+  have GD : HoldsGenerically (𝕜 := 𝕜) Prm fun x => R0 - ε
       ≤ Module.finrank 𝕜 (Submodule.span 𝕜 (Set.range fun i s => eval x (FD i s))) := by
     obtain ⟨q, hq⟩ := hres
-    have hq' : (k - u) * (n + 2) ≤ Module.finrank 𝕜
+    have hq' : R0 ≤ Module.finrank 𝕜
         ((⨆ m, (veroneseDegParam (n + 1) (d + 1) (q m)).tangentSpace : Submodule 𝕜 _)) := by
       have h22 : (k - u) * (n + 1 + 1) = (k - u) * (n + 2) := rfl
       rw [h22, ← hN1] at hq
-      exact le_trans (le_min (by omega) le_rfl) hq
+      exact hq
     have hεk : ε ≤ k - u := by omega
     let qγ : Fin ε → Fin (n + 2) → 𝕜 := fun i => q (Fin.castLE hεk i)
     obtain ⟨L, L', hLL, hL0⟩ := exists_linear_zero_of_lt (n := n + 1) (by omega) qγ
@@ -852,7 +857,7 @@ theorem AHHolds.step {n d k u ε : ℕ} (hd : 1 ≤ d) (hε : ε ≤ n) (hεu : 
     rw [h22, ← hNd] at hσ'
     exact le_trans (le_min le_rfl hfill) hσ'
   -- the residual: add `u` general points of `H` to a general configuration of `GD`
-  have GC : HoldsGenerically (𝕜 := 𝕜) Prm fun x => N1
+  have GC : HoldsGenerically (𝕜 := 𝕜) Prm fun x => min N1 (R0 - ε + u)
       ≤ Module.finrank 𝕜 (Submodule.span 𝕜 (Set.range fun i s => eval x (FC i s))) := by
     obtain ⟨x₁, ⟨h1, h2⟩, h3⟩ := ((GD.and G2).and G3).exists_point
     set σ₁ := fun i => polyPoint (Pσ i) x₁ with hσ₁
@@ -907,9 +912,9 @@ theorem AHHolds.step {n d k u ε : ℕ} (hd : 1 ≤ d) (hε : ε ≤ n) (hεu : 
     rw [hFC, hA, show (fun b => veroneseDeg (n + 1) (d + 1)
         (Fin.cons 0 (polyPoint (Pφ b) (mk σ₁ φ₁ γ₁)))) = v ∘ φ₁ from
       funext fun b => by rw [hmkφ]; rfl]
-    have hAf : (k - u) * (n + 2) - ε ≤ Module.finrank 𝕜 A := h1
+    have hAf : R0 - ε ≤ Module.finrank 𝕜 A := h1
     rw [show (n + 1 + (d + 1)).choose (d + 1) = N1 from rfl] at hφ₁
-    exact le_trans (le_min (by omega) le_rfl) hφ₁
+    exact le_trans (le_min (by omega) (min_le_left _ _)) hφ₁
   -- a general configuration, and the Horace step
   obtain ⟨x, ⟨h1, h2⟩, h3⟩ := ((G1.and GC).and G3).exists_point
   rw [hF1] at h1
@@ -957,7 +962,7 @@ theorem AHHolds.step {n d k u ε : ℕ} (hd : 1 ≤ d) (hε : ε ≤ n) (hεu : 
       (le_sup_left : W ≤ W ⊔ E))
     omega
   -- the residual
-  have hRle : N1 ≤ Module.finrank 𝕜 R := by
+  have hRle : min N1 (R0 - ε + u) ≤ Module.finrank 𝕜 R := by
     refine h2.trans (Submodule.finrank_mono (sup_le (sup_le ?_ ?_) ?_))
     · refine iSup_le fun i => (tangentSpace_le_map_resid (by omega) (h3 i)).trans
         (le_sup_of_le_left (Submodule.map_mono ?_))
@@ -999,6 +1004,26 @@ theorem AHHolds.step {n d k u ε : ℕ} (hd : 1 ≤ d) (hε : ε ≤ n) (hεu : 
     ring
   have h22 : k * (n + 1 + 1) = k * (n + 2) := rfl
   rw [hpascal, h22]
+  rcases hcase with ⟨hc1, hc2⟩ | ⟨hc1, hc2⟩
+  · have : R0 = (k - u) * (n + 2) := min_eq_right (by omega)
+    omega
+  · have : N1 ≤ R0 - ε + u := by omega
+    omega
+
+/-- **The Alexander–Hirschowitz step** (Brambilla–Ottaviani, Theorem 6.4). In `ℙ^{n+1}` and
+degree `d + 2`, choose `u` and `ε ≤ n` with `(n+1)u + ε + N_{d+1} = k(n+2)`. Then
+`AH_{n,d+2}(u)` (the trace), `AH_{n+1,d+1}(k-u)` and `AH_{n+1,d}(k-u-ε)` filling (the residual)
+give `AH_{n+1,d+2}(k)`. -/
+theorem AHHolds.step {n d k u ε : ℕ} (hd : 1 ≤ d) (hε : ε ≤ n) (hεu : ε ≤ u) (hk : u + ε ≤ k)
+    (hu : (n + 1) * u + ε + (n + 1 + (d + 1)).choose (d + 1) = k * (n + 2))
+    (hfill : (n + 1 + d).choose d ≤ (k - u - ε) * (n + 2))
+    (htr : AHHolds 𝕜 n (d + 2) u) (hres : AHHolds 𝕜 (n + 1) (d + 1) (k - u))
+    (hres₂ : AHHolds 𝕜 (n + 1) d (k - u - ε)) :
+    AHHolds 𝕜 (n + 1) (d + 2) k := by
+  refine AHHolds.horace hd hε hεu hk ?_ hfill htr hres hres₂
+  have hkk : k * (n + 2) = (k - u) * (n + 2) + (n + 1) * u + u := by
+    conv_lhs => rw [show k = (k - u) + u by omega]
+    ring
   omega
 
 end AHStep

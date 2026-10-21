@@ -2,6 +2,7 @@ module
 
 public import TerraciniLemma.AlexanderHirschowitzCubic
 public import TerraciniLemma.VeroneseGeneral
+public import TerraciniLemma.AHArith
 
 /-!
 # The Alexander–Hirschowitz exceptional cases, at general points
@@ -15,8 +16,9 @@ The Alexander–Hirschowitz theorem says that `σ_r(v_d(ℙⁿ))` has the expect
 
 This file proves the defectivity of every exceptional case **for general points**
 (`ForGeneralPoints`), following Brambilla–Ottaviani, *On the Alexander–Hirschowitz theorem*,
-J. Pure Appl. Algebra **212** (2008), §2. (The hard direction of the theorem, that every other
-case is non-defective, is not formalized.) By Terracini's Lemma, defectivity of `σ_r` at general
+J. Pure Appl. Algebra **212** (2008), §2. (The other direction, that every other case is
+non-defective, is `alexanderHirschowitz` in `TerraciniLemma.AlexanderHirschowitzGeneral`.) By
+Terracini's Lemma, defectivity of `σ_r` at general
 points is defectivity of the span of the tangent spaces at `r` general points of the cone, which
 is what `IsDefective` measures.
 
@@ -233,12 +235,6 @@ theorem alexanderHirschowitz_quadric {n r : ℕ} (hr : 1 ≤ r) :
   · exact (quadric_not_isDefective_general hr').mono fun p hp => iff_of_false hp h
 
 /-! ### §3 — All the exceptional cases -/
-
-/-- The exceptional cases of the Alexander–Hirschowitz theorem: `σ_r(v_d(ℙⁿ))` with
-`d = 2, 2 ≤ r ≤ n`, or `(n, d, r) ∈ {(2,4,5), (3,4,9), (4,4,14), (4,3,7)}`. -/
-def IsAHException (n d r : ℕ) : Prop :=
-  (d = 2 ∧ 2 ≤ r ∧ r ≤ n) ∨ (n, d, r) = (2, 4, 5) ∨ (n, d, r) = (3, 4, 9) ∨
-    (n, d, r) = (4, 4, 14) ∨ (n, d, r) = (4, 3, 7)
 
 /-- **The Alexander–Hirschowitz exceptions are defective.** In every exceptional case, the
 tangent spaces to the cone over `v_d(ℙⁿ)` at `r` general points are defective, i.e. (by

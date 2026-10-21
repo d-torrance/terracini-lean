@@ -54,17 +54,20 @@ section Spans
 
 variable {n : ℕ} (q : ℕ → Fin (n + 1) → 𝕜)
 
-/-- The span of the tangent spaces to `v₃` at the first `r` points of a sequence. -/
-def tanSpan (r : ℕ) : Submodule 𝕜 (Sym (Fin (n + 1)) 3 → 𝕜) :=
-  ⨆ k : Fin r, (veroneseDegParam n 3 (q k)).tangentSpace
+/-- The span of the tangent spaces to `v_d` (by default `v₃`) at the first `r` points of a
+sequence. -/
+def tanSpan (r : ℕ) (d : ℕ := 3) : Submodule 𝕜 (Sym (Fin (n + 1)) d → 𝕜) :=
+  ⨆ k : Fin r, (veroneseDegParam n d (q k)).tangentSpace
+
+variable {d : ℕ}
 
 omit [CharZero 𝕜] in
-theorem tanSpan_mono {r r' : ℕ} (h : r ≤ r') : tanSpan q r ≤ tanSpan q r' :=
+theorem tanSpan_mono {r r' : ℕ} (h : r ≤ r') : tanSpan q r d ≤ tanSpan q r' d :=
   iSup_le fun k => le_iSup_of_le (Fin.castLE h k) le_rfl
 
 omit [CharZero 𝕜] in
 theorem tanSpan_succ (r : ℕ) :
-    tanSpan q (r + 1) = tanSpan q r ⊔ (veroneseDegParam n 3 (q r)).tangentSpace := by
+    tanSpan q (r + 1) d = tanSpan q r d ⊔ (veroneseDegParam n d (q r)).tangentSpace := by
   refine le_antisymm (iSup_le fun k => ?_)
     (sup_le (tanSpan_mono q (Nat.le_succ r)) (le_iSup_of_le (Fin.last r) le_rfl))
   induction k using Fin.lastCases with
@@ -74,33 +77,33 @@ theorem tanSpan_succ (r : ℕ) :
 omit [CharZero 𝕜] in
 /-- Each further point adds at most `n + 1` dimensions. -/
 theorem finrank_tanSpan_le {r r' : ℕ} (h : r ≤ r') :
-    Module.finrank 𝕜 (tanSpan q r') ≤ Module.finrank 𝕜 (tanSpan q r) + (r' - r) * (n + 1) := by
+    Module.finrank 𝕜 (tanSpan q r' d) ≤ Module.finrank 𝕜 (tanSpan q r d) + (r' - r) * (n + 1) := by
   induction r', h using Nat.le_induction with
   | base => simp
   | succ r' h ih =>
-    have hT : Module.finrank 𝕜 (veroneseDegParam n 3 (q r')).tangentSpace ≤ n + 1 :=
-      (LinearMap.finrank_range_le (veroneseDegDeriv (𝕜 := 𝕜) n 3 (q r')).toLinearMap).trans
+    have hT : Module.finrank 𝕜 (veroneseDegParam n d (q r')).tangentSpace ≤ n + 1 :=
+      (LinearMap.finrank_range_le (veroneseDegDeriv (𝕜 := 𝕜) n d (q r')).toLinearMap).trans
         (by simp)
     rw [tanSpan_succ, Nat.succ_sub h, Nat.succ_mul]
-    have := Submodule.finrank_add_le_finrank_add_finrank (tanSpan q r')
-      (veroneseDegParam n 3 (q r')).tangentSpace
+    have := Submodule.finrank_add_le_finrank_add_finrank (tanSpan q r' d)
+      (veroneseDegParam n d (q r')).tangentSpace
     omega
 
 omit [CharZero 𝕜] in
 /-- If `r₀` points fill the ambient space, so do `r ≥ r₀` points. -/
 theorem min_le_finrank_tanSpan_of_fill {r₀ r : ℕ}
-    (hq : (n + 3).choose 3 ≤ Module.finrank 𝕜 (tanSpan q r₀)) (hr : r₀ ≤ r) :
-    min ((n + 3).choose 3) (r * (n + 1)) ≤ Module.finrank 𝕜 (tanSpan q r) :=
+    (hq : (n + d).choose d ≤ Module.finrank 𝕜 (tanSpan q r₀ d)) (hr : r₀ ≤ r) :
+    min ((n + d).choose d) (r * (n + 1)) ≤ Module.finrank 𝕜 (tanSpan q r d) :=
   (min_le_left _ _).trans (hq.trans (Submodule.finrank_mono (tanSpan_mono q hr)))
 
 omit [CharZero 𝕜] in
 /-- If `r₀` points have independent tangent spaces, so do `r ≤ r₀` points. -/
 theorem min_le_finrank_tanSpan_of_indep {r₀ r : ℕ}
-    (hq : r₀ * (n + 1) ≤ Module.finrank 𝕜 (tanSpan q r₀)) (hr : r ≤ r₀) :
-    min ((n + 3).choose 3) (r * (n + 1)) ≤ Module.finrank 𝕜 (tanSpan q r) := by
+    (hq : r₀ * (n + 1) ≤ Module.finrank 𝕜 (tanSpan q r₀ d)) (hr : r ≤ r₀) :
+    min ((n + d).choose d) (r * (n + 1)) ≤ Module.finrank 𝕜 (tanSpan q r d) := by
   refine (min_le_right _ _).trans ?_
-  have h := finrank_tanSpan_le q hr
-  obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le hr
+  have h := finrank_tanSpan_le (d := d) q hr
+  obtain ⟨e, rfl⟩ := Nat.exists_eq_add_of_le hr
   rw [Nat.add_sub_cancel_left] at h
   rw [add_mul] at hq
   omega

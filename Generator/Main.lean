@@ -1,4 +1,4 @@
-import Generator.Cubic
+import Generator.Degree
 
 open Generator
 
@@ -12,3 +12,6 @@ def main (args : List String) : IO Unit := do
   for (job, imp) in cubicJobs.zip imports do
     if args.isEmpty || args.contains job.name then
       job.run m2 imp
+  for job in degJobs do
+    if args.isEmpty || args.contains job.name then
+      job.run m2
